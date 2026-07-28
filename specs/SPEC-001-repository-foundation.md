@@ -1,6 +1,16 @@
+---
+id: SPEC-001
+title: Fundação documental e governança do repositório
+status: done
+phase: 0
+dependencies: []
+adrs: [ADR-0001, ADR-0002]
+contracts: []
+---
+
 # SPEC-001 — Fundação documental e governança do repositório
 
-Status: ready
+Status: done
 Fase: 0
 Dependências: nenhuma
 ADRs aplicáveis: ADR-0001, ADR-0002
@@ -33,8 +43,8 @@ A fundação executável híbrida pertence à SPEC-025.
 
 ## Critérios de aceite
 
-- [ ] Validador rejeita SPEC sem objetivo, escopo negativo ou critérios.
-- [ ] ADRs e contratos são localizáveis.
-- [ ] Configurações normativas possuem schema.
-- [ ] A árvore do repositório é gerada.
-- [ ] Fluxo documental funciona sem dependências de IA.
+- [x] Validador rejeita SPEC sem objetivo, escopo negativo ou critérios.
+- [x] ADRs e contratos são localizáveis.
+- [x] Configurações normativas possuem schema.
+- [x] A árvore do repositório é gerada.
+- [x] Fluxo documental funciona sem dependências de IA.

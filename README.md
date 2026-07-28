@@ -45,6 +45,18 @@ Nenhum agente deve implementar uma funcionalidade sem:
 
 Este pacote contém a fundação documental e as primeiras SPECs. O código de produção deve ser criado incrementalmente a partir delas.
 
+## Validação documental
+
+No Windows PowerShell:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tests/documentation/Test-Documentation.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/validate_documentation.ps1
+```
+
+Os validadores verificam frontmatter e critérios das SPECs, referências a
+dependências, ADRs e contratos, schemas de configuração e a árvore normativa
+do repositório. Eles não dependem de serviços de IA.
 
 ## Validação científica
 

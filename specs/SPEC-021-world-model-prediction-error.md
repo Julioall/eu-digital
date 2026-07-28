@@ -1,3 +1,13 @@
+---
+id: SPEC-021
+title: World model e erro preditivo
+status: blocked
+phase: 4
+dependencies: [SPEC-007, SPEC-009, SPEC-018]
+adrs: []
+contracts: []
+---
+
 # SPEC-021 — World model e erro preditivo
 
 Status: blocked

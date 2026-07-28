@@ -1,3 +1,13 @@
+---
+id: SPEC-019
+title: Propriocepção e agência digital
+status: blocked
+phase: 4
+dependencies: [SPEC-002, SPEC-010, SPEC-012, SPEC-018]
+adrs: [ADR-0006]
+contracts: []
+---
+
 # SPEC-019 — Propriocepção e agência digital
 
 Status: blocked

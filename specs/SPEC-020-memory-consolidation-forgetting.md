@@ -1,3 +1,13 @@
+---
+id: SPEC-020
+title: Consolidação e esquecimento
+status: blocked
+phase: 3
+dependencies: [SPEC-008, SPEC-018]
+adrs: [ADR-0007]
+contracts: []
+---
+
 # SPEC-020 — Consolidação e esquecimento
 
 Status: blocked

@@ -1,3 +1,13 @@
+---
+id: SPEC-016
+title: Ações supervisionadas
+status: future
+phase: 8
+dependencies: [SPEC-012, SPEC-014]
+adrs: []
+contracts: []
+---
+
 # SPEC-016 — Ações supervisionadas
 
 Status: future

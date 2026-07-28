@@ -1,3 +1,13 @@
+---
+id: SPEC-011
+title: Metacognição e curiosidade
+status: blocked
+phase: 4
+dependencies: [SPEC-009, SPEC-010]
+adrs: []
+contracts: [HYPOTHESIS_SCHEMA.md]
+---
+
 # SPEC-011 — Metacognição e curiosidade
 
 Status: blocked

@@ -38,8 +38,24 @@
     "dependencies": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "pattern": "^SPEC-[0-9]{3}$"
+      }
+    },
+    "adrs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]{4}$"
+      }
+    },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z0-9_]+\\.md$"
       }
     }
-  }
+  },
+  "additionalProperties": false
 }

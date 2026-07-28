@@ -1,3 +1,13 @@
+---
+id: SPEC-008
+title: Memória episódica
+status: blocked
+phase: 3
+dependencies: [SPEC-007]
+adrs: []
+contracts: []
+---
+
 # SPEC-008 — Memória episódica
 
 Status: blocked

@@ -1,3 +1,13 @@
+---
+id: SPEC-027
+title: Gates de verificação, validade e transferência ecológica
+status: blocked
+phase: 0.5
+dependencies: [SPEC-017, SPEC-018, SPEC-025, SPEC-026]
+adrs: [ADR-0005, ADR-0008, ADR-0010, ADR-0011]
+contracts: []
+---
+
 # SPEC-027 — Gates de verificação, validade e transferência ecológica
 
 Status: blocked
@@ -22,6 +32,15 @@ Implementar gates independentes para verificação, equivalência computacional,
 9. sessões online controladas;
 10. relatório longitudinal;
 11. revisão independente ou protocolo congelado.
+
+## Escopo negativo
+
+- implementar mecanismos cognitivos, sensores ou funcionalidades de produto;
+- definir consciência fenomenal como objeto mensurável;
+- substituir avaliações específicas de cada domínio;
+- usar equivalência Python–C++ como ground truth;
+- apresentar métricas operacionais como evidência cognitiva;
+- alterar contratos de promoção sem versionamento.
 
 ## Critérios de aceite
 

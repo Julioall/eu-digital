@@ -1,3 +1,13 @@
+---
+id: SPEC-009
+title: Aprendizagem incremental de padrões
+status: blocked
+phase: 4
+dependencies: [SPEC-008]
+adrs: []
+contracts: []
+---
+
 # SPEC-009 — Aprendizagem incremental de padrões
 
 Status: blocked

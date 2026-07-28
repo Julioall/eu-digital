@@ -1,3 +1,13 @@
+---
+id: SPEC-015
+title: Áudio ambiente
+status: future
+phase: 9
+dependencies: [SPEC-002, SPEC-023]
+adrs: []
+contracts: []
+---
+
 # SPEC-015 — Áudio ambiente
 
 Status: future

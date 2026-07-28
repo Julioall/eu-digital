@@ -1,3 +1,13 @@
+---
+id: SPEC-026
+title: Pipeline de promoção Python para C++
+status: blocked
+phase: 0.5
+dependencies: [SPEC-018, SPEC-025]
+adrs: [ADR-0005, ADR-0008, ADR-0010]
+contracts: [CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md]
+---
+
 # SPEC-026 — Pipeline de promoção Python para C++
 
 Status: blocked
@@ -34,6 +44,15 @@ Implementar o processo reproduzível que transforma um mecanismo Python validado
 8. executar benchmark;
 9. aprovar ou rejeitar;
 10. registrar no manifesto do runtime.
+
+## Escopo negativo
+
+- criar ou validar novos mecanismos cognitivos;
+- tratar a referência Python como ground truth;
+- implementar o runtime de capacidades;
+- alterar contratos compartilhados sem versionamento;
+- definir gates ecológicos além dos necessários à promoção;
+- promover componentes ainda não aprovados cientificamente.
 
 ## Critérios de aceite
 

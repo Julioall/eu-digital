@@ -1,3 +1,13 @@
+---
+id: SPEC-003
+title: Sensor de atividade do sistema
+status: blocked
+phase: 1
+dependencies: [SPEC-002, SPEC-023]
+adrs: []
+contracts: []
+---
+
 # SPEC-003 — Sensor de atividade do sistema
 
 Status: blocked

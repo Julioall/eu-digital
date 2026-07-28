@@ -1,3 +1,13 @@
+---
+id: SPEC-002
+title: Barramento e evento canônico
+status: blocked
+phase: 0
+dependencies: [SPEC-001]
+adrs: []
+contracts: [EVENT_SCHEMA.md]
+---
+
 # SPEC-002 — Barramento e evento canônico
 
 Status: blocked

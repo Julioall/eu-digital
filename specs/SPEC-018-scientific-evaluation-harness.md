@@ -1,3 +1,13 @@
+---
+id: SPEC-018
+title: Harness de avaliação, ablação e validade
+status: blocked
+phase: 0.5
+dependencies: [SPEC-017, SPEC-025]
+adrs: [ADR-0005, ADR-0008, ADR-0011]
+contracts: []
+---
+
 # SPEC-018 — Harness de avaliação, ablação e validade
 
 Status: blocked

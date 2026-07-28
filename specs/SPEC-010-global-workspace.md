@@ -1,3 +1,13 @@
+---
+id: SPEC-010
+title: Atenção e workspace global
+status: blocked
+phase: 4
+dependencies: [SPEC-008, SPEC-009]
+adrs: []
+contracts: []
+---
+
 # SPEC-010 — Atenção e workspace global
 
 Status: blocked

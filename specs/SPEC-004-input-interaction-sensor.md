@@ -1,3 +1,13 @@
+---
+id: SPEC-004
+title: Sensor de interação
+status: blocked
+phase: 1
+dependencies: [SPEC-002, SPEC-023]
+adrs: []
+contracts: []
+---
+
 # SPEC-004 — Sensor de interação
 
 Status: blocked

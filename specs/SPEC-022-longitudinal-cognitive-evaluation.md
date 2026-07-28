@@ -1,3 +1,13 @@
+---
+id: SPEC-022
+title: Avaliação longitudinal
+status: future
+phase: 6
+dependencies: [SPEC-018, SPEC-019, SPEC-020, SPEC-021]
+adrs: []
+contracts: []
+---
+
 # SPEC-022 — Avaliação longitudinal
 
 Status: future

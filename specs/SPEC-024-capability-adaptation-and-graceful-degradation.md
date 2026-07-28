@@ -1,3 +1,13 @@
+---
+id: SPEC-024
+title: Adaptação a ausência e novas capacidades
+status: blocked
+phase: 4
+dependencies: [SPEC-010, SPEC-012, SPEC-018, SPEC-021, SPEC-023]
+adrs: [ADR-0006, ADR-0008, ADR-0009]
+contracts: []
+---
+
 # SPEC-024 — Adaptação a ausência e novas capacidades
 
 Status: blocked

@@ -1,3 +1,13 @@
+---
+id: SPEC-025
+title: Fundação do monorepositório Laboratório/Cérebro
+status: ready
+phase: 0
+dependencies: [SPEC-001]
+adrs: [ADR-0001, ADR-0009, ADR-0010]
+contracts: []
+---
+
 # SPEC-025 — Fundação do monorepositório Laboratório/Cérebro
 
 Status: ready
@@ -32,6 +42,15 @@ Transformar a fundação do projeto em um monorepositório com Laboratório Pyth
 4. O laboratório deve funcionar sem compilar o runtime completo quando usar apenas replays.
 5. Deve existir comando único para validação completa.
 6. O repositório deve distinguir artefatos gerados de fontes normativas.
+
+## Escopo negativo
+
+- runtime cognitivo além do executável mínimo de verificação;
+- sensores, memória, modelos e avatar;
+- runtime de capacidades da SPEC-023;
+- pipeline de promoção da SPEC-026;
+- gates científicos e ecológicos da SPEC-027;
+- instalação de componentes Python no produto C++ distribuído.
 
 ## Critérios de aceite
 

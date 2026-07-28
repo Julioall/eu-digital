@@ -1,3 +1,13 @@
+---
+id: SPEC-023
+title: Runtime de capacidades removíveis
+status: ready
+phase: 0
+dependencies: [SPEC-001, SPEC-002]
+adrs: [ADR-0001, ADR-0008, ADR-0009]
+contracts: [CAPABILITY_DESCRIPTOR.md, CAPABILITY_STATE_SCHEMA.md, OBSERVATION_ENVELOPE.md, MODULE_LIFECYCLE.md, SELF_MODEL_SCHEMA.md]
+---
+
 # SPEC-023 — Runtime de capacidades removíveis
 
 Status: ready

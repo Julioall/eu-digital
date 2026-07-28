@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectConfiguration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "project",
+    "constraints",
+    "hardware_assumption",
+    "capability_architecture",
+    "implementation_architecture",
+    "scientific_validation"
+  ],
+  "properties": {
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "language", "mode", "target_os", "python"],
+      "properties": {
+        "name": {"type": "string", "const": "eu-digital"},
+        "language": {"type": "string", "const": "pt-BR"},
+        "mode": {"type": "string", "const": "local-first"},
+        "target_os": {"type": "string", "const": "windows"},
+        "python": {"type": "string", "pattern": "^>=3\\.12$"}
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cloud_apis_allowed",
+        "heavy_models_concurrent",
+        "destructive_actions_allowed",
+        "specs_required",
+        "tests_before_completion"
+      ],
+      "properties": {
+        "cloud_apis_allowed": {"type": "boolean", "const": false},
+        "heavy_models_concurrent": {"type": "integer", "minimum": 1},
+        "destructive_actions_allowed": {"type": "boolean", "const": false},
+        "specs_required": {"type": "boolean", "const": true},
+        "tests_before_completion": {"type": "boolean", "const": true}
+      }
+    },
+    "hardware_assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cpu", "ram_gb", "dedicated_gpu"],
+      "properties": {
+        "cpu": {"type": "string"},
+        "ram_gb": {"type": "integer", "minimum": 1},
+        "dedicated_gpu": {"type": "string"}
+      }
+    },
+    "capability_architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_domain_sensors",
+        "core_may_import_concrete_plugins",
+        "missing_capability_is_explicit_state",
+        "supports_runtime_addition",
+        "supports_runtime_removal",
+        "fallback_must_be_audited"
+      ],
+      "properties": {
+        "required_domain_sensors": {"type": "array", "items": {"type": "string"}},
+        "core_may_import_concrete_plugins": {"type": "boolean", "const": false},
+        "missing_capability_is_explicit_state": {"type": "boolean", "const": true},
+        "supports_runtime_addition": {"type": "boolean", "const": true},
+        "supports_runtime_removal": {"type": "boolean", "const": true},
+        "fallback_must_be_audited": {"type": "boolean", "const": true}
+      }
+    },
+    "implementation_architecture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository_model",
+        "research_environment",
+        "deployed_runtime",
+        "promotion",
+        "contracts"
+      ],
+      "properties": {
+        "repository_model": {"type": "string", "const": "monorepo"},
+        "research_environment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["language", "role"],
+          "properties": {
+            "language": {"type": "string", "const": "python"},
+            "role": {"type": "string", "const": "laboratory"}
+          }
+        },
+        "deployed_runtime": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["language", "standard", "python_runtime_dependency"],
+          "properties": {
+            "language": {"type": "string", "const": "cpp"},
+            "standard": {"type": "string", "const": "c++23"},
+            "python_runtime_dependency": {"type": "boolean", "const": false}
+          }
+        },
+        "promotion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["required", "equivalence_test_required", "performance_gate_required"],
+          "properties": {
+            "required": {"type": "boolean", "const": true},
+            "equivalence_test_required": {"type": "boolean", "const": true},
+            "performance_gate_required": {"type": "boolean", "const": true}
+          }
+        },
+        "contracts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_of_truth"],
+          "properties": {
+            "source_of_truth": {"type": "string", "const": "contracts/"}
+          }
+        }
+      }
+    },
+    "scientific_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "python_reference_is_ground_truth",
+        "cross_language_equivalence_is_sufficient",
+        "ground_truth_required_when_possible",
+        "locked_holdout_required",
+        "metamorphic_tests_required_without_oracle",
+        "ecological_validation_required",
+        "cognitive_and_operational_metrics_separate"
+      ],
+      "properties": {
+        "python_reference_is_ground_truth": {"type": "boolean", "const": false},
+        "cross_language_equivalence_is_sufficient": {"type": "boolean", "const": false},
+        "ground_truth_required_when_possible": {"type": "boolean", "const": true},
+        "locked_holdout_required": {"type": "boolean", "const": true},
+        "metamorphic_tests_required_without_oracle": {"type": "boolean", "const": true},
+        "ecological_validation_required": {"type": "boolean", "const": true},
+        "cognitive_and_operational_metrics_separate": {"type": "boolean", "const": true}
+      }
+    }
+  }
+}

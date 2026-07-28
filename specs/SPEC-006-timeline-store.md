@@ -1,3 +1,13 @@
+---
+id: SPEC-006
+title: Timeline persistente
+status: blocked
+phase: 2
+dependencies: [SPEC-002]
+adrs: []
+contracts: []
+---
+
 # SPEC-006 — Timeline persistente
 
 Status: blocked

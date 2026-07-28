@@ -1,3 +1,13 @@
+---
+id: SPEC-017
+title: Sandbox e corpus de avaliação
+status: ready
+phase: 0.5
+dependencies: [SPEC-001]
+adrs: [ADR-0005, ADR-0008]
+contracts: []
+---
+
 # SPEC-017 — Sandbox e corpus de avaliação
 
 Status: ready

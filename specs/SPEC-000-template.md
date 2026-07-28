@@ -1,3 +1,13 @@
+---
+id: SPEC-000
+title: Template de especificação
+status: draft
+phase: template
+dependencies: []
+adrs: []
+contracts: []
+---
+
 # SPEC-000 — Título
 
 Status: draft  

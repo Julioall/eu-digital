@@ -1,3 +1,13 @@
+---
+id: SPEC-013
+title: Gateway de modelo local
+status: blocked
+phase: 5
+dependencies: [SPEC-001]
+adrs: [ADR-0003, ADR-0004]
+contracts: []
+---
+
 # SPEC-013 — Gateway de modelo local
 
 Status: blocked

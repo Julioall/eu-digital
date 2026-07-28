@@ -1,3 +1,13 @@
+---
+id: SPEC-014
+title: Diálogo e avatar
+status: blocked
+phase: 5
+dependencies: [SPEC-011, SPEC-012, SPEC-013]
+adrs: []
+contracts: []
+---
+
 # SPEC-014 — Diálogo e avatar
 
 Status: blocked

@@ -1,3 +1,13 @@
+---
+id: SPEC-012
+title: Modelo de si funcional
+status: blocked
+phase: 4
+dependencies: [SPEC-010, SPEC-011]
+adrs: []
+contracts: [SELF_MODEL_SCHEMA.md]
+---
+
 # SPEC-012 — Modelo de si funcional
 
 Status: blocked

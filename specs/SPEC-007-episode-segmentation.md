@@ -1,3 +1,13 @@
+---
+id: SPEC-007
+title: Segmentação de episódios
+status: blocked
+phase: 2
+dependencies: [SPEC-003, SPEC-004, SPEC-005, SPEC-006]
+adrs: []
+contracts: [EPISODE_SCHEMA.md]
+---
+
 # SPEC-007 — Segmentação de episódios
 
 Status: blocked

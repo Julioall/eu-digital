@@ -1,3 +1,13 @@
+---
+id: SPEC-005
+title: Tela e OCR
+status: blocked
+phase: 1
+dependencies: [SPEC-002, SPEC-023]
+adrs: []
+contracts: []
+---
+
 # SPEC-005 — Tela e OCR
 
 Status: blocked

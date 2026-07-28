@@ -1,0 +1,27 @@
+name: Documentation Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "spec/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate repository governance
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run documentation tests
+        shell: powershell
+        run: .\tests\documentation\Test-Documentation.ps1
+
+      - name: Validate documentation
+        shell: powershell
+        run: .\tools\validate_documentation.ps1
