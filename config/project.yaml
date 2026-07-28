@@ -1,0 +1,51 @@
+project:
+  name: eu-digital
+  language: pt-BR
+  mode: local-first
+  target_os: windows
+  python: ">=3.12"
+
+constraints:
+  cloud_apis_allowed: false
+  heavy_models_concurrent: 1
+  destructive_actions_allowed: false
+  specs_required: true
+  tests_before_completion: true
+
+hardware_assumption:
+  cpu: Intel Core i7 12th generation
+  ram_gb: 16
+  dedicated_gpu: unknown
+
+capability_architecture:
+  required_domain_sensors: []
+  core_may_import_concrete_plugins: false
+  missing_capability_is_explicit_state: true
+  supports_runtime_addition: true
+  supports_runtime_removal: true
+  fallback_must_be_audited: true
+
+implementation_architecture:
+  repository_model: monorepo
+  research_environment:
+    language: python
+    role: laboratory
+  deployed_runtime:
+    language: cpp
+    standard: c++23
+    python_runtime_dependency: false
+  promotion:
+    required: true
+    equivalence_test_required: true
+    performance_gate_required: true
+  contracts:
+    source_of_truth: contracts/
+
+scientific_validation:
+  python_reference_is_ground_truth: false
+  cross_language_equivalence_is_sufficient: false
+  ground_truth_required_when_possible: true
+  locked_holdout_required: true
+  metamorphic_tests_required_without_oracle: true
+  ecological_validation_required: true
+  cognitive_and_operational_metrics_separate: true

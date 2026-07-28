@@ -1,0 +1,24 @@
+# SPEC-003 — Sensor de atividade do sistema
+
+Status: blocked
+Fase: 1
+Dependências: SPEC-002, SPEC-023
+
+## Objetivo
+Capturar processos, janela ativa, abertura, fechamento e mudança de foco.
+
+## Requisitos
+- Adaptador Windows inicial.
+- Polling ou hooks encapsulados.
+- Eventos normalizados.
+- Health check.
+- Reconexão automática.
+
+## Escopo negativo
+Conteúdo da tela e automação de aplicativos.
+
+## Critérios de aceite
+- [ ] Detecta mudança de janela ativa.
+- [ ] Detecta início e fim de processo observável.
+- [ ] Uso médio de CPU abaixo do orçamento definido no plano.
+- [ ] Falha de permissão não encerra o agente.
