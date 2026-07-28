@@ -1,1 +1,1 @@
-bootstrap final scientific specification — per-segment verification
+bootstrap final scientific specification — publish segment diagnostics
