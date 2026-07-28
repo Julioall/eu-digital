@@ -63,3 +63,11 @@ status: draft|reference_frozen|candidate_ready|validated|rejected|promoted
 - Performance não compensa divergência semântica.
 - Equivalência textual de respostas de LLM não é exigida; invariantes e métricas devem ser usados.
 - Todo relatório deve incluir casos divergentes, mesmo quando a promoção é aprovada.
+
+## 3. Implementação da SPEC-026
+
+O manifesto é validado por `python/eu_digital_lab/promotion.py`. Fixtures de
+JSON-lines são serializadas com chaves ordenadas e UTF-8 para que ambos os
+runners recebam os mesmos bytes. O gate de CI é
+`tools/check_promotions.py`; o runtime C++ consulta
+`eu_digital::PromotionRegistry` em `cpp/core/promotion_registry.hpp`.

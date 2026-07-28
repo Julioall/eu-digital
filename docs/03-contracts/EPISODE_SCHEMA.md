@@ -1,5 +1,10 @@
 # Contrato: Episode
 
+A definição executável e versionada deste contrato está em
+`contracts/schemas/episode.schema.json`. A segmentação não preenche `people`,
+`topics`, `summary` ou `embedding_ref` sem observação explícita; ausência fica
+representada por listas vazias ou `null`.
+
 ```yaml
 episode_id: uuid
 schema_version: "1.0"

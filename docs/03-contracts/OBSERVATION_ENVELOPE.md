@@ -1,5 +1,8 @@
 # Contrato: ObservationEnvelope
 
+A definição executável deste contrato está em
+`contracts/schemas/observation_envelope.schema.json`.
+
 O envelope impede que o núcleo confunda ausência, falha e observação negativa.
 
 ```yaml

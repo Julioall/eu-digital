@@ -1,5 +1,8 @@
 # Contrato: CapabilityState
 
+A definição executável deste contrato está em
+`contracts/schemas/capability_state.schema.json`.
+
 ```yaml
 capability_id: string
 implementation_id: string

@@ -1,5 +1,8 @@
 # Contrato: CapabilityDescriptor
 
+A definição executável deste contrato está em
+`contracts/schemas/capability_descriptor.schema.json`.
+
 ```yaml
 schema_version: "1.0"
 capability_id: string

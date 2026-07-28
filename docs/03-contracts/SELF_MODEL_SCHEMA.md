@@ -1,5 +1,8 @@
 # Contrato: SelfModel
 
+A definição executável deste contrato está em
+`contracts/schemas/self_model.schema.json`.
+
 ```yaml
 self_model_version: integer
 identity:
