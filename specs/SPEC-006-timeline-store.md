@@ -1,7 +1,7 @@
 ---
 id: SPEC-006
 title: Timeline persistente
-status: blocked
+status: done
 phase: 2
 dependencies: [SPEC-002]
 adrs: []
@@ -10,7 +10,7 @@ contracts: []
 
 # SPEC-006 — Timeline persistente
 
-Status: blocked
+Status: done
 Fase: 2
 Dependências: SPEC-002
 
@@ -29,7 +29,7 @@ Persistir e consultar eventos por tempo, sessão, fonte, aplicativo e correlaç�
 Memória semântica e embeddings.
 
 ## Critérios de aceite
-- [ ] Reinicialização preserva eventos.
-- [ ] Consulta temporal retorna ordem correta.
-- [ ] Migração é testada.
-- [ ] Replay reproduz sequência determinística.
+- [x] Reinicialização preserva eventos.
+- [x] Consulta temporal retorna ordem correta.
+- [x] Migração é testada.
+- [x] Replay reproduz sequência determinística.
