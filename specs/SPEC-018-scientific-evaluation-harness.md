@@ -1,7 +1,7 @@
 ---
 id: SPEC-018
 title: Harness de avaliação, ablação e validade
-status: blocked
+status: done
 phase: 0.5
 dependencies: [SPEC-017, SPEC-025]
 adrs: [ADR-0005, ADR-0008, ADR-0011]
@@ -10,7 +10,7 @@ contracts: []
 
 # SPEC-018 — Harness de avaliação, ablação e validade
 
-Status: blocked
+Status: done
 Fase: 0.5
 Dependências: SPEC-017, SPEC-025
 ADRs aplicáveis: ADR-0005, ADR-0008, ADR-0011
@@ -45,10 +45,10 @@ Executar baselines, ablações, métricas, verificação e relatórios reproduz�
 
 ## Critérios de aceite
 
-- [ ] Módulo pode ser desativado sem alteração de código.
-- [ ] Experimento registra commit, hardware, backend e configuração.
-- [ ] Relatório compara baseline e tratamento.
-- [ ] Pelo menos uma condição utiliza ground truth.
-- [ ] Testes metamórficos detectam mutação conhecida.
-- [ ] O holdout possui hash e política de acesso.
-- [ ] Resultados cognitivos e operacionais são apresentados separadamente.
+- [x] Módulo pode ser desativado sem alteração de código.
+- [x] Experimento registra commit, hardware, backend e configuração.
+- [x] Relatório compara baseline e tratamento.
+- [x] Pelo menos uma condição utiliza ground truth.
+- [x] Testes metamórficos detectam mutação conhecida.
+- [x] O holdout possui hash e política de acesso.
+- [x] Resultados cognitivos e operacionais são apresentados separadamente.
