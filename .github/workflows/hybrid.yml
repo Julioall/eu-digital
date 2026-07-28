@@ -29,6 +29,14 @@ jobs:
       - name: Set up MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Install SQLite runtime for timeline store
+        shell: pwsh
+        run: |
+          vcpkg install sqlite3:x64-windows
+          $vcpkgPrefix = Join-Path $env:VCPKG_INSTALLATION_ROOT "installed\x64-windows"
+          "$vcpkgPrefix\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "CMAKE_PREFIX_PATH=$vcpkgPrefix" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Install locked Python package
         run: uv sync --locked
 
@@ -37,3 +45,6 @@ jobs:
 
       - name: Validate shared contracts
         run: uv run python tools/validate_contracts.py
+
+      - name: Enforce approved promotion gate
+        run: uv run python tools/check_promotions.py
