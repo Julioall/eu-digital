@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -21,7 +22,7 @@ def main() -> int:
     if shutil.which("cmake") is None and not args.skip_build:
         raise SystemExit("cmake is required; install CMake before running the hybrid validation")
 
-    run(["python", "-m", "unittest", "discover", "-s", "python/tests", "-v"], root)
+    run([sys.executable, "-m", "unittest", "discover", "-s", "python/tests", "-v"], root)
     if args.skip_build:
         return 0
     run(["cmake", "--preset", "dev"], root)

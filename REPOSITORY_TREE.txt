@@ -18,12 +18,14 @@ cpp/app/.gitkeep
 cpp/app/main.cpp
 cpp/benchmarks/.gitkeep
 cpp/core/.gitkeep
+cpp/core/event_bus.hpp
 cpp/inference/.gitkeep
 cpp/plugins/.gitkeep
 cpp/README.md
 cpp/runtime/.gitkeep
 cpp/storage/.gitkeep
 cpp/tests/.gitkeep
+cpp/tests/event_bus_test.cpp
 datasets/annotated/.gitkeep
 datasets/annotated/README.md
 datasets/normalized/.gitkeep
@@ -107,6 +109,7 @@ python/eu_digital_lab.egg-info/top_level.txt
 python/eu_digital_lab/.gitkeep
 python/eu_digital_lab/__init__.py
 python/eu_digital_lab/annotation.py
+python/eu_digital_lab/event_bus.py
 python/eu_digital_lab/fixture_reader.py
 python/eu_digital_lab/sandbox.py
 python/notebooks/.gitkeep
@@ -114,12 +117,14 @@ python/prototypes/.gitkeep
 python/README.md
 python/reference/.gitkeep
 python/tests/.gitkeep
+python/tests/test_event_bus.py
 python/tests/test_foundation.py
 python/tests/test_sandbox.py
 python/training/.gitkeep
 README.md
 reports/.gitkeep
 reports/SPEC-001-execution-report.md
+reports/SPEC-002-execution-report.md
 reports/SPEC-017-execution-report.md
 reports/SPEC-025-execution-report.md
 REPOSITORY_TREE.txt

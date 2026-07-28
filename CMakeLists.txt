@@ -9,11 +9,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(eu_digital_runtime cpp/app/main.cpp)
 target_compile_features(eu_digital_runtime PRIVATE cxx_std_23)
 
+add_executable(event_bus_test cpp/tests/event_bus_test.cpp)
+target_include_directories(event_bus_test PRIVATE cpp)
+target_compile_features(event_bus_test PRIVATE cxx_std_23)
+
 enable_testing()
 add_test(
     NAME canonical_event_fixture
     COMMAND eu_digital_runtime "${CMAKE_SOURCE_DIR}/contracts/fixtures/canonical_event.json"
 )
+add_test(NAME event_bus COMMAND event_bus_test)
 
 include(GNUInstallDirs)
 install(TARGETS eu_digital_runtime RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

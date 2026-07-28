@@ -47,6 +47,14 @@ O comando unificado da SPEC-025 é:
 uv run python tools/validate_hybrid.py
 ```
 
+SPEC-002 event-bus checks are covered by the Python suite and the CTest target
+`event_bus`. To run only the Python asynchronous bus tests:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_event_bus -v
+```
+
 Ele executa testes Python, configura/compila/testa o C++ e instala uma release
 mínima, verificando que nenhum arquivo Python é empacotado.
 
