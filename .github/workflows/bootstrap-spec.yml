@@ -1,0 +1,75 @@
+name: Bootstrap final specification
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".bootstrap/**"
+      - ".github/workflows/bootstrap-spec.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-specification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct and verify archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/chunk_*.b64 | tr -d '[:space:]' | base64 --decode > /tmp/eu-digital-spec.zip
+          echo "e7efa683d9817579b631aaba3fe0cb6a0e613899f8c5128ba642069d7a462142  /tmp/eu-digital-spec.zip" | sha256sum -c -
+
+      - name: Extract specification into repository root
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          import zipfile
+
+          archive = Path('/tmp/eu-digital-spec.zip')
+          temp = Path('/tmp/eu-digital-spec')
+          if temp.exists():
+              shutil.rmtree(temp)
+          temp.mkdir(parents=True)
+
+          with zipfile.ZipFile(archive) as bundle:
+              bad = bundle.testzip()
+              if bad:
+                  raise RuntimeError(f'Corrupted archive entry: {bad}')
+              bundle.extractall(temp)
+
+          source = temp / 'eu-digital-agent-spec'
+          if not source.is_dir():
+              raise RuntimeError('Expected eu-digital-agent-spec root not found')
+
+          root = Path.cwd()
+          for item in source.iterdir():
+              target = root / item.name
+              if item.is_dir():
+                  shutil.copytree(item, target, dirs_exist_ok=True)
+              else:
+                  shutil.copy2(item, target)
+          PY
+
+      - name: Commit imported specification
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .bootstrap
+          rm -f .github/workflows/bootstrap-spec.yml
+          rmdir .github/workflows 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "docs: import final scientific specification"
+          git push origin HEAD:main
