@@ -44,3 +44,22 @@ workspace versionados:
 4. a primeira referência é Python, local e efêmera, com snapshots para replay
    determinístico. Promoção C++ permanece sujeita à SPEC-026 e evidência
    independente.
+
+## Bloqueios arquiteturais da SPEC-011
+
+A SPEC-011 permanece bloqueada até que sejam definidos e aprovados:
+
+1. contratos executáveis e versionados para hipótese, avaliação
+   metacognitiva, pergunta estruturada, resposta/correção e supressão, pois
+   `HYPOTHESIS_SCHEMA.md` hoje é somente documentação YAML;
+2. um protocolo de calibração que relacione previsão, confiança, correção,
+   abstinência e custo de interrupção, com baseline, Brier/ECE/AUROC e
+   risk–coverage congelados antes do holdout;
+3. a política local de orçamento de perguntas, cooldown, redundância e regra
+   de silêncio, sem introduzir diálogo, LLM obrigatório, busca externa ou ação
+   autônoma;
+4. o limite entre a referência Python e eventual promoção C++, que continua
+   condicionado à SPEC-026 e à validade independente.
+
+Sem essas decisões, uma implementação escolheria silenciosamente a semântica
+de confiança, interrupção e atualização que a SPEC não define.
