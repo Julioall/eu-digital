@@ -1,7 +1,7 @@
 ---
 id: SPEC-004
 title: Sensor de interação
-status: blocked
+status: done
 phase: 1
 dependencies: [SPEC-002, SPEC-023]
 adrs: []
@@ -10,7 +10,7 @@ contracts: []
 
 # SPEC-004 — Sensor de interação
 
-Status: blocked
+Status: done
 Fase: 1
 Dependências: SPEC-002, SPEC-023
 
@@ -27,6 +27,6 @@ Registrar eventos de teclado, mouse, atalhos, clipboard e atividade de entrada.
 Interpretação de intenção e execução de entrada.
 
 ## Critérios de aceite
-- [ ] Eventos possuem contexto de janela.
-- [ ] Alto volume é agregado sem perda de métricas.
-- [ ] Clipboard produz evento separado.
+- [x] Eventos possuem contexto de janela.
+- [x] Alto volume é agregado sem perda de métricas.
+- [x] Clipboard produz evento separado.
