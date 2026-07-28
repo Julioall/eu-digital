@@ -1,7 +1,7 @@
 ---
 id: SPEC-027
 title: Gates de verificação, validade e transferência ecológica
-status: blocked
+status: done
 phase: 0.5
 dependencies: [SPEC-017, SPEC-018, SPEC-025, SPEC-026]
 adrs: [ADR-0005, ADR-0008, ADR-0010, ADR-0011]
@@ -10,7 +10,7 @@ contracts: []
 
 # SPEC-027 — Gates de verificação, validade e transferência ecológica
 
-Status: blocked
+Status: done
 Fase: 0.5
 Dependências: SPEC-017, SPEC-018, SPEC-025, SPEC-026
 ADRs aplicáveis: ADR-0005, ADR-0008, ADR-0010, ADR-0011
@@ -44,12 +44,12 @@ Implementar gates independentes para verificação, equivalência computacional,
 
 ## Critérios de aceite
 
-- [ ] Equivalência com Python não é usada como único critério.
-- [ ] Pelo menos uma fixture possui verdade conhecida.
-- [ ] O holdout possui hash e acesso registrado.
-- [ ] Testes metamórficos detectam mutações deliberadas.
-- [ ] Replay controla relógio e ordem.
-- [ ] Falhas de sensor são reproduzíveis.
-- [ ] Modelo exportado possui relatório de diferença.
-- [ ] Teste online é executado após replay.
-- [ ] Relatório separa validade cognitiva de desempenho operacional.
+- [x] Equivalência com Python não é usada como único critério.
+- [x] Pelo menos uma fixture possui verdade conhecida.
+- [x] O holdout possui hash e acesso registrado.
+- [x] Testes metamórficos detectam mutações deliberadas.
+- [x] Replay controla relógio e ordem.
+- [x] Falhas de sensor são reproduzíveis.
+- [x] Modelo exportado possui relatório de diferença.
+- [x] Teste online é executado após replay.
+- [x] Relatório separa validade cognitiva de desempenho operacional.
