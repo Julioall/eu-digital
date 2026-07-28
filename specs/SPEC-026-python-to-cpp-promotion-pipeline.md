@@ -1,7 +1,7 @@
 ---
 id: SPEC-026
 title: Pipeline de promoção Python para C++
-status: blocked
+status: done
 phase: 0.5
 dependencies: [SPEC-018, SPEC-025]
 adrs: [ADR-0005, ADR-0008, ADR-0010]
@@ -10,7 +10,7 @@ contracts: [CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md]
 
 # SPEC-026 — Pipeline de promoção Python para C++
 
-Status: blocked
+Status: done
 Fase: 0.5
 Dependências: SPEC-018, SPEC-025
 ADRs aplicáveis: ADR-0005, ADR-0008, ADR-0010
@@ -56,12 +56,12 @@ Implementar o processo reproduzível que transforma um mecanismo Python validado
 
 ## Critérios de aceite
 
-- [ ] referência e candidato recebem bytes semanticamente idênticos.
-- [ ] todas as divergências são persistidas.
-- [ ] alteração de tolerância exige justificativa e nova revisão.
-- [ ] CI bloqueia componente sem promoção aprovada.
-- [ ] relatório associa hipótese, commits, dataset, hardware e métricas.
-- [ ] runtime informa a promoção correspondente de cada componente cognitivo.
+- [x] referência e candidato recebem bytes semanticamente idênticos.
+- [x] todas as divergências são persistidas.
+- [x] alteração de tolerância exige justificativa e nova revisão.
+- [x] CI bloqueia componente sem promoção aprovada.
+- [x] relatório associa hipótese, commits, dataset, hardware e métricas.
+- [x] runtime informa a promoção correspondente de cada componente cognitivo.
 
 ## Correção científica obrigatória
 
