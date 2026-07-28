@@ -1,7 +1,7 @@
 ---
 id: SPEC-023
 title: Runtime de capacidades removíveis
-status: ready
+status: done
 phase: 0
 dependencies: [SPEC-001, SPEC-002]
 adrs: [ADR-0001, ADR-0008, ADR-0009]
@@ -10,7 +10,7 @@ contracts: [CAPABILITY_DESCRIPTOR.md, CAPABILITY_STATE_SCHEMA.md, OBSERVATION_EN
 
 # SPEC-023 — Runtime de capacidades removíveis
 
-Status: ready
+Status: done
 Fase: 0
 Dependências: SPEC-001, SPEC-002
 ADRs aplicáveis: ADR-0001, ADR-0008, ADR-0009
@@ -106,16 +106,16 @@ De `available`:
 
 ## Critérios de aceite
 
-- [ ] O núcleo inicia com zero sensores opcionais.
-- [ ] Um plugin compatível pode ser adicionado sem modificar o núcleo.
-- [ ] Um plugin ativo pode ser removido sem corromper timeline ou memória.
-- [ ] O self-model reflete a mudança em até um ciclo cognitivo.
-- [ ] Operações sem fornecedor retornam erro tipado e não são inventadas.
-- [ ] Um fallback compatível pode ser selecionado e a troca fica auditada.
-- [ ] Falha de plugin não encerra event bus nem memória.
-- [ ] Eventos antigos permanecem legíveis após desinstalação.
-- [ ] Testes comprovam ausência de imports concretos no pacote `core`.
-- [ ] Reinicialização restaura registry e estados persistidos aplicáveis.
+- [x] O núcleo inicia com zero sensores opcionais.
+- [x] Um plugin compatível pode ser adicionado sem modificar o núcleo.
+- [x] Um plugin ativo pode ser removido sem corromper timeline ou memória.
+- [x] O self-model reflete a mudança em até um ciclo cognitivo.
+- [x] Operações sem fornecedor retornam erro tipado e não são inventadas.
+- [x] Um fallback compatível pode ser selecionado e a troca fica auditada.
+- [x] Falha de plugin não encerra event bus nem memória.
+- [x] Eventos antigos permanecem legíveis após desinstalação.
+- [x] Testes comprovam ausência de imports concretos no pacote `core`.
+- [x] Reinicialização restaura registry e estados persistidos aplicáveis.
 
 ## Plano de testes
 

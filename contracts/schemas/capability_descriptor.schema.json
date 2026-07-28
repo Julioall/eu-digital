@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityDescriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "capability_id", "implementation_id", "implementation_version", "kind", "provides", "requires", "runtime", "quality", "permissions", "config_schema", "health_check_operation"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "capability_id": {"type": "string", "minLength": 1},
+    "implementation_id": {"type": "string", "minLength": 1},
+    "implementation_version": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "enum": ["sensor", "tool", "actuator", "model", "cognitive_service"]},
+    "provides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["operation", "input_schema", "output_schema", "modalities", "side_effect", "streaming"],
+        "properties": {
+          "operation": {"type": "string", "minLength": 1},
+          "input_schema": {"type": ["string", "null"]},
+          "output_schema": {"type": "string", "minLength": 1},
+          "modalities": {"type": "array", "items": {"type": "string"}},
+          "side_effect": {"type": "string", "enum": ["none", "reversible", "irreversible"]},
+          "streaming": {"type": "boolean"}
+        }
+      }
+    },
+    "requires": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mandatory", "optional"],
+      "properties": {
+        "mandatory": {"type": "array", "items": {"$ref": "#/$defs/requirement"}},
+        "optional": {"type": "array", "items": {"$ref": "#/$defs/requirement"}}
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["execution", "startup", "supports_hot_plug", "supports_checkpoint", "estimated_ram_mb", "estimated_cpu_class"],
+      "properties": {
+        "execution": {"type": "string", "enum": ["in_process", "subprocess", "ipc"]},
+        "startup": {"type": "string", "enum": ["eager", "lazy", "manual"]},
+        "supports_hot_plug": {"type": "boolean"},
+        "supports_checkpoint": {"type": "boolean"},
+        "estimated_ram_mb": {"type": ["integer", "null"], "minimum": 0},
+        "estimated_cpu_class": {"type": "string", "enum": ["low", "medium", "high", "unknown"]}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confidence_model", "latency_class", "calibration_required"],
+      "properties": {
+        "confidence_model": {"type": ["string", "null"]},
+        "latency_class": {"type": "string", "enum": ["realtime", "interactive", "batch"]},
+        "calibration_required": {"type": "boolean"}
+      }
+    },
+    "permissions": {"type": "array", "items": {"type": "string"}},
+    "config_schema": {"type": ["string", "null"]},
+    "health_check_operation": {"type": "string", "minLength": 1}
+  },
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "version_range"],
+      "properties": {
+        "operation": {"type": "string", "minLength": 1},
+        "version_range": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

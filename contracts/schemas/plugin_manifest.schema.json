@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LocalCapabilityPluginManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["descriptor", "entry_point", "priority"],
+  "properties": {
+    "descriptor": {"type": "object"},
+    "entry_point": {"type": "string", "minLength": 3},
+    "priority": {"type": "integer"}
+  }
+}

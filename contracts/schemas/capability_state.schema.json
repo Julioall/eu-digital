@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["capability_id", "implementation_id", "state", "changed_at", "reason_code", "message", "health", "performance", "availability", "impact"],
+  "properties": {
+    "capability_id": {"type": "string", "minLength": 1},
+    "implementation_id": {"type": "string", "minLength": 1},
+    "state": {"type": "string", "enum": ["unknown", "discovered", "calibrating", "available", "degraded", "temporarily_unavailable", "disabled", "failed", "removed", "incompatible"]},
+    "changed_at": {"type": "string", "minLength": 1},
+    "reason_code": {"type": ["string", "null"]},
+    "message": {"type": ["string", "null"]},
+    "health": {"type": "object"},
+    "performance": {"type": "object"},
+    "availability": {"type": "object"},
+    "impact": {"type": "object"}
+  }
+}

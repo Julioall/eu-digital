@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ObservationEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["observation_id", "capability_id", "operation", "occurred_at", "status", "content_schema", "content", "quality", "observability", "provenance"],
+  "properties": {
+    "observation_id": {"type": "string", "minLength": 1},
+    "capability_id": {"type": "string", "minLength": 1},
+    "operation": {"type": "string", "minLength": 1},
+    "occurred_at": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["observed", "no_signal", "not_observable", "sensor_degraded", "sensor_failed"]},
+    "content_schema": {"type": "string", "minLength": 1},
+    "content": {"type": ["object", "null"]},
+    "quality": {"type": "object"},
+    "observability": {"type": "object"},
+    "provenance": {"type": "object"}
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SelfModel",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["self_model_version", "identity", "capabilities", "observability", "sensors", "state", "knowledge", "confidence", "continuity"],
+  "properties": {
+    "self_model_version": {"type": "integer", "minimum": 0},
+    "identity": {"type": "object"},
+    "capabilities": {"type": "object"},
+    "observability": {"type": "object"},
+    "sensors": {"type": "object"},
+    "state": {"type": "object"},
+    "knowledge": {"type": "object"},
+    "confidence": {"type": "object"},
+    "continuity": {"type": "object"}
+  }
+}
