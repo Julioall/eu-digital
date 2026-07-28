@@ -25,6 +25,12 @@ Os contratos executáveis de metacognição e curiosidade da SPEC-011 estão em
 semântica está documentada em
 `docs/03-contracts/METACOGNITION_CURIOSITY_SCHEMA.md`.
 
+Os contratos complementares de modelo de si funcional da SPEC-012 estão em
+`self_model_internal_event.schema.json`,
+`functional_self_model_snapshot.schema.json` e `self_model_decision.schema.json`.
+Eles preservam `self_model.schema.json` da SPEC-023; a semântica está em
+`docs/03-contracts/FUNCTIONAL_SELF_MODEL_SCHEMA.md`.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

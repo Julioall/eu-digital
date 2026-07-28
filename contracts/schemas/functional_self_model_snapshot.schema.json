@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FunctionalSelfModelSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_id",
+    "schema_version",
+    "version",
+    "prior_snapshot_id",
+    "updated_at",
+    "trigger_event_id",
+    "capabilities",
+    "facts",
+    "hypotheses",
+    "configuration",
+    "history_hash"
+  ],
+  "$defs": {
+    "capability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability_id", "status", "explanation", "source_event_ids"],
+      "properties": {
+        "capability_id": {"type": "string", "minLength": 1},
+        "status": {
+          "type": "string",
+          "enum": ["available", "degraded", "unavailable", "removed"]
+        },
+        "explanation": {"type": "string", "minLength": 1},
+        "source_event_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "assertion_id",
+        "subject",
+        "predicate",
+        "value",
+        "classification",
+        "explanation",
+        "source_event_ids"
+      ],
+      "properties": {
+        "assertion_id": {"type": "string", "minLength": 1},
+        "subject": {"type": "string", "minLength": 1},
+        "predicate": {"type": "string", "minLength": 1},
+        "value": {"type": "string", "minLength": 1},
+        "classification": {
+          "type": "string",
+          "enum": ["fact", "hypothesis", "configuration"]
+        },
+        "explanation": {"type": "string", "minLength": 1},
+        "source_event_ids": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "properties": {
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "version": {"type": "integer", "minimum": 0},
+    "prior_snapshot_id": {"type": ["string", "null"]},
+    "updated_at": {"type": "string", "minLength": 1},
+    "trigger_event_id": {"type": ["string", "null"]},
+    "capabilities": {"type": "array", "items": {"$ref": "#/$defs/capability"}},
+    "facts": {"type": "array", "items": {"$ref": "#/$defs/assertion"}},
+    "hypotheses": {"type": "array", "items": {"$ref": "#/$defs/assertion"}},
+    "configuration": {"type": "array", "items": {"$ref": "#/$defs/assertion"}},
+    "history_hash": {"type": "string", "minLength": 1}
+  }
+}

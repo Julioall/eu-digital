@@ -71,3 +71,11 @@ information-gain estimates. Budget, cooldown, correction and redundancy rules
 can suppress a proposal; it never sends a message, searches externally,
 executes an action or invokes an LLM. The module is laboratory-only and its
 calibration metrics are evidence records, not a claim of cognitive validity.
+
+The SPEC-012 functional self-model reference is in
+`eu_digital_lab/functional_self_model.py`. It turns typed internal updates into
+immutable, hash-linked snapshots; keeps facts, hypotheses and configuration
+separate; and emits explanation-backed structural capability decisions. The
+`unconstrained_decision_v0` control is selected through the same interface for
+ablation. It does not execute a decision, persist a longitudinal identity,
+invoke an LLM, or import a concrete capability implementation.

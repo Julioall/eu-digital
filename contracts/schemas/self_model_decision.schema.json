@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SelfModelDecision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision_id",
+    "schema_version",
+    "snapshot_id",
+    "requested_capability_id",
+    "allowed",
+    "reason_code",
+    "explanation",
+    "policy_id"
+  ],
+  "properties": {
+    "decision_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "requested_capability_id": {"type": "string", "minLength": 1},
+    "allowed": {"type": "boolean"},
+    "reason_code": {"type": "string", "minLength": 1},
+    "explanation": {"type": "string", "minLength": 1},
+    "policy_id": {"type": "string", "minLength": 1}
+  }
+}

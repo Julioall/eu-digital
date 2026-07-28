@@ -65,3 +65,18 @@ versionados:
 
 A questão aberta 10 continua necessária para validar utilidade humana em
 estudo posterior, mas não altera a semântica contratual desta SPEC.
+
+## Resoluções registradas pela SPEC-012
+
+Os requisitos arquiteturais da SPEC-012 foram resolvidos por ADR-0014 e
+contratos complementares, sem alterar o contrato público de capacidades:
+
+1. `self_model.schema.json` da SPEC-023 permanece compatível; eventos,
+   snapshots e decisões funcionais possuem schemas novos e versionados;
+2. cada evento interno gera snapshot imutável, recuperável e encadeado por
+   hash; persistência longitudinal continua fora desta SPEC;
+3. fatos, hipóteses e configuração são coleções distintas; ausência de uma
+   capacidade é não verificada, não evidência negativa;
+4. a decisão estrutural consulta o snapshot para bloquear disponibilidade
+   incompatível e expõe `unconstrained_decision_v0` para ablação. Ela não
+   executa ação, importa plugin concreto ou alega subjetividade.

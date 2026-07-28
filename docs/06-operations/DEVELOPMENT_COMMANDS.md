@@ -194,3 +194,15 @@ an inconclusive response is not negative evidence. Question proposals are
 local structures subject to gain, budget, cooldown, correction and redundancy
 suppression, with `fixed_gain_v0` and calibration-disabled controls available
 through `CuriosityConfig`.
+
+The SPEC-012 functional self-model reference is exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_functional_self_model -v
+```
+
+It validates immutable snapshot history, version recovery, facts/hypotheses/
+configuration separation, capability explanations and causal decision gating.
+`unconstrained_decision_v0` is an ablation control only: both policies emit a
+structural decision and neither executes an action.

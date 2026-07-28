@@ -25,11 +25,17 @@ def _validate(
 ) -> None:
     reference = schema.get("$ref")
     if reference:
-        if reference != "#/$defs/requirement":
+        prefix = "#/$defs/"
+        if not isinstance(reference, str) or not reference.startswith(prefix):
             raise SchemaValidationError(
                 f"{name}: unsupported schema reference {reference!r}"
             )
-        schema = root["$defs"]["requirement"]
+        definition = root.get("$defs", {}).get(reference.removeprefix(prefix))
+        if not isinstance(definition, Mapping):
+            raise SchemaValidationError(
+                f"{name}: unknown schema definition {reference!r}"
+            )
+        schema = definition
 
     if "const" in schema and value != schema["const"]:
         raise SchemaValidationError(
