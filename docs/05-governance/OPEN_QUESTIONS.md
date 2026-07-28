@@ -28,3 +28,20 @@
    e checkpoints tornam o reinício seguro nos demais casos.
 13. Não há ontologia fixa de operações: cada `CapabilityDescriptor` declara as
    operações que fornece, e o resolver seleciona por operação.
+
+## Bloqueios arquiteturais da SPEC-010
+
+A SPEC-010 permanece bloqueada até que sejam definidos e aprovados:
+
+1. um contrato versionado para item de workspace, seleção, expiração e
+   broadcast, incluindo compatibilidade com `CanonicalEvent`, `Episode` e
+   padrões sem alterar seus contratos públicos;
+2. um baseline determinístico de saliência, com entradas permitidas, política
+   para ausência de observação, desempate e justificativa auditável;
+3. o protocolo científico exigido por ADR-0005 e ADR-0008: hipótese, métricas,
+   ablação, conjunto anotado/holdout e critério de falsificação;
+4. o ciclo de vida do estado (persistência, replay, expiração e recuperação)
+   e o limite entre a referência Python e uma futura promoção para C++.
+
+Sem essas decisões, uma implementação escolheria silenciosamente semântica de
+prioridade, durabilidade e validade científica que não constam da SPEC.
