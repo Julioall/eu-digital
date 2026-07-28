@@ -1,5 +1,10 @@
 # Contrato: CanonicalEvent
 
+A definição executável e versionada deste contrato está em
+`contracts/schemas/canonical_event.schema.json`. O bloco abaixo documenta a
+semântica dos campos; validadores e fixtures devem consumir o schema compartilhado,
+sem duplicar sua definição em Python ou C++.
+
 ```yaml
 schema_version: "1.0"
 event_id: uuid

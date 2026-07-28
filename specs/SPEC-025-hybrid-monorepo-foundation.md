@@ -1,7 +1,7 @@
 ---
 id: SPEC-025
 title: Fundação do monorepositório Laboratório/Cérebro
-status: ready
+status: done
 phase: 0
 dependencies: [SPEC-001]
 adrs: [ADR-0001, ADR-0009, ADR-0010]
@@ -10,7 +10,7 @@ contracts: []
 
 # SPEC-025 — Fundação do monorepositório Laboratório/Cérebro
 
-Status: ready
+Status: done
 Fase: 0
 Dependências: SPEC-001
 ADRs aplicáveis: ADR-0001, ADR-0009, ADR-0010
@@ -54,10 +54,10 @@ Transformar a fundação do projeto em um monorepositório com Laboratório Pyth
 
 ## Critérios de aceite
 
-- [ ] `cmake --preset dev` configura o Cérebro Implantado.
-- [ ] `cmake --build --preset dev` produz executável mínimo.
-- [ ] o pacote Python instala em ambiente isolado.
-- [ ] Python e C++ leem a mesma fixture de `CanonicalEvent`.
-- [ ] alteração incompatível em contrato falha em CI.
-- [ ] pacote de release não contém Python.
-- [ ] documentação identifica claramente laboratório e runtime.
+- [x] `cmake --preset dev` configura o Cérebro Implantado.
+- [x] `cmake --build --preset dev` produz executável mínimo.
+- [x] o pacote Python instala em ambiente isolado.
+- [x] Python e C++ leem a mesma fixture de `CanonicalEvent`.
+- [x] alteração incompatível em contrato falha em CI.
+- [x] pacote de release não contém Python.
+- [x] documentação identifica claramente laboratório e runtime.

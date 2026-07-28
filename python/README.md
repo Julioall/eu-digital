@@ -7,3 +7,6 @@ Código experimental não entra automaticamente no Cérebro Implantado. A promo�
 O sandbox reprodutível da SPEC-017 está em `eu_digital_lab/` e usa somente a
 biblioteca padrão. Execute `python -m unittest discover -s python/tests -v` para
 validar reprodutibilidade, ground truth, splits e anotações humanas.
+
+Para validar o pacote isolado e a fixture compartilhada, use
+`uv run python tools/validate_hybrid.py`.

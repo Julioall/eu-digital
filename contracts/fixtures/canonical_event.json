@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "event_id": "00000000-0000-4000-8000-000000000001",
+  "source": "system",
+  "event_type": "fixture.canonical_event",
+  "occurred_at": "2026-01-01T00:00:00Z",
+  "monotonic_ns": 1000000,
+  "received_at": "2026-01-01T00:00:00Z",
+  "session_id": "00000000-0000-4000-8000-000000000002",
+  "actor_id": null,
+  "context": {
+    "process_name": "eu-digital-fixture",
+    "window_title": null,
+    "document_uri": null
+  },
+  "payload": {
+    "fixture": true,
+    "value": "shared-contract"
+  },
+  "quality": {
+    "confidence": 1.0,
+    "completeness": 1.0,
+    "latency_ms": 0
+  },
+  "provenance": {
+    "sensor_id": "fixture",
+    "raw_event_id": null
+  },
+  "privacy_class": "synthetic",
+  "tags": ["spec-025", "fixture"]
+}

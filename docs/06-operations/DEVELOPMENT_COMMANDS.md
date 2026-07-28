@@ -18,6 +18,7 @@ validador em modo somente leitura; uma árvore desatualizada falha.
 
 ```powershell
 python -m unittest discover -s python/tests -v
+python tools/validate_contracts.py
 python tools/generate_sandbox_corpus.py --output datasets/synthetic/v1
 python tools/validate_sandbox.py datasets/synthetic/v1
 # após duas anotações humanas da mesma sessão:
@@ -39,5 +40,14 @@ uv run ruff format --check .
 uv run mypy src
 uv run pytest -q
 ```
+
+O comando unificado da SPEC-025 é:
+
+```powershell
+uv run python tools/validate_hybrid.py
+```
+
+Ele executa testes Python, configura/compila/testa o C++ e instala uma release
+mínima, verificando que nenhum arquivo Python é empacotado.
 
 Nenhuma tarefa deve ser marcada como concluída sem executar a sequência aplicável.

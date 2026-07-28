@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CanonicalEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "source",
+    "event_type",
+    "occurred_at",
+    "monotonic_ns",
+    "received_at",
+    "session_id",
+    "actor_id",
+    "context",
+    "payload",
+    "quality",
+    "provenance",
+    "privacy_class",
+    "tags"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "event_id": {"type": "string"},
+    "source": {"type": "string"},
+    "event_type": {"type": "string"},
+    "occurred_at": {"type": "string"},
+    "monotonic_ns": {"type": "integer", "minimum": 0},
+    "received_at": {"type": "string"},
+    "session_id": {"type": "string"},
+    "actor_id": {"type": ["string", "null"]},
+    "context": {"type": "object"},
+    "payload": {"type": "object"},
+    "quality": {"type": "object"},
+    "provenance": {"type": "object"},
+    "privacy_class": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}}
+  }
+}
