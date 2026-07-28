@@ -1,1 +1,1 @@
-bootstrap final scientific specification — complete verified segments
+bootstrap final scientific specification — per-segment verification
