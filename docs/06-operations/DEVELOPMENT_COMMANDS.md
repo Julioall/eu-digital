@@ -14,6 +14,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/generate_repository_tr
 O último comando atualiza `REPOSITORY_TREE.txt`. A CI executa os testes e o
 validador em modo somente leitura; uma árvore desatualizada falha.
 
+## Sandbox científico
+
+```powershell
+python -m unittest discover -s python/tests -v
+python tools/generate_sandbox_corpus.py --output datasets/synthetic/v1
+python tools/validate_sandbox.py datasets/synthetic/v1
+# após duas anotações humanas da mesma sessão:
+python tools/calculate_agreement.py anotador-1.json anotador-2.json agreement.json
+```
+
+O corpus sintético é determinístico, versionado por manifesto e não importa
+LLM ou serviços externos. O split `test` é o holdout bloqueado.
+
 ## Fundação executável
 
 Os comandos abaixo são alvos da SPEC-025 e ainda não fazem parte da

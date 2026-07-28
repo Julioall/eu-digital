@@ -58,6 +58,13 @@ Os validadores verificam frontmatter e critérios das SPECs, referências a
 dependências, ADRs e contratos, schemas de configuração e a árvore normativa
 do repositório. Eles não dependem de serviços de IA.
 
+O sandbox sintético da SPEC-017 é validado separadamente com:
+
+```powershell
+python -m unittest discover -s python/tests -v
+python tools/validate_sandbox.py datasets/synthetic/v1
+```
+
 ## Validação científica
 
 A pasta `docs/07-research/` contém o relatório de validação, matriz de evidências, comparações com arquiteturas existentes, programa experimental, limitações e bibliografia.

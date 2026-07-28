@@ -1,7 +1,7 @@
 ---
 id: SPEC-017
 title: Sandbox e corpus de avaliação
-status: ready
+status: done
 phase: 0.5
 dependencies: [SPEC-001]
 adrs: [ADR-0005, ADR-0008]
@@ -10,7 +10,7 @@ contracts: []
 
 # SPEC-017 — Sandbox e corpus de avaliação
 
-Status: ready
+Status: done
 Fase: 0.5
 Dependências: SPEC-001
 ADRs: ADR-0005, ADR-0008
@@ -29,7 +29,7 @@ Criar ambiente reprodutível e corpus anotado para testar sensores, episódios, 
 Inferência cognitiva de produção.
 
 ## Critérios de aceite
-- [ ] Uma sessão é reproduzível por seed.
-- [ ] Ground truth possui schema versionado.
-- [ ] Concordância entre anotadores é calculada.
-- [ ] Corpus não depende do LLM.
+- [x] Uma sessão é reproduzível por seed.
+- [x] Ground truth possui schema versionado.
+- [x] Concordância entre anotadores é calculada.
+- [x] Corpus não depende do LLM.

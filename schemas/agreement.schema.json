@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "InterAnnotatorAgreement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "session_id", "annotators", "compared_episodes", "exact_agreement", "cohen_kappa"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "session_id": {"type": ["string", "null"]},
+    "annotators": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "string"}},
+    "compared_episodes": {"type": "integer", "minimum": 1},
+    "exact_agreement": {"type": "number", "minimum": 0, "maximum": 1},
+    "cohen_kappa": {"type": "number", "minimum": -1, "maximum": 1}
+  }
+}

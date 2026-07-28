@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HumanEpisodeAnnotation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "session_id", "annotator_id", "annotations"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "session_id": {"type": "string"},
+    "annotator_id": {"type": "string", "minLength": 1},
+    "annotations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["episode_id", "event_ids", "label", "goal", "relevance"],
+        "properties": {
+          "episode_id": {"type": "string"},
+          "event_ids": {"type": "array", "items": {"type": "string"}},
+          "label": {"type": "string", "minLength": 1},
+          "goal": {"type": ["string", "null"]},
+          "relevance": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+        }
+      }
+    }
+  }
+}

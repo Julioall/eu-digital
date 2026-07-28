@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SyntheticSandboxSession",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generator_version", "seed", "session_id", "events", "episodes", "episode_ids", "causal_links"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "generator_version": {"type": "string"},
+    "seed": {"type": "integer"},
+    "session_id": {"type": "string"},
+    "episode_ids": {"type": "array", "items": {"type": "string"}},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_id", "session_id", "sequence", "occurred_at", "source", "event_type", "payload"],
+        "properties": {
+          "event_id": {"type": "string"},
+          "session_id": {"type": "string"},
+          "sequence": {"type": "integer", "minimum": 0},
+          "occurred_at": {"type": "string"},
+          "source": {"type": "string", "enum": ["system", "user", "agent", "external"]},
+          "event_type": {"type": "string"},
+          "payload": {"type": "object"}
+        }
+      }
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["episode_id", "session_id", "event_ids", "routine", "boundary_reason"],
+        "properties": {
+          "episode_id": {"type": "string"},
+          "session_id": {"type": "string"},
+          "event_ids": {"type": "array", "items": {"type": "string"}},
+          "routine": {"type": "string"},
+          "boundary_reason": {"type": "string"}
+        }
+      }
+    },
+    "causal_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["event_id", "actor", "cause"],
+        "properties": {
+          "event_id": {"type": "string"},
+          "actor": {"type": "string", "enum": ["agent", "user", "external", "none"]},
+          "cause": {"type": "string"}
+        }
+      }
+    }
+  }
+}

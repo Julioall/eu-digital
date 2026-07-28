@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SyntheticCorpusManifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "corpus_id", "generator_version", "seed", "split_seed", "session_count", "llm_dependency", "holdout_split", "splits"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "corpus_id": {"type": "string"},
+    "generator_version": {"type": "string"},
+    "seed": {"type": "integer"},
+    "split_seed": {"type": "integer"},
+    "session_count": {"type": "integer", "minimum": 3},
+    "llm_dependency": {"type": "boolean", "const": false},
+    "holdout_split": {"type": "string", "const": "test"},
+    "splits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["train", "development", "test"],
+      "properties": {
+        "train": {"type": "array"},
+        "development": {"type": "array"},
+        "test": {"type": "array"}
+      }
+    }
+  }
+}

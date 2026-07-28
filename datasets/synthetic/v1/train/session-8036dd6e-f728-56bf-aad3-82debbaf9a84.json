@@ -1,0 +1,278 @@
+{
+  "causal_links": [
+    {
+      "actor": "external",
+      "cause": "external_interrupt:0",
+      "event_id": "a162c57e-3a35-58ab-925b-fa3cf41aed30"
+    },
+    {
+      "actor": "user",
+      "cause": "external_interrupt:1",
+      "event_id": "92fe8852-25ae-54fd-b7cf-0afd3c52e784"
+    },
+    {
+      "actor": "agent",
+      "cause": "external_interrupt:2",
+      "event_id": "4ed042ae-a415-52f8-ae7c-447e55580424"
+    },
+    {
+      "actor": "external",
+      "cause": "external_interrupt:0",
+      "event_id": "42284363-3b2d-5e21-98b7-b0975654bc6e"
+    },
+    {
+      "actor": "user",
+      "cause": "external_interrupt:1",
+      "event_id": "d810c36f-2dd1-568f-9e35-74b3a790b50d"
+    },
+    {
+      "actor": "agent",
+      "cause": "external_interrupt:2",
+      "event_id": "6a2a5ad2-949f-5070-8a5a-908691b9c00c"
+    },
+    {
+      "actor": "external",
+      "cause": "external_interrupt:0",
+      "event_id": "2026173f-3f82-5f96-9f52-12843ce8d356"
+    },
+    {
+      "actor": "user",
+      "cause": "external_interrupt:1",
+      "event_id": "ae866998-cb25-5344-b547-a91514f86c09"
+    },
+    {
+      "actor": "agent",
+      "cause": "external_interrupt:2",
+      "event_id": "287b366e-8f30-52dd-82ab-8d42479bae4b"
+    },
+    {
+      "actor": "external",
+      "cause": "external_interrupt:0",
+      "event_id": "4cab0fe8-bf16-525b-b530-da9757b23342"
+    },
+    {
+      "actor": "user",
+      "cause": "external_interrupt:1",
+      "event_id": "04a83f77-2b65-56d7-8151-c0632ed09937"
+    },
+    {
+      "actor": "agent",
+      "cause": "external_interrupt:2",
+      "event_id": "1baf886b-9d33-5c1a-852f-bccdcefb8ab5"
+    }
+  ],
+  "episode_ids": [
+    "db5f71a6-7ac0-57ea-9875-7abdac4798dd",
+    "1b07156e-5053-5501-85ec-20079775dfff",
+    "5c816077-dec4-5272-ba1c-8cb698556cd5",
+    "d33b607b-eb7a-5a94-bd54-83fa65461c4b"
+  ],
+  "episodes": [
+    {
+      "boundary_reason": "routine_transition",
+      "episode_id": "db5f71a6-7ac0-57ea-9875-7abdac4798dd",
+      "event_ids": [
+        "a162c57e-3a35-58ab-925b-fa3cf41aed30",
+        "92fe8852-25ae-54fd-b7cf-0afd3c52e784",
+        "4ed042ae-a415-52f8-ae7c-447e55580424"
+      ],
+      "routine": "external_interrupt",
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84"
+    },
+    {
+      "boundary_reason": "routine_transition",
+      "episode_id": "1b07156e-5053-5501-85ec-20079775dfff",
+      "event_ids": [
+        "42284363-3b2d-5e21-98b7-b0975654bc6e",
+        "d810c36f-2dd1-568f-9e35-74b3a790b50d",
+        "6a2a5ad2-949f-5070-8a5a-908691b9c00c"
+      ],
+      "routine": "external_interrupt",
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84"
+    },
+    {
+      "boundary_reason": "routine_transition",
+      "episode_id": "5c816077-dec4-5272-ba1c-8cb698556cd5",
+      "event_ids": [
+        "2026173f-3f82-5f96-9f52-12843ce8d356",
+        "ae866998-cb25-5344-b547-a91514f86c09",
+        "287b366e-8f30-52dd-82ab-8d42479bae4b"
+      ],
+      "routine": "external_interrupt",
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84"
+    },
+    {
+      "boundary_reason": "routine_transition",
+      "episode_id": "d33b607b-eb7a-5a94-bd54-83fa65461c4b",
+      "event_ids": [
+        "4cab0fe8-bf16-525b-b530-da9757b23342",
+        "04a83f77-2b65-56d7-8151-c0632ed09937",
+        "1baf886b-9d33-5c1a-852f-bccdcefb8ab5"
+      ],
+      "routine": "external_interrupt",
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84"
+    }
+  ],
+  "events": [
+    {
+      "event_id": "a162c57e-3a35-58ab-925b-fa3cf41aed30",
+      "event_type": "notification_received",
+      "occurred_at": "2026-01-01T00:00:00Z",
+      "payload": {
+        "local_index": 0,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 0,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "external"
+    },
+    {
+      "event_id": "92fe8852-25ae-54fd-b7cf-0afd3c52e784",
+      "event_type": "notification_opened",
+      "occurred_at": "2026-01-01T00:00:01Z",
+      "payload": {
+        "local_index": 1,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 1,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "user"
+    },
+    {
+      "event_id": "4ed042ae-a415-52f8-ae7c-447e55580424",
+      "event_type": "question_prepared",
+      "occurred_at": "2026-01-01T00:00:02Z",
+      "payload": {
+        "local_index": 2,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 2,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "agent"
+    },
+    {
+      "event_id": "42284363-3b2d-5e21-98b7-b0975654bc6e",
+      "event_type": "notification_received",
+      "occurred_at": "2026-01-01T00:00:03Z",
+      "payload": {
+        "local_index": 0,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 3,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "external"
+    },
+    {
+      "event_id": "d810c36f-2dd1-568f-9e35-74b3a790b50d",
+      "event_type": "notification_opened",
+      "occurred_at": "2026-01-01T00:00:04Z",
+      "payload": {
+        "local_index": 1,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 4,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "user"
+    },
+    {
+      "event_id": "6a2a5ad2-949f-5070-8a5a-908691b9c00c",
+      "event_type": "question_prepared",
+      "occurred_at": "2026-01-01T00:00:05Z",
+      "payload": {
+        "local_index": 2,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 5,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "agent"
+    },
+    {
+      "event_id": "2026173f-3f82-5f96-9f52-12843ce8d356",
+      "event_type": "notification_received",
+      "occurred_at": "2026-01-01T00:00:06Z",
+      "payload": {
+        "local_index": 0,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 6,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "external"
+    },
+    {
+      "event_id": "ae866998-cb25-5344-b547-a91514f86c09",
+      "event_type": "notification_opened",
+      "occurred_at": "2026-01-01T00:00:07Z",
+      "payload": {
+        "local_index": 1,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 7,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "user"
+    },
+    {
+      "event_id": "287b366e-8f30-52dd-82ab-8d42479bae4b",
+      "event_type": "question_prepared",
+      "occurred_at": "2026-01-01T00:00:08Z",
+      "payload": {
+        "local_index": 2,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 8,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "agent"
+    },
+    {
+      "event_id": "4cab0fe8-bf16-525b-b530-da9757b23342",
+      "event_type": "notification_received",
+      "occurred_at": "2026-01-01T00:00:09Z",
+      "payload": {
+        "local_index": 0,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 9,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "external"
+    },
+    {
+      "event_id": "04a83f77-2b65-56d7-8151-c0632ed09937",
+      "event_type": "notification_opened",
+      "occurred_at": "2026-01-01T00:00:10Z",
+      "payload": {
+        "local_index": 1,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 10,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "user"
+    },
+    {
+      "event_id": "1baf886b-9d33-5c1a-852f-bccdcefb8ab5",
+      "event_type": "question_prepared",
+      "occurred_at": "2026-01-01T00:00:11Z",
+      "payload": {
+        "local_index": 2,
+        "routine": "external_interrupt",
+        "subject": "calendar"
+      },
+      "sequence": 11,
+      "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84",
+      "source": "agent"
+    }
+  ],
+  "generator_version": "1.0.0",
+  "schema_version": "1.0",
+  "seed": 20260732,
+  "session_id": "8036dd6e-f728-56bf-aad3-82debbaf9a84"
+}

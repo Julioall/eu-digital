@@ -174,14 +174,14 @@ foreach ($SpecFile in $SpecFiles) {
         @{ Name = 'Criterios de aceite'; Pattern = 'Crit[^\r\n]*rios de aceite' }
     )
     foreach ($Section in $RequiredSections) {
-        if ($Content -notmatch "(?m)^## $($Section.Pattern)[ \t]*$") {
+        if ($Content -notmatch "(?m)^## $($Section.Pattern)[ \t]*(?:\r?$)") {
             $Errors.Add("$($SpecFile.Name): secao obrigatoria ausente: $($Section.Name).")
         }
     }
-    if ($Content -match '(?m)^## Crit[^\r\n]*rios de aceite[ \t]*$') {
+    if ($Content -match '(?m)^## Crit[^\r\n]*rios de aceite[ \t]*(?:\r?$)') {
         $CriteriaBlock = [regex]::Match(
             $Content,
-            '(?ms)^## Crit[^\r\n]*rios de aceite[ \t]*\r?\n(?<body>.*?)(?=^## |\z)'
+            '(?ms)^## Crit[^\r\n]*rios de aceite[ \t]*(?:\r?$)\r?\n(?<body>.*?)(?=^## |\z)'
         )
         if (-not $CriteriaBlock.Success -or $CriteriaBlock.Groups['body'].Value -notmatch '(?m)^[ \t]*-[ \t]+\[[ xX]\][ \t]+\S') {
             $Errors.Add("$($SpecFile.Name): critérios de aceite devem conter pelo menos um checkbox.")
