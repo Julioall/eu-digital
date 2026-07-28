@@ -1,5 +1,10 @@
 # Contrato: Hypothesis
 
+A definição executável e versionada está em
+`contracts/schemas/hypothesis.schema.json`. O YAML abaixo documenta a
+semântica; Python e C++ devem consumir o schema compartilhado, sem manter
+definições manuais divergentes.
+
 ```yaml
 hypothesis_id: uuid
 kind: enum

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CuriosityResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "response_id",
+    "schema_version",
+    "question_id",
+    "received_at",
+    "outcome",
+    "correction",
+    "evidence_refs",
+    "provenance"
+  ],
+  "properties": {
+    "response_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "question_id": {"type": "string", "minLength": 1},
+    "received_at": {"type": "string", "minLength": 1},
+    "outcome": {"type": "string", "enum": ["confirmed", "rejected", "inconclusive"]},
+    "correction": {"type": "boolean"},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "actor_id"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "actor_id": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

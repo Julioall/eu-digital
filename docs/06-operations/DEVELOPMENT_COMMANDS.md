@@ -180,3 +180,17 @@ The reference is local and accepts generic candidates with source references.
 `fifo_capacity_v0` through `WorkspaceConfig` runs the control without changing
 the module interface. Snapshots are broadcast only as local canonical events
 of type `workspace.selection.v1`.
+
+The SPEC-011 metacognition-and-curiosity reference is exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_metacognition_curiosity -v
+```
+
+It validates versioned hypothesis, assessment, question and response
+contracts. Only confirmed and rejected responses enter the calibration record;
+an inconclusive response is not negative evidence. Question proposals are
+local structures subject to gain, budget, cooldown, correction and redundancy
+suppression, with `fixed_gain_v0` and calibration-disabled controls available
+through `CuriosityConfig`.

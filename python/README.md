@@ -62,3 +62,12 @@ exclusion reasons; expires entries; and broadcasts validated snapshots through
 an injected local event-bus port. FIFO is selectable through the same
 configuration for ablation. The module is laboratory-only and makes no claim
 about consciousness or promotion to C++.
+
+The SPEC-011 metacognition-and-curiosity reference is in
+`eu_digital_lab/metacognition_curiosity.py`. It evaluates explicit hypotheses,
+records confirmed/rejected/inconclusive local outcomes, calibrates confidence
+against only verified outcomes, and emits structured question proposals with
+information-gain estimates. Budget, cooldown, correction and redundancy rules
+can suppress a proposal; it never sends a message, searches externally,
+executes an action or invokes an LLM. The module is laboratory-only and its
+calibration metrics are evidence records, not a claim of cognitive validity.

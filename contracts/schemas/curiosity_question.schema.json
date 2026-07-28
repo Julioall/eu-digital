@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CuriosityQuestion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "question_id",
+    "schema_version",
+    "hypothesis_id",
+    "assessment_id",
+    "prompt",
+    "expected_information_gain",
+    "created_at",
+    "status",
+    "suppression_reason",
+    "budget_window_started_at",
+    "cooldown_until",
+    "correction_count",
+    "provenance"
+  ],
+  "properties": {
+    "question_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "hypothesis_id": {"type": "string", "minLength": 1},
+    "assessment_id": {"type": "string", "minLength": 1},
+    "prompt": {"type": "string", "minLength": 1},
+    "expected_information_gain": {"type": "number", "minimum": 0, "maximum": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["proposed", "suppressed", "asked", "answered"]},
+    "suppression_reason": {"type": ["string", "null"]},
+    "budget_window_started_at": {"type": "string", "minLength": 1},
+    "cooldown_until": {"type": ["string", "null"]},
+    "correction_count": {"type": "integer", "minimum": 0},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["module", "policy_id"],
+      "properties": {
+        "module": {"type": "string", "minLength": 1},
+        "policy_id": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

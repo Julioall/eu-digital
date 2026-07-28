@@ -19,6 +19,12 @@ Os contratos executáveis do workspace global da SPEC-010 estão em
 `workspace_snapshot.schema.json` e `workspace_broadcast.schema.json`. A
 semântica está documentada em `docs/03-contracts/GLOBAL_WORKSPACE_SCHEMA.md`.
 
+Os contratos executáveis de metacognição e curiosidade da SPEC-011 estão em
+`hypothesis.schema.json`, `metacognitive_assessment.schema.json`,
+`curiosity_question.schema.json` e `curiosity_response.schema.json`. A
+semântica está documentada em
+`docs/03-contracts/METACOGNITION_CURIOSITY_SCHEMA.md`.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

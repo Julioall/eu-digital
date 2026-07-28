@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MetacognitiveAssessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assessment_id",
+    "schema_version",
+    "hypothesis_id",
+    "evaluated_at",
+    "raw_confidence",
+    "calibrated_confidence",
+    "evidence_balance",
+    "uncertainty",
+    "supporting_refs",
+    "opposing_refs",
+    "alternatives",
+    "decision",
+    "reason_codes",
+    "calibrator_id"
+  ],
+  "properties": {
+    "assessment_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "hypothesis_id": {"type": "string", "minLength": 1},
+    "evaluated_at": {"type": "string", "minLength": 1},
+    "raw_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "calibrated_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "evidence_balance": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "uncertainty": {"type": "number", "minimum": 0, "maximum": 1},
+    "supporting_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "opposing_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "alternatives": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "decision": {"type": "string", "enum": ["question", "silence"]},
+    "reason_codes": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "calibrator_id": {"type": "string", "minLength": 1}
+  }
+}

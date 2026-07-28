@@ -45,21 +45,23 @@ workspace versionados:
    determinístico. Promoção C++ permanece sujeita à SPEC-026 e evidência
    independente.
 
-## Bloqueios arquiteturais da SPEC-011
+## Resoluções registradas pela SPEC-011
 
-A SPEC-011 permanece bloqueada até que sejam definidos e aprovados:
+Os bloqueios da SPEC-011 foram resolvidos por ADR-0013 e contratos
+versionados:
 
-1. contratos executáveis e versionados para hipótese, avaliação
-   metacognitiva, pergunta estruturada, resposta/correção e supressão, pois
-   `HYPOTHESIS_SCHEMA.md` hoje é somente documentação YAML;
-2. um protocolo de calibração que relacione previsão, confiança, correção,
-   abstinência e custo de interrupção, com baseline, Brier/ECE/AUROC e
-   risk–coverage congelados antes do holdout;
-3. a política local de orçamento de perguntas, cooldown, redundância e regra
-   de silêncio, sem introduzir diálogo, LLM obrigatório, busca externa ou ação
-   autônoma;
-4. o limite entre a referência Python e eventual promoção C++, que continua
-   condicionado à SPEC-026 e à validade independente.
+1. hipótese, avaliação metacognitiva, pergunta estruturada e resposta têm
+   schemas executáveis em `contracts/schemas/` e validação local;
+2. `bucketed_beta_v1` aprende exclusivamente com outcomes confirmados ou
+   rejeitados indexados pela confiança bruta; Brier, ECE, AUROC e
+   risk-coverage permanecem métricas registradas para avaliação posterior em
+   holdout congelado;
+3. `information_gain_v1` produz somente propostas estruturadas e aplica
+   orçamento, cooldown, correção, redundância e silêncio. Não há diálogo,
+   LLM, busca externa ou ação autônoma;
+4. a referência é Python, local e efêmera. Promoção C++ continua condicionada
+   à SPEC-026 e a evidência independente; concordância entre runtimes não é
+   prova de validade científica.
 
-Sem essas decisões, uma implementação escolheria silenciosamente a semântica
-de confiança, interrupção e atualização que a SPEC não define.
+A questão aberta 10 continua necessária para validar utilidade humana em
+estudo posterior, mas não altera a semântica contratual desta SPEC.
