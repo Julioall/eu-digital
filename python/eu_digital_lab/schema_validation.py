@@ -57,6 +57,13 @@ def _validate(
         and value < schema["minimum"]
     ):
         raise SchemaValidationError(f"{name}{path}: value is below minimum")
+    if (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and "maximum" in schema
+        and value > schema["maximum"]
+    ):
+        raise SchemaValidationError(f"{name}{path}: value is above maximum")
 
     if isinstance(value, Mapping):
         required = set(schema.get("required", []))

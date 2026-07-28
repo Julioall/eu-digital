@@ -167,3 +167,16 @@ python -m unittest python.tests.test_pattern_learning -v
 Patterns use only observed numeric features, require configurable support for
 promotion, preserve versions and feedback, and expose an exact-key ablation.
 No pattern invokes an actuator or becomes a task automatically.
+
+The SPEC-010 global-workspace reference is exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_global_workspace -v
+```
+
+The reference is local and accepts generic candidates with source references.
+`observed_weighted_mean_v1` excludes absent factors from its score; selecting
+`fifo_capacity_v0` through `WorkspaceConfig` runs the control without changing
+the module interface. Snapshots are broadcast only as local canonical events
+of type `workspace.selection.v1`.

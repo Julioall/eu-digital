@@ -14,6 +14,11 @@ O schema executável de `Episode` da SPEC-007 está em
 O schema executável de padrões incrementais da SPEC-009 está em
 `contracts/schemas/pattern.schema.json`.
 
+Os contratos executáveis do workspace global da SPEC-010 estão em
+`workspace_candidate.schema.json`, `workspace_item.schema.json`,
+`workspace_snapshot.schema.json` e `workspace_broadcast.schema.json`. A
+semântica está documentada em `docs/03-contracts/GLOBAL_WORKSPACE_SCHEMA.md`.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

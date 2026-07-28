@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceBroadcast",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "broadcast_id",
+    "schema_version",
+    "workspace_id",
+    "session_id",
+    "emitted_at",
+    "snapshot"
+  ],
+  "properties": {
+    "broadcast_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "workspace_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "emitted_at": {"type": "string", "minLength": 1},
+    "snapshot": {"type": "object"}
+  }
+}

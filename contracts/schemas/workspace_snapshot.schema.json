@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorkspaceSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_id",
+    "schema_version",
+    "workspace_id",
+    "session_id",
+    "created_at",
+    "capacity",
+    "policy_id",
+    "config_fingerprint",
+    "selection_churn",
+    "active_items",
+    "decisions",
+    "expired_candidate_ids",
+    "discarded_candidate_ids"
+  ],
+  "properties": {
+    "snapshot_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "workspace_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "capacity": {"type": "integer", "minimum": 1},
+    "policy_id": {"type": "string", "minLength": 1},
+    "config_fingerprint": {"type": "string", "minLength": 1},
+    "selection_churn": {"type": "number", "minimum": 0, "maximum": 1},
+    "active_items": {"type": "array", "items": {"type": "object"}},
+    "decisions": {"type": "array", "items": {"type": "object"}},
+    "expired_candidate_ids": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "discarded_candidate_ids": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

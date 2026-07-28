@@ -54,3 +54,11 @@ The SPEC-009 pattern learner reference is in `eu_digital_lab/pattern_learning.py
 It incrementally clusters numeric observations, waits for configurable support
 before promotion, records human feedback and concept-drift versions, and
 publishes cluster metrics without executing actions.
+
+The SPEC-010 global-workspace reference is in
+`eu_digital_lab/global_workspace.py`. It ranks only explicitly observed
+salience factors into a short-lived, bounded workspace; records selection and
+exclusion reasons; expires entries; and broadcasts validated snapshots through
+an injected local event-bus port. FIFO is selectable through the same
+configuration for ablation. The module is laboratory-only and makes no claim
+about consciousness or promotion to C++.

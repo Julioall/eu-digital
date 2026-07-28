@@ -29,19 +29,18 @@
 13. Não há ontologia fixa de operações: cada `CapabilityDescriptor` declara as
    operações que fornece, e o resolver seleciona por operação.
 
-## Bloqueios arquiteturais da SPEC-010
+## Resoluções registradas pela SPEC-010
 
-A SPEC-010 permanece bloqueada até que sejam definidos e aprovados:
+Os bloqueios da SPEC-010 foram resolvidos por ADR-0012 e pelos schemas de
+workspace versionados:
 
-1. um contrato versionado para item de workspace, seleção, expiração e
-   broadcast, incluindo compatibilidade com `CanonicalEvent`, `Episode` e
-   padrões sem alterar seus contratos públicos;
-2. um baseline determinístico de saliência, com entradas permitidas, política
-   para ausência de observação, desempate e justificativa auditável;
-3. o protocolo científico exigido por ADR-0005 e ADR-0008: hipótese, métricas,
-   ablação, conjunto anotado/holdout e critério de falsificação;
-4. o ciclo de vida do estado (persistência, replay, expiração e recuperação)
-   e o limite entre a referência Python e uma futura promoção para C++.
-
-Sem essas decisões, uma implementação escolheria silenciosamente semântica de
-prioridade, durabilidade e validade científica que não constam da SPEC.
+1. candidatos, itens, snapshots e broadcasts possuem contratos próprios e o
+   broadcast usa `CanonicalEvent` sem alterar contratos de evento, episódio ou
+   padrão;
+2. `observed_weighted_mean_v1` define fatores permitidos, desempate por
+   `candidate_id` e ausência explícita fora da média ponderada;
+3. o protocolo fixa baseline FIFO, métricas de seleção, ablação configurável,
+   holdout anotado e critério de falsificação;
+4. a primeira referência é Python, local e efêmera, com snapshots para replay
+   determinístico. Promoção C++ permanece sujeita à SPEC-026 e evidência
+   independente.
