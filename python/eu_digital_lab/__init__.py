@@ -102,6 +102,16 @@ from .local_model_gateway import (
     PromptTemplate,
     SchedulingPolicy,
 )
+from .longitudinal_evaluation import (
+    BASELINE_POLICY_ID as LONGITUDINAL_BASELINE_POLICY_ID,
+)
+from .longitudinal_evaluation import (
+    LongitudinalEvaluationError,
+    LongitudinalEvaluator,
+    LongitudinalProtocol,
+    LongitudinalReport,
+    LongitudinalSnapshot,
+)
 from .memory_consolidation import (
     ABLATION as CONSOLIDATION_ABLATION,
 )
@@ -173,6 +183,7 @@ __all__ = [
     "CONSOLIDATION_HYPOTHESIS",
     "CONSOLIDATION_POLICY_ID",
     "FREQUENCY_BASELINE_ID",
+    "LONGITUDINAL_BASELINE_POLICY_ID",
     "MARKOV_BASELINE_ID",
     "PREDICTOR_POLICY_ID",
     "WORLD_MODEL_ABLATION",
@@ -225,6 +236,11 @@ __all__ = [
     "InvalidModelResponseError",
     "LocalModelBackend",
     "LocalModelGateway",
+    "LongitudinalEvaluationError",
+    "LongitudinalEvaluator",
+    "LongitudinalProtocol",
+    "LongitudinalReport",
+    "LongitudinalSnapshot",
     "MemoryConsolidationError",
     "MemoryConsolidator",
     "MemoryQuery",

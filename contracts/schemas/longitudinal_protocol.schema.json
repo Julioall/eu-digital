@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LongitudinalProtocol",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_id", "schema_version", "study_id", "metrics", "acceptance_criteria", "holdout_sha256", "protocol_hash", "frozen"],
+  "properties": {
+    "protocol_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "study_id": {"type": "string", "minLength": 1},
+    "metrics": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "acceptance_criteria": {"type": "object", "additionalProperties": {"type": "number"}},
+    "holdout_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "protocol_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "frozen": {"type": "boolean", "const": true}
+  }
+}

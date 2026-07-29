@@ -143,6 +143,17 @@ The test compares the incremental n-gram predictor with the frequency
 baseline on a holdout, validates log loss and top-k, and verifies that drift
 reduces confidence while preserving the source observations.
 
+The SPEC-022 longitudinal-evaluation tests are exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_longitudinal_evaluation -v
+```
+
+The test freezes the protocol/holdout, records 7/30/90-day snapshots, and
+replays the report to verify deterministic gains, losses, calibration and
+self-model drift.
+
 `time_context_threshold_v1` is deterministic and records a reason for every
 boundary. Its output is validated against `contracts/schemas/episode.schema.json`;
 boundary F1 and WindowDiff are engineering metrics against annotated episodes,

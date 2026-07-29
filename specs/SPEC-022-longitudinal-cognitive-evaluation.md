@@ -1,18 +1,20 @@
 ---
 id: SPEC-022
 title: Avaliação longitudinal
-status: future
+status: done
 phase: 6
 dependencies: [SPEC-018, SPEC-019, SPEC-020, SPEC-021]
-adrs: []
-contracts: []
+adrs: [ADR-0005, ADR-0008, ADR-0022]
+contracts: [LONGITUDINAL_EVALUATION_SCHEMA.md, longitudinal_protocol.schema.json, longitudinal_snapshot.schema.json, longitudinal_report.schema.json]
 ---
 
 # SPEC-022 — Avaliação longitudinal
 
-Status: future
+Status: done
 Fase: 6
 Dependências: SPEC-018, SPEC-019, SPEC-020, SPEC-021
+ADRs aplicáveis: ADR-0005, ADR-0008, ADR-0022
+Contratos: `LONGITUDINAL_EVALUATION_SCHEMA.md`, `longitudinal_protocol.schema.json`, `longitudinal_snapshot.schema.json`, `longitudinal_report.schema.json`
 
 ## Objetivo
 Avaliar evolução, retenção, deriva, contradição e utilidade em 7, 30 e 90 dias.
@@ -29,6 +31,6 @@ Avaliar evolução, retenção, deriva, contradição e utilidade em 7, 30 e 90 
 Alterar métricas após observar resultados.
 
 ## Critérios de aceite
-- [ ] Resultados são reproduzíveis a partir de snapshots.
-- [ ] Ganhos e perdas são reportados.
-- [ ] Deriva de self-model é quantificada.
+- [x] Resultados são reproduzíveis a partir de snapshots.
+- [x] Ganhos e perdas são reportados.
+- [x] Deriva de self-model é quantificada.

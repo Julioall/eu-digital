@@ -70,6 +70,13 @@ prediction error to the workspace surprise factor, and emits auditable drift
 signals that reduce confidence and start relearning. It is laboratory-only;
 it does not plan, execute actions or invoke an LLM.
 
+The SPEC-022 longitudinal-evaluation reference is in
+`eu_digital_lab/longitudinal_evaluation.py`. It freezes a protocol and holdout
+hash, records 7/30/90-day snapshots, separates cognitive and operational
+metrics, reports retention/calibration changes, and quantifies self-model
+version/digest drift. Reports are replayable from snapshots and do not claim
+phenomenal identity or cognitive validity by themselves.
+
 The SPEC-011 metacognition-and-curiosity reference is in
 `eu_digital_lab/metacognition_curiosity.py`. It evaluates explicit hypotheses,
 records confirmed/rejected/inconclusive local outcomes, calibrates confidence

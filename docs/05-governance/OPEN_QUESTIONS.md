@@ -173,3 +173,18 @@ world model sem criar dependência externa:
 4. o fator é mapeado ao sinal de workspace `surprise`; a política de seleção
    permanece no Global Workspace;
 5. promoção C++ e validade ecológica permanecem fora desta SPEC.
+
+## Resoluções registradas pela SPEC-022
+
+O ADR-0022 e os contratos de avaliação resolvem a primeira referência
+longitudinal:
+
+1. protocolo e holdout são congelados por hashes antes da coleta;
+2. snapshots imutáveis cobrem apenas 7, 30 e 90 dias e mantêm métricas
+   cognitivas/operacionais separadas;
+3. o baseline `chronological_first_snapshot_v0` reporta retenção, calibração,
+   ganhos, perdas e ausência de métricas sem convertê-la em zero;
+4. cada snapshot preserva versão, digest e fontes do self-model, permitindo
+   quantificar drift sem alegar continuidade fenomenal;
+5. o relatório é reconstruível por replay local; validade ecológica e promoção
+   C++ permanecem fora desta SPEC.
