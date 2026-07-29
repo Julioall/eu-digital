@@ -20,6 +20,7 @@
 | Pattern Learner | Clusters e sequências | fase cognitiva |
 | Predictor | Próximos eventos, erro e drift | laboratório Python (SPEC-021) |
 | Longitudinal Evaluator | Snapshots, retenção e deriva | laboratório Python (SPEC-022) |
+| Capability Adaptation | Observabilidade, atenção e degradação | laboratório Python (SPEC-024) |
 | Curiosity Engine | Perguntas informativas | fase cognitiva |
 | Metacognition Engine | Confiança e crítica | fase cognitiva |
 | Self Model | Estado e história do agente | fase cognitiva |

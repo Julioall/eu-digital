@@ -154,6 +154,17 @@ The test freezes the protocol/holdout, records 7/30/90-day snapshots, and
 replays the report to verify deterministic gains, losses, calibration and
 self-model drift.
 
+The SPEC-024 capability-adaptation tests are exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_capability_adaptation -v
+```
+
+The test covers modality removal, partial observability, confidence and
+attention changes, plan blocking, calibration-gated onboarding, return of a
+capability and fixed-attention ablation.
+
 `time_context_threshold_v1` is deterministic and records a reason for every
 boundary. Its output is validated against `contracts/schemas/episode.schema.json`;
 boundary F1 and WindowDiff are engineering metrics against annotated episodes,

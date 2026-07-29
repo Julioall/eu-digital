@@ -67,6 +67,10 @@ Os contratos locais da SPEC-022 estão em longitudinal_protocol.schema.json,
 longitudinal_snapshot.schema.json e longitudinal_report.schema.json. A
 semântica está documentada em docs/03-contracts/LONGITUDINAL_EVALUATION_SCHEMA.md.
 
+Os contratos locais da SPEC-024 estão em capability_adaptation_event.schema.json,
+observability_profile.schema.json e capability_onboarding.schema.json. A
+semântica está documentada em docs/03-contracts/CAPABILITY_ADAPTATION_SCHEMA.md.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

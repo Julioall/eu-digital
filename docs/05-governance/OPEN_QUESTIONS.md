@@ -174,6 +174,21 @@ world model sem criar dependência externa:
    permanece no Global Workspace;
 5. promoção C++ e validade ecológica permanecem fora desta SPEC.
 
+## Resoluções registradas pela SPEC-024
+
+O ADR-0023 e os contratos de adaptação resolvem a degradação funcional:
+
+1. eventos de capacidade entram como dados versionados, sem importar
+   implementações concretas;
+2. remoção reduz confiança de hipóteses dependentes e redistribui atenção para
+   modalidades disponíveis, mantendo cegueiras conhecidas explícitas;
+3. predições dependentes são invalidadas e planos com capacidade ausente são
+   bloqueados; episódios de outras modalidades continuam válidos;
+4. onboarding permanece em calibração até a amostra mínima, e o retorno de uma
+   capacidade preserva `agent_id`, geração e histórico;
+5. a ablação `fixed_attention_v0` compara pesos não adaptativos; promoção C++ e
+   validade ecológica permanecem fora desta SPEC.
+
 ## Resoluções registradas pela SPEC-022
 
 O ADR-0022 e os contratos de avaliação resolvem a primeira referência

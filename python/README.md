@@ -77,6 +77,13 @@ metrics, reports retention/calibration changes, and quantifies self-model
 version/digest drift. Reports are replayable from snapshots and do not claim
 phenomenal identity or cognitive validity by themselves.
 
+The SPEC-024 capability-adaptation reference is in
+`eu_digital_lab/capability_adaptation.py`. It consumes only versioned
+capability changes, redistributes attention across available modalities,
+adjusts confidence, invalidates dependent predictions, blocks incompatible
+plans, and gates new modalities behind calibration. It preserves agent
+identity/history and does not import concrete sensors, tools or actuators.
+
 The SPEC-011 metacognition-and-curiosity reference is in
 `eu_digital_lab/metacognition_curiosity.py`. It evaluates explicit hypotheses,
 records confirmed/rejected/inconclusive local outcomes, calibrates confidence

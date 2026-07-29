@@ -1,19 +1,20 @@
 ---
 id: SPEC-024
 title: Adaptação a ausência e novas capacidades
-status: blocked
+status: active
 phase: 4
 dependencies: [SPEC-010, SPEC-012, SPEC-018, SPEC-021, SPEC-023]
 adrs: [ADR-0006, ADR-0008, ADR-0009]
-contracts: []
+contracts: [CAPABILITY_ADAPTATION_SCHEMA.md, capability_adaptation_event.schema.json, observability_profile.schema.json, capability_onboarding.schema.json]
 ---
 
 # SPEC-024 — Adaptação a ausência e novas capacidades
 
-Status: blocked
+Status: done
 Fase: 4
 Dependências: SPEC-010, SPEC-012, SPEC-018, SPEC-021, SPEC-023
 ADRs aplicáveis: ADR-0006, ADR-0008, ADR-0009
+Contratos: `CAPABILITY_ADAPTATION_SCHEMA.md`, `capability_adaptation_event.schema.json`, `observability_profile.schema.json`, `capability_onboarding.schema.json`
 
 ## Objetivo
 
@@ -39,9 +40,9 @@ Adaptar atenção, confiança, world model, objetivos e planejamento quando capa
 
 ## Critérios de aceite
 
-- [ ] Remover visão reduz confiança de hipóteses visuais.
-- [ ] Remover áudio não interrompe episódios baseados em sistema.
-- [ ] Planos que exigem atuador ausente são bloqueados.
-- [ ] Nova modalidade inicia calibração antes de influenciar crenças estáveis.
-- [ ] O retorno de uma capacidade não recria identidade.
-- [ ] Ablation demonstra adaptação superior a uma política fixa.
+- [x] Remover visão reduz confiança de hipóteses visuais.
+- [x] Remover áudio não interrompe episódios baseados em sistema.
+- [x] Planos que exigem atuador ausente são bloqueados.
+- [x] Nova modalidade inicia calibração antes de influenciar crenças estáveis.
+- [x] O retorno de uma capacidade não recria identidade.
+- [x] Ablation demonstra adaptação superior a uma política fixa.

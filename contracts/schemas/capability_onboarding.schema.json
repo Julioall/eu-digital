@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityOnboarding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["onboarding_id", "schema_version", "agent_id", "capability_id", "modality", "state", "calibration_samples", "required_samples", "stable_influence", "observed_at"],
+  "properties": {
+    "onboarding_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "agent_id": {"type": "string", "minLength": 1},
+    "capability_id": {"type": "string", "minLength": 1},
+    "modality": {"type": "string", "minLength": 1},
+    "state": {"type": "string", "enum": ["calibrating", "available"]},
+    "calibration_samples": {"type": "integer", "minimum": 0},
+    "required_samples": {"type": "integer", "minimum": 1},
+    "stable_influence": {"type": "boolean"},
+    "observed_at": {"type": "string", "minLength": 1}
+  }
+}

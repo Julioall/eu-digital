@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ObservabilityProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile_id", "schema_version", "agent_id", "version", "available_modalities", "unavailable_modalities", "calibrating_modalities", "attention_weights", "confidence_adjustments", "limitation_codes", "capability_history", "identity_generation"],
+  "properties": {
+    "profile_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "agent_id": {"type": "string", "minLength": 1},
+    "version": {"type": "integer", "minimum": 1},
+    "available_modalities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "unavailable_modalities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "calibrating_modalities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "attention_weights": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}},
+    "confidence_adjustments": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}},
+    "limitation_codes": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "capability_history": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "identity_generation": {"type": "integer", "minimum": 1}
+  }
+}

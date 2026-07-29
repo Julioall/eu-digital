@@ -8,6 +8,25 @@ from .capabilities import (
     ModuleLifecycleManager,
     PluginDiscovery,
 )
+from .capability_adaptation import (
+    ABLATION as CAPABILITY_ADAPTATION_ABLATION,
+)
+from .capability_adaptation import (
+    ADAPTATION_POLICY_ID,
+    AdaptationEvent,
+    CapabilityAdaptationEngine,
+    CapabilityAdaptationError,
+    OnboardingRecord,
+)
+from .capability_adaptation import (
+    BASELINE_POLICY_ID as CAPABILITY_ADAPTATION_BASELINE_POLICY_ID,
+)
+from .capability_adaptation import (
+    FALSIFICATION as CAPABILITY_ADAPTATION_FALSIFICATION,
+)
+from .capability_adaptation import (
+    HYPOTHESIS as CAPABILITY_ADAPTATION_HYPOTHESIS,
+)
 from .dialogue_avatar import (
     AvatarPresenter,
     AvatarState,
@@ -172,11 +191,16 @@ from .world_model import (
 )
 
 __all__ = [
+    "ADAPTATION_POLICY_ID",
     "AGENCY_ABLATION",
     "AGENCY_BASELINE_POLICY_ID",
     "AGENCY_FALSIFICATION",
     "AGENCY_HYPOTHESIS",
     "AGENCY_POLICY_ID",
+    "CAPABILITY_ADAPTATION_ABLATION",
+    "CAPABILITY_ADAPTATION_BASELINE_POLICY_ID",
+    "CAPABILITY_ADAPTATION_FALSIFICATION",
+    "CAPABILITY_ADAPTATION_HYPOTHESIS",
     "CONSOLIDATION_ABLATION",
     "CONSOLIDATION_BASELINE_POLICY_ID",
     "CONSOLIDATION_FALSIFICATION",
@@ -190,6 +214,7 @@ __all__ = [
     "WORLD_MODEL_FALSIFICATION",
     "WORLD_MODEL_HYPOTHESIS",
     "ActionIntention",
+    "AdaptationEvent",
     "AgencyActionOutcome",
     "AgencyAttribution",
     "AgencyPolicy",
@@ -199,6 +224,8 @@ __all__ = [
     "AvatarState",
     "AvatarViewState",
     "BoundaryDecision",
+    "CapabilityAdaptationEngine",
+    "CapabilityAdaptationError",
     "CapabilityDescriptor",
     "CapabilityEntry",
     "CapabilityRegistry",
@@ -254,6 +281,7 @@ __all__ = [
     "ModelRequest",
     "ModelResponse",
     "ModuleLifecycleManager",
+    "OnboardingRecord",
     "PluginDiscovery",
     "Prediction",
     "PredictionConfig",

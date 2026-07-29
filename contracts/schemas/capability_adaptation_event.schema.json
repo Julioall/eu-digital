@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapabilityAdaptationEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["adaptation_id", "schema_version", "agent_id", "capability_id", "implementation_id", "modality", "old_state", "new_state", "observed_at", "affected_belief_ids", "invalidated_prediction_ids", "blocked_plan_ids", "confidence_adjustments", "attention_weights", "limitation_code", "source_observation_present"],
+  "properties": {
+    "adaptation_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "agent_id": {"type": "string", "minLength": 1},
+    "capability_id": {"type": "string", "minLength": 1},
+    "implementation_id": {"type": "string", "minLength": 1},
+    "modality": {"type": "string", "minLength": 1},
+    "old_state": {"type": "string", "minLength": 1},
+    "new_state": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "minLength": 1},
+    "affected_belief_ids": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "invalidated_prediction_ids": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "blocked_plan_ids": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "confidence_adjustments": {"type": "object", "additionalProperties": {"type": "number"}},
+    "attention_weights": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}},
+    "limitation_code": {"type": "string", "minLength": 1},
+    "source_observation_present": {"type": "boolean"}
+  }
+}
