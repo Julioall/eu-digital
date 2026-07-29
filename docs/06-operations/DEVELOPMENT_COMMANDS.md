@@ -219,6 +219,19 @@ inference at a time, priority/FIFO controls, timeout/cancel/unload, structured
 output rejection and backend substitution. No concrete model, runtime or API
 is downloaded or selected by this command.
 
+The SPEC-015 local audio sensor test is included in CTest as audio_sensor:
+
+~~~powershell
+ctest --test-dir build/dev -R audio_sensor --output-on-failure
+~~~
+
+The sensor receives frames, VAD and local speech-to-text through injectable
+ports. It emits timestamped segments with only a local audio URI and hash;
+transcription failures emit a separate failure event without removing the
+segment. AudioSensorHealth.last_processing_cost_ms records the measured
+processing cost. No microphone backend or external service is selected by the
+reference runtime.
+
 The SPEC-014 dialogue-and-avatar reference is exercised with:
 
 ```powershell

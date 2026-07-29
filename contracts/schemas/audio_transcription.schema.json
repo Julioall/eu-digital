@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AudioTranscription",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "segment_id",
+    "start_timestamp_ms",
+    "end_timestamp_ms",
+    "status",
+    "text",
+    "confidence",
+    "processing_cost_ms"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "segment_id": {"type": "string", "minLength": 1},
+    "start_timestamp_ms": {"type": "integer", "minimum": 0},
+    "end_timestamp_ms": {"type": "integer", "minimum": 0},
+    "status": {"type": "string", "enum": ["transcribed", "failed"]},
+    "text": {"type": ["string", "null"]},
+    "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+    "error_code": {"type": ["string", "null"]},
+    "processing_cost_ms": {"type": "number", "minimum": 0}
+  }
+}

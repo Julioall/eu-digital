@@ -106,3 +106,17 @@ ADR-0016 e os contratos locais definem uma porta de apresentação substituível
 3. perguntas/notificações carregam hipótese, confiança, contexto e motivo;
 4. feedback permite `correct`, `defer` e `silence`, preservando histórico sem
    declarar emoção, consciência ou personalidade.
+
+## Resoluções registradas pela SPEC-015
+
+O ADR-0017 e os contratos versionados de áudio resolvem a integração mínima:
+
+1. captura, VAD e transcrição são portas locais substituíveis; nenhum backend
+   de microfone, codec ou modelo é dependência do núcleo;
+2. cada segmento preserva timestamps, confiança de VAD, referência/hash do
+   áudio bruto e custo medido;
+3. falha de transcrição gera evento de falha e não remove o segmento da
+   timeline; ausência de sinal permanece distinta de fala não detectada;
+4. a questão 9, sobre retenção do áudio bruto, permanece aberta e é política
+   do adaptador local. A SPEC-015 não define retenção nem envia bytes para a
+   nuvem.

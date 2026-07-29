@@ -1,18 +1,20 @@
 ---
 id: SPEC-015
 title: Áudio ambiente
-status: future
+status: done
 phase: 9
 dependencies: [SPEC-002, SPEC-023]
-adrs: []
-contracts: []
+adrs: [ADR-0017]
+contracts: [AUDIO_SENSOR_SCHEMA.md]
 ---
 
 # SPEC-015 — Áudio ambiente
 
-Status: future
+Status: done
 Fase: 9
 Dependências: SPEC-002, SPEC-023
+ADR aplicável: `ADR-0017-local-audio-sensor-ports.md`
+Contrato afetado: `AUDIO_SENSOR_SCHEMA.md`
 
 ## Objetivo
 Capturar áudio local, detectar fala e produzir transcrições temporais.
@@ -28,6 +30,14 @@ Capturar áudio local, detectar fala e produzir transcrições temporais.
 Inferência de verdade, intenção ou emoção apenas pela voz.
 
 ## Critérios de aceite
-- [ ] Segmentos possuem timestamps.
-- [ ] Transcrição falha não quebra timeline.
-- [ ] Custo de processamento é medido.
+- [x] Segmentos possuem timestamps.
+- [x] Transcrição falha não quebra timeline.
+- [x] Custo de processamento é medido.
+
+## Implementação e testes
+
+- cpp/core/audio_sensor.hpp implementa as portas locais e o plugin removível.
+- cpp/tests/audio_sensor_test.cpp cobre segmento temporal, referência/hash,
+  falha de transcrição, ausência de sinal, falha de VAD/captura e custo.
+- contracts/schemas/audio_segment.schema.json e
+  contracts/schemas/audio_transcription.schema.json versionam os payloads.
