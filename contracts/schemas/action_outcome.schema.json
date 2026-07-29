@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionOutcome",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "audit_id", "plan_id", "plan_digest", "status", "occurred_at_ms", "authorized_by", "effects"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "audit_id": {"type": "string", "minLength": 1},
+    "plan_id": {"type": "string", "minLength": 1},
+    "plan_digest": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["blocked", "succeeded", "failed", "rolled_back", "rollback_failed"]},
+    "occurred_at_ms": {"type": "integer", "minimum": 0},
+    "authorized_by": {"type": "string", "minLength": 1},
+    "effects": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "error_code": {"type": ["string", "null"]}
+  }
+}

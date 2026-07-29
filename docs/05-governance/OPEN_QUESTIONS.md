@@ -120,3 +120,16 @@ O ADR-0017 e os contratos versionados de áudio resolvem a integração mínima:
 4. a questão 9, sobre retenção do áudio bruto, permanece aberta e é política
    do adaptador local. A SPEC-015 não define retenção nem envia bytes para a
    nuvem.
+
+## Resoluções registradas pela SPEC-016
+
+O ADR-0018 e os contratos de ações supervisionadas resolvem o primeiro gate de
+agência:
+
+1. o controlador executa apenas por ActionPort e ActionPolicy abstratos;
+2. prepare produz plano e simulação sem executar;
+3. authorize exige confirmação explícita, validade temporal e correspondência
+   exata de plan_id e plan_digest;
+4. execute consome a autorização, audita o resultado e bloqueia a ausência de
+   fornecedor; rollback é melhor esforço e também auditado;
+5. a SPEC-016 não habilita nenhum atuador concreto nem ações destrutivas.

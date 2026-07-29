@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionAuthorization",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "authorization_id", "plan_id", "plan_digest", "authorized_by", "confirmed_at_ms", "expires_at_ms", "confirmation"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "authorization_id": {"type": "string", "minLength": 1},
+    "plan_id": {"type": "string", "minLength": 1},
+    "plan_digest": {"type": "string", "minLength": 1},
+    "authorized_by": {"type": "string", "minLength": 1},
+    "confirmed_at_ms": {"type": "integer", "minimum": 0},
+    "expires_at_ms": {"type": "integer", "minimum": 0},
+    "confirmation": {"type": "string", "const": "explicit"}
+  }
+}

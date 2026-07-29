@@ -41,6 +41,10 @@ add_executable(audio_sensor_test cpp/tests/audio_sensor_test.cpp)
 target_include_directories(audio_sensor_test PRIVATE cpp)
 target_compile_features(audio_sensor_test PRIVATE cxx_std_23)
 
+add_executable(supervised_actions_test cpp/tests/supervised_actions_test.cpp)
+target_include_directories(supervised_actions_test PRIVATE cpp)
+target_compile_features(supervised_actions_test PRIVATE cxx_std_23)
+
 set(EU_DIGITAL_SQLITE3_SEARCH_PATHS /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu)
 if(DEFINED ENV{VCPKG_INSTALLATION_ROOT})
     list(APPEND EU_DIGITAL_SQLITE3_SEARCH_PATHS
@@ -69,6 +73,7 @@ add_test(NAME system_activity_sensor COMMAND system_activity_sensor_test)
 add_test(NAME input_interaction_sensor COMMAND input_interaction_sensor_test)
 add_test(NAME screen_ocr_sensor COMMAND screen_ocr_sensor_test)
 add_test(NAME audio_sensor COMMAND audio_sensor_test)
+add_test(NAME supervised_actions COMMAND supervised_actions_test)
 add_test(NAME timeline_store COMMAND timeline_store_test)
 
 include(GNUInstallDirs)

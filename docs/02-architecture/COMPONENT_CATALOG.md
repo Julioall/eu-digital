@@ -8,6 +8,7 @@
 | Capability Resolver | Seleção por operação e qualidade | obrigatório |
 | Sensor Manager | Ciclo de vida dos sensores | obrigatório |
 | Audio Sensor | VAD local, segmentos e transcrição referenciada | fase sensorial |
+| Supervised Action Controller | Preparar, confirmar, executar e auditar ações | fase de agência |
 | Event Normalizer | Produzir eventos canônicos | obrigatório |
 | Timeline Store | Persistir e consultar eventos | obrigatório |
 | Episode Segmenter | Gerar episódios | obrigatório |

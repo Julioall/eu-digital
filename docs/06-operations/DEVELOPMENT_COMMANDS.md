@@ -242,3 +242,15 @@ python -m unittest python.tests.test_dialogue_avatar -v
 The test presenter is an injected local port. It verifies contextual question
 fields, non-blocking view invariants, interruption budget, correction, defer,
 silence and feedback history without opening a desktop window.
+
+The SPEC-016 supervised-action test is included in CTest as supervised_actions:
+
+~~~powershell
+ctest --test-dir build/dev -R supervised_actions --output-on-failure
+~~~
+
+The controller exposes plan and simulation before execution and requires an
+explicit, non-expired authorization bound to the same plan digest. It calls
+only the injected ActionPort after the gate passes, records action.audit
+events, consumes authorization, and attempts rollback only for reversible
+actions. No concrete actuator is enabled by the reference runtime.

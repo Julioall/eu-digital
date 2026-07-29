@@ -44,6 +44,11 @@ Os contratos locais da SPEC-015 estão em `audio_segment.schema.json` e
 `audio_transcription.schema.json`. A semântica está documentada em
 `docs/03-contracts/AUDIO_SENSOR_SCHEMA.md`.
 
+Os contratos locais da SPEC-016 estão em action_plan.schema.json,
+action_simulation.schema.json, action_authorization.schema.json e
+action_outcome.schema.json. A semântica está documentada em
+docs/03-contracts/SUPERVISED_ACTION_SCHEMA.md.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;
