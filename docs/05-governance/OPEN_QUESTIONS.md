@@ -146,3 +146,15 @@ O ADR-0019 e os contratos de propriocepção resolvem o bloqueio documental:
 4. ausência de correlação é ambiguous; external exige observação explicitamente
    marcada como externa;
 5. promoção para C++ e validade ecológica permanecem fora desta SPEC.
+
+## Resoluções registradas pela SPEC-020
+
+O ADR-0020 e os contratos de consolidação resolvem o bloqueio documental:
+
+1. replay_with_provenance_v1 deriva somente chaves observáveis e registra
+   source_episode_ids em todo conhecimento;
+2. reconciliação incrementa versões e preserva alternativas/contradições sem
+   promover hipóteses a fatos;
+3. no_replay_v0 é o baseline pela mesma interface;
+4. archive e restore são decisões reversíveis e nenhum episódio é apagado;
+5. promoção para C++ e retenção física de bytes permanecem fora desta SPEC.

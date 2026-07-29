@@ -10,6 +10,7 @@
 | Audio Sensor | VAD local, segmentos e transcrição referenciada | fase sensorial |
 | Supervised Action Controller | Preparar, confirmar, executar e auditar ações | fase de agência |
 | Digital Agency Reference | Propriocepção, cópia eferente e atribuição | laboratório |
+| Memory Consolidator | Replay, proveniência, reconciliação e retenção reversível | laboratório |
 | Event Normalizer | Produzir eventos canônicos | obrigatório |
 | Timeline Store | Persistir e consultar eventos | obrigatório |
 | Episode Segmenter | Gerar episódios | obrigatório |

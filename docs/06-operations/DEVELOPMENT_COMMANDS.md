@@ -266,3 +266,14 @@ The reference records DigitalBodyState, ActionIntention, EfferenceCopy,
 AgencyActionOutcome and AgencyAttribution. The treatment and passive-observer
 baseline share one interface; the treatment requires causal correlation and
 never converts missing correlation into external evidence.
+
+The SPEC-020 memory-consolidation reference is exercised with:
+
+~~~powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_memory_consolidation -v
+~~~
+
+Replay derives only observable context keys, keeps source episode IDs, merges
+versions and alternatives, and archives episodes reversibly. The no_replay_v0
+baseline uses the same interface without creating semantic knowledge.

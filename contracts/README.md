@@ -55,6 +55,10 @@ agency_action_outcome.schema.json e agency_attribution.schema.json. A
 semântica está documentada em
 docs/03-contracts/DIGITAL_PROPRIOCEPTION_AGENCY_SCHEMA.md.
 
+Os contratos locais da SPEC-020 estão em semantic_knowledge.schema.json,
+consolidation_record.schema.json e retention_decision.schema.json. A
+semântica está documentada em docs/03-contracts/MEMORY_CONSOLIDATION_SCHEMA.md.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;
