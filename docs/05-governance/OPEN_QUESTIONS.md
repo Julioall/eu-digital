@@ -158,3 +158,18 @@ O ADR-0020 e os contratos de consolidação resolvem o bloqueio documental:
 3. no_replay_v0 é o baseline pela mesma interface;
 4. archive e restore são decisões reversíveis e nenhum episódio é apagado;
 5. promoção para C++ e retenção física de bytes permanecem fora desta SPEC.
+
+## Resoluções registradas pela SPEC-021
+
+O ADR-0021 e os contratos versionados de previsão resolvem o incremento de
+world model sem criar dependência externa:
+
+1. `frequency_baseline_v0` e `markov_order1_v0` são controles comparáveis para
+   `incremental_markov_v1`, que usa contexto n-grama com fallback observável;
+2. cada previsão publica uma distribuição de próximos estados, e cada erro
+   observado registra log loss, top-k e um fator monotônico de surpresa;
+3. uma janela de erro acima do limiar reduz confiança, limpa somente contagens
+   derivadas e inicia reaprendizagem, sem apagar eventos ou inventar estados;
+4. o fator é mapeado ao sinal de workspace `surprise`; a política de seleção
+   permanece no Global Workspace;
+5. promoção C++ e validade ecológica permanecem fora desta SPEC.

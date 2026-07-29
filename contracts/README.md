@@ -59,6 +59,10 @@ Os contratos locais da SPEC-020 estão em semantic_knowledge.schema.json,
 consolidation_record.schema.json e retention_decision.schema.json. A
 semântica está documentada em docs/03-contracts/MEMORY_CONSOLIDATION_SCHEMA.md.
 
+Os contratos locais da SPEC-021 estão em world_model_prediction.schema.json,
+prediction_error.schema.json e prediction_drift.schema.json. A semântica está
+documentada em docs/03-contracts/WORLD_MODEL_PREDICTION_SCHEMA.md.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

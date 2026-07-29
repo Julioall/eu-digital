@@ -18,7 +18,7 @@
 | Salience Engine | Priorizar informações | fase cognitiva |
 | Global Workspace | Integrar itens ativos | fase cognitiva |
 | Pattern Learner | Clusters e sequências | fase cognitiva |
-| Predictor | Próximos eventos | fase cognitiva |
+| Predictor | Próximos eventos, erro e drift | laboratório Python (SPEC-021) |
 | Curiosity Engine | Perguntas informativas | fase cognitiva |
 | Metacognition Engine | Confiança e crítica | fase cognitiva |
 | Self Model | Estado e história do agente | fase cognitiva |

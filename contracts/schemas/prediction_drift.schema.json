@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PredictionDrift",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "drift_id",
+    "schema_version",
+    "model_id",
+    "stream_id",
+    "detected_at",
+    "rolling_log_loss",
+    "threshold",
+    "confidence_before",
+    "confidence_after",
+    "relearning_started",
+    "trigger_prediction_id",
+    "reason"
+  ],
+  "properties": {
+    "drift_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "model_id": {"type": "string", "minLength": 1},
+    "stream_id": {"type": "string", "minLength": 1},
+    "detected_at": {"type": "string", "minLength": 1},
+    "rolling_log_loss": {"type": "number", "minimum": 0},
+    "threshold": {"type": "number", "minimum": 0},
+    "confidence_before": {"type": "number", "minimum": 0, "maximum": 1},
+    "confidence_after": {"type": "number", "minimum": 0, "maximum": 1},
+    "relearning_started": {"type": "boolean"},
+    "trigger_prediction_id": {"type": "string", "minLength": 1},
+    "reason": {"type": "string", "minLength": 1}
+  }
+}

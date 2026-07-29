@@ -132,6 +132,17 @@ $env:PYTHONPATH = "python"
 python -m unittest python.tests.test_episode_segmentation -v
 ```
 
+The SPEC-021 world-model tests are exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_world_model -v
+```
+
+The test compares the incremental n-gram predictor with the frequency
+baseline on a holdout, validates log loss and top-k, and verifies that drift
+reduces confidence while preserving the source observations.
+
 `time_context_threshold_v1` is deterministic and records a reason for every
 boundary. Its output is validated against `contracts/schemas/episode.schema.json`;
 boundary F1 and WindowDiff are engineering metrics against annotated episodes,

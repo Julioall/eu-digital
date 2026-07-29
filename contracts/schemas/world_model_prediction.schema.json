@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WorldModelPrediction",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "prediction_id",
+    "schema_version",
+    "model_id",
+    "stream_id",
+    "context",
+    "predicted_distribution",
+    "predicted_at",
+    "top_k",
+    "observed_state",
+    "log_loss",
+    "top_k_hit",
+    "salience_contribution",
+    "confidence",
+    "drift_id",
+    "created_by"
+  ],
+  "properties": {
+    "prediction_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "model_id": {
+      "type": "string",
+      "enum": ["frequency_baseline_v0", "markov_order1_v0", "incremental_markov_v1"]
+    },
+    "stream_id": {"type": "string", "minLength": 1},
+    "context": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "predicted_distribution": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+    },
+    "predicted_at": {"type": "string", "minLength": 1},
+    "top_k": {"type": "integer", "minimum": 1},
+    "observed_state": {"type": ["string", "null"]},
+    "log_loss": {"type": ["number", "null"], "minimum": 0},
+    "top_k_hit": {"type": ["boolean", "null"]},
+    "salience_contribution": {"type": "number", "minimum": 0, "maximum": 1},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "drift_id": {"type": ["string", "null"]},
+    "created_by": {"type": "string", "minLength": 1}
+  }
+}

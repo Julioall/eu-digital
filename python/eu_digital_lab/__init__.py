@@ -8,12 +8,21 @@ from .capabilities import (
     ModuleLifecycleManager,
     PluginDiscovery,
 )
+from .dialogue_avatar import (
+    AvatarPresenter,
+    AvatarState,
+    AvatarViewState,
+    DialogueAvatarController,
+    DialogueAvatarError,
+    DialogueFeedback,
+    DialogueNotice,
+    FeedbackAction,
+)
 from .digital_proprioception_agency import (
     ABLATION as AGENCY_ABLATION,
+)
+from .digital_proprioception_agency import (
     AGENCY_POLICY_ID,
-    BASELINE_POLICY_ID as AGENCY_BASELINE_POLICY_ID,
-    FALSIFICATION as AGENCY_FALSIFICATION,
-    HYPOTHESIS as AGENCY_HYPOTHESIS,
     ActionIntention,
     AgencyActionOutcome,
     AgencyAttribution,
@@ -26,15 +35,14 @@ from .digital_proprioception_agency import (
     macro_f1,
     prediction_error,
 )
-from .dialogue_avatar import (
-    AvatarPresenter,
-    AvatarState,
-    AvatarViewState,
-    DialogueAvatarController,
-    DialogueAvatarError,
-    DialogueFeedback,
-    DialogueNotice,
-    FeedbackAction,
+from .digital_proprioception_agency import (
+    BASELINE_POLICY_ID as AGENCY_BASELINE_POLICY_ID,
+)
+from .digital_proprioception_agency import (
+    FALSIFICATION as AGENCY_FALSIFICATION,
+)
+from .digital_proprioception_agency import (
+    HYPOTHESIS as AGENCY_HYPOTHESIS,
 )
 from .episode_segmentation import (
     BoundaryDecision,
@@ -96,16 +104,24 @@ from .local_model_gateway import (
 )
 from .memory_consolidation import (
     ABLATION as CONSOLIDATION_ABLATION,
+)
+from .memory_consolidation import (
     BASELINE_POLICY_ID as CONSOLIDATION_BASELINE_POLICY_ID,
+)
+from .memory_consolidation import (
     CONSOLIDATION_POLICY_ID,
-    FALSIFICATION as CONSOLIDATION_FALSIFICATION,
-    HYPOTHESIS as CONSOLIDATION_HYPOTHESIS,
     ConsolidationPolicy,
     ConsolidationRecord,
     MemoryConsolidationError,
     MemoryConsolidator,
     RetentionDecision,
     SemanticKnowledge,
+)
+from .memory_consolidation import (
+    FALSIFICATION as CONSOLIDATION_FALSIFICATION,
+)
+from .memory_consolidation import (
+    HYPOTHESIS as CONSOLIDATION_HYPOTHESIS,
 )
 from .metacognition_curiosity import (
     CuriosityConfig,
@@ -123,22 +139,54 @@ from .metacognition_curiosity import (
 from .promotion import PromotionManifest, PromotionPipeline, PromotionRegistry
 from .sandbox import SyntheticSession, generate_session, split_sessions
 from .validation import ValidationGateRunner, ValidationProtocol
+from .world_model import (
+    ABLATION as WORLD_MODEL_ABLATION,
+)
+from .world_model import (
+    FALSIFICATION as WORLD_MODEL_FALSIFICATION,
+)
+from .world_model import (
+    FREQUENCY_BASELINE_ID,
+    MARKOV_BASELINE_ID,
+    PREDICTOR_POLICY_ID,
+    DriftSignal,
+    ModelPolicy,
+    Prediction,
+    PredictionConfig,
+    WorldModel,
+    WorldModelError,
+    prediction_error_to_salience,
+)
+from .world_model import (
+    HYPOTHESIS as WORLD_MODEL_HYPOTHESIS,
+)
 
 __all__ = [
-    "ActionIntention",
-    "AgencyActionOutcome",
-    "AgencyAttribution",
-    "AgencyPolicy",
     "AGENCY_ABLATION",
     "AGENCY_BASELINE_POLICY_ID",
     "AGENCY_FALSIFICATION",
     "AGENCY_HYPOTHESIS",
     "AGENCY_POLICY_ID",
+    "CONSOLIDATION_ABLATION",
+    "CONSOLIDATION_BASELINE_POLICY_ID",
+    "CONSOLIDATION_FALSIFICATION",
+    "CONSOLIDATION_HYPOTHESIS",
+    "CONSOLIDATION_POLICY_ID",
+    "FREQUENCY_BASELINE_ID",
+    "MARKOV_BASELINE_ID",
+    "PREDICTOR_POLICY_ID",
+    "WORLD_MODEL_ABLATION",
+    "WORLD_MODEL_FALSIFICATION",
+    "WORLD_MODEL_HYPOTHESIS",
+    "ActionIntention",
+    "AgencyActionOutcome",
+    "AgencyAttribution",
+    "AgencyPolicy",
     "AssertionClassification",
+    "AttributionLabel",
     "AvatarPresenter",
     "AvatarState",
     "AvatarViewState",
-    "AttributionLabel",
     "BoundaryDecision",
     "CapabilityDescriptor",
     "CapabilityEntry",
@@ -146,11 +194,6 @@ __all__ = [
     "CapabilityRuntime",
     "CapabilityState",
     "CapabilityStatus",
-    "CONSOLIDATION_ABLATION",
-    "CONSOLIDATION_BASELINE_POLICY_ID",
-    "CONSOLIDATION_FALSIFICATION",
-    "CONSOLIDATION_HYPOTHESIS",
-    "CONSOLIDATION_POLICY_ID",
     "ConsolidationPolicy",
     "ConsolidationRecord",
     "CuriosityConfig",
@@ -158,19 +201,20 @@ __all__ = [
     "CuriosityResponse",
     "DatasetRepository",
     "DecisionPolicy",
-    "DigitalAgencyEngine",
-    "DigitalAgencyError",
-    "DigitalBodyState",
     "DialogueAvatarController",
     "DialogueAvatarError",
     "DialogueFeedback",
     "DialogueNotice",
+    "DigitalAgencyEngine",
+    "DigitalAgencyError",
+    "DigitalBodyState",
+    "DriftSignal",
+    "EfferenceCopy",
     "EpisodicMemory",
     "EpisodicMemoryError",
     "ExperimentConfig",
     "ExperimentReport",
     "ExperimentRunner",
-    "EfferenceCopy",
     "FeedbackAction",
     "FunctionalSelfModelError",
     "FunctionalSelfModelSnapshot",
@@ -181,19 +225,22 @@ __all__ = [
     "InvalidModelResponseError",
     "LocalModelBackend",
     "LocalModelGateway",
-    "MemoryQuery",
     "MemoryConsolidationError",
     "MemoryConsolidator",
+    "MemoryQuery",
     "MetacognitionCuriosityEngine",
     "MetacognitionCuriosityError",
     "MetacognitiveAssessment",
     "ModelGatewayCancelledError",
     "ModelGatewayError",
     "ModelGatewayTimeoutError",
+    "ModelPolicy",
     "ModelRequest",
     "ModelResponse",
     "ModuleLifecycleManager",
     "PluginDiscovery",
+    "Prediction",
+    "PredictionConfig",
     "PromotionManifest",
     "PromotionPipeline",
     "PromotionRegistry",
@@ -212,8 +259,8 @@ __all__ = [
     "SelfModelDecision",
     "SelfModelEvent",
     "SelfModelEventKind",
-    "StoreResult",
     "SemanticKnowledge",
+    "StoreResult",
     "SyntheticSession",
     "ValidationGateRunner",
     "ValidationProtocol",
@@ -223,12 +270,15 @@ __all__ = [
     "WorkspaceError",
     "WorkspaceItem",
     "WorkspaceSnapshot",
+    "WorldModel",
+    "WorldModelError",
     "boundary_metrics",
     "evaluate_baseline",
     "evaluate_selection",
     "generate_session",
     "macro_f1",
     "prediction_error",
+    "prediction_error_to_salience",
     "segment_events",
     "split_sessions",
 ]

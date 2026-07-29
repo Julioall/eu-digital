@@ -63,6 +63,13 @@ an injected local event-bus port. FIFO is selectable through the same
 configuration for ablation. The module is laboratory-only and makes no claim
 about consciousness or promotion to C++.
 
+The SPEC-021 world-model reference is in `eu_digital_lab/world_model.py`. It
+compares a frequency baseline and first-order Markov baseline with an
+incremental n-gram predictor, records distributions and log loss, maps
+prediction error to the workspace surprise factor, and emits auditable drift
+signals that reduce confidence and start relearning. It is laboratory-only;
+it does not plan, execute actions or invoke an LLM.
+
 The SPEC-011 metacognition-and-curiosity reference is in
 `eu_digital_lab/metacognition_curiosity.py`. It evaluates explicit hypotheses,
 records confirmed/rejected/inconclusive local outcomes, calibrates confidence

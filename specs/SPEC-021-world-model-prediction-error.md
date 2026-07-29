@@ -1,18 +1,20 @@
 ---
 id: SPEC-021
 title: World model e erro preditivo
-status: blocked
+status: done
 phase: 4
 dependencies: [SPEC-007, SPEC-009, SPEC-018]
-adrs: []
-contracts: []
+adrs: [ADR-0021]
+contracts: [WORLD_MODEL_PREDICTION_SCHEMA.md, world_model_prediction.schema.json, prediction_error.schema.json, prediction_drift.schema.json]
 ---
 
 # SPEC-021 — World model e erro preditivo
 
-Status: blocked
+Status: done
 Fase: 4
 Dependências: SPEC-007, SPEC-009, SPEC-018
+ADRs aplicáveis: ADR-0005, ADR-0008, ADR-0021
+Contratos: `WORLD_MODEL_PREDICTION_SCHEMA.md`, `world_model_prediction.schema.json`, `prediction_error.schema.json`, `prediction_drift.schema.json`
 
 ## Objetivo
 Prever próximos eventos e estados e usar erro preditivo como sinal de novidade.
@@ -29,6 +31,6 @@ Prever próximos eventos e estados e usar erro preditivo como sinal de novidade.
 Planejamento autônomo irrestrito.
 
 ## Critérios de aceite
-- [ ] Supera baseline de frequência em conjunto de teste.
-- [ ] Erro elevado aumenta saliência de forma auditável.
-- [ ] Drift reduz confiança e inicia reaprendizagem.
+- [x] Supera baseline de frequência em conjunto de teste.
+- [x] Erro elevado aumenta saliência de forma auditável.
+- [x] Drift reduz confiança e inicia reaprendizagem.
