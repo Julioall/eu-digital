@@ -31,6 +31,11 @@ Os contratos complementares de modelo de si funcional da SPEC-012 estão em
 Eles preservam `self_model.schema.json` da SPEC-023; a semântica está em
 `docs/03-contracts/FUNCTIONAL_SELF_MODEL_SCHEMA.md`.
 
+Os contratos do gateway de modelo local da SPEC-013 estão em
+`model_prompt_template.schema.json`, `local_model_request.schema.json` e
+`local_model_response.schema.json`. A semântica está documentada em
+`docs/03-contracts/LOCAL_MODEL_GATEWAY_SCHEMA.md`.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

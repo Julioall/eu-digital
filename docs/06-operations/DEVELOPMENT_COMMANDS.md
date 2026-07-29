@@ -206,3 +206,15 @@ It validates immutable snapshot history, version recovery, facts/hypotheses/
 configuration separation, capability explanations and causal decision gating.
 `unconstrained_decision_v0` is an ablation control only: both policies emit a
 structural decision and neither executes an action.
+
+The SPEC-013 local-model gateway reference is exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_local_model_gateway -v
+```
+
+The tests use an injected deterministic backend fixture. They verify one heavy
+inference at a time, priority/FIFO controls, timeout/cancel/unload, structured
+output rejection and backend substitution. No concrete model, runtime or API
+is downloaded or selected by this command.

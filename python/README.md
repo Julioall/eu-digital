@@ -79,3 +79,10 @@ separate; and emits explanation-backed structural capability decisions. The
 `unconstrained_decision_v0` control is selected through the same interface for
 ablation. It does not execute a decision, persist a longitudinal identity,
 invoke an LLM, or import a concrete capability implementation.
+
+The SPEC-013 local-model gateway reference is in
+`eu_digital_lab/local_model_gateway.py`. It accepts an injected local backend,
+serializes heavy inference through one worker, supports stable priority or FIFO
+ablation, cancellation, timeout and unloading, and validates structured
+`kind`/`fields` output. It does not select or download a model, import an
+inference runtime, send data to an API, or perform dialogue or actions.

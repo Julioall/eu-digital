@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ModelPromptTemplate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["template_id", "version", "body", "variables"],
+  "properties": {
+    "template_id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "body": {"type": "string", "minLength": 1},
+    "variables": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -80,3 +80,17 @@ contratos complementares, sem alterar o contrato público de capacidades:
 4. a decisão estrutural consulta o snapshot para bloquear disponibilidade
    incompatível e expõe `unconstrained_decision_v0` para ablação. Ela não
    executa ação, importa plugin concreto ou alega subjetividade.
+
+## Resoluções registradas pela SPEC-013
+
+Os requisitos de gateway foram resolvidos por ADR-0015 e contratos locais:
+
+1. o gateway depende de uma porta `LocalModelBackend`, sem escolher, baixar ou
+   importar modelo, runtime concreto ou API;
+2. um worker único, fila estável, timeout, cancelamento e descarregamento
+   mantêm o limite de um modelo pesado por vez;
+3. templates possuem identificador/versão e respostas só retornam após validar
+   `output.kind` e `output.fields`;
+4. backend e política de fila são selecionáveis pela mesma configuração, com
+   FIFO como controle. A questão aberta 5 permanece necessária para escolher
+   um modelo multimodal compatível em uma SPEC posterior.

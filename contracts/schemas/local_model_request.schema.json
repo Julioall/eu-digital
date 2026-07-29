@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LocalModelRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "schema_version",
+    "backend_id",
+    "model_id",
+    "priority",
+    "timeout_seconds",
+    "template",
+    "rendered_prompt"
+  ],
+  "properties": {
+    "request_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "backend_id": {"type": "string", "minLength": 1},
+    "model_id": {"type": "string", "minLength": 1},
+    "priority": {"type": "integer", "minimum": 0},
+    "timeout_seconds": {"type": "number", "minimum": 0},
+    "template": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["template_id", "version"],
+      "properties": {
+        "template_id": {"type": "string", "minLength": 1},
+        "version": {"type": "string", "minLength": 1}
+      }
+    },
+    "rendered_prompt": {"type": "string", "minLength": 1}
+  }
+}
