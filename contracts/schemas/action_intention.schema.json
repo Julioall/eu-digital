@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionIntention",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "intention_id", "action_id", "operation", "target", "created_at", "predicted_effects", "confidence", "origin"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "intention_id": {"type": "string", "minLength": 1},
+    "action_id": {"type": "string", "minLength": 1},
+    "operation": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "predicted_effects": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "origin": {"type": "string", "minLength": 1}
+  }
+}

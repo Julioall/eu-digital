@@ -133,3 +133,16 @@ agência:
 4. execute consome a autorização, audita o resultado e bloqueia a ausência de
    fornecedor; rollback é melhor esforço e também auditado;
 5. a SPEC-016 não habilita nenhum atuador concreto nem ações destrutivas.
+
+## Resoluções registradas pela SPEC-019
+
+O ADR-0019 e os contratos de propriocepção resolvem o bloqueio documental:
+
+1. o módulo Python registra estado corporal funcional, intenção, cópia
+   eferente, resultado e atribuição;
+2. H7 fixa passive_observer_v0 como baseline, macro-F1 como métrica primária,
+   ablação pela mesma interface e holdout congelado como critério;
+3. own exige correlação de ação e controle com a cópia eferente;
+4. ausência de correlação é ambiguous; external exige observação explicitamente
+   marcada como externa;
+5. promoção para C++ e validade ecológica permanecem fora desta SPEC.

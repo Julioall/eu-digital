@@ -49,6 +49,12 @@ action_simulation.schema.json, action_authorization.schema.json e
 action_outcome.schema.json. A semântica está documentada em
 docs/03-contracts/SUPERVISED_ACTION_SCHEMA.md.
 
+Os contratos locais da SPEC-019 estão em digital_body_state.schema.json,
+action_intention.schema.json, efference_copy.schema.json,
+agency_action_outcome.schema.json e agency_attribution.schema.json. A
+semântica está documentada em
+docs/03-contracts/DIGITAL_PROPRIOCEPTION_AGENCY_SCHEMA.md.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;

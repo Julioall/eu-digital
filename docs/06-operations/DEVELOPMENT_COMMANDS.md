@@ -254,3 +254,15 @@ explicit, non-expired authorization bound to the same plan digest. It calls
 only the injected ActionPort after the gate passes, records action.audit
 events, consumes authorization, and attempts rollback only for reversible
 actions. No concrete actuator is enabled by the reference runtime.
+
+The SPEC-019 digital-proprioception reference is exercised with:
+
+~~~powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_digital_proprioception_agency -v
+~~~
+
+The reference records DigitalBodyState, ActionIntention, EfferenceCopy,
+AgencyActionOutcome and AgencyAttribution. The treatment and passive-observer
+baseline share one interface; the treatment requires causal correlation and
+never converts missing correlation into external evidence.

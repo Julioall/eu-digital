@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DigitalBodyState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "state_id", "occurred_at", "active_capabilities", "queued_events", "available_actions", "initiated_actions", "failures", "limitations", "latencies_ms", "avatar_state", "action_origins"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "state_id": {"type": "string", "minLength": 1},
+    "occurred_at": {"type": "string", "minLength": 1},
+    "active_capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "queued_events": {"type": "integer", "minimum": 0},
+    "available_actions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "initiated_actions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "failures": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "latencies_ms": {"type": "object"},
+    "avatar_state": {"type": "string", "minLength": 1},
+    "action_origins": {"type": "object"}
+  }
+}
