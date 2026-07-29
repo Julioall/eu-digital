@@ -52,6 +52,8 @@ contracts/schemas/plugin_manifest.schema.json
 contracts/schemas/prediction_drift.schema.json
 contracts/schemas/prediction_error.schema.json
 contracts/schemas/retention_decision.schema.json
+contracts/schemas/runtime_health.schema.json
+contracts/schemas/runtime_manifest.schema.json
 contracts/schemas/self_model_decision.schema.json
 contracts/schemas/self_model_internal_event.schema.json
 contracts/schemas/self_model.schema.json
@@ -131,6 +133,7 @@ docs/03-contracts/MEMORY_CONSOLIDATION_SCHEMA.md
 docs/03-contracts/METACOGNITION_CURIOSITY_SCHEMA.md
 docs/03-contracts/MODULE_INTERFACE.md
 docs/03-contracts/MODULE_LIFECYCLE.md
+docs/03-contracts/NATIVE_RUNTIME_CONTRACTS.md
 docs/03-contracts/OBSERVATION_ENVELOPE.md
 docs/03-contracts/PATTERN_SCHEMA.md
 docs/03-contracts/SELF_MODEL_SCHEMA.md
@@ -159,6 +162,7 @@ docs/04-adrs/ADR-0020-reversible-memory-consolidation-retention.md
 docs/04-adrs/ADR-0021-incremental-world-model-prediction-error.md
 docs/04-adrs/ADR-0022-frozen-longitudinal-evaluation.md
 docs/04-adrs/ADR-0023-capability-adaptation-and-graceful-degradation.md
+docs/04-adrs/ADR-0024-native-runtime-host-and-local-lifecycle.md
 docs/05-governance/CHANGE_CONTROL.md
 docs/05-governance/OPEN_QUESTIONS.md
 docs/05-governance/RISK_REGISTER.md
@@ -190,6 +194,7 @@ models/exported/.gitkeep
 models/manifests/.gitkeep
 models/source/.gitkeep
 plans/PLAN-001-foundation.md
+plans/PLAN-002-runtime-shell.md
 promotions/registry.json
 promotions/required_components.json
 pyproject.toml
@@ -312,6 +317,7 @@ specs/SPEC-024-capability-adaptation-and-graceful-degradation.md
 specs/SPEC-025-hybrid-monorepo-foundation.md
 specs/SPEC-026-python-to-cpp-promotion-pipeline.md
 specs/SPEC-027-verification-validation-ecological-gates.md
+specs/SPEC-028-native-runtime-shell.md
 src/.gitkeep
 templates/ADR_TEMPLATE.md
 templates/EXECUTION_REPORT.md

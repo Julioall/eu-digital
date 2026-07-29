@@ -57,3 +57,13 @@ Políticas, orçamento de ação, permissões, auditoria e desligamento seguro.
 - equivalência;
 - benchmarks;
 - registro de componentes aprovados.
+
+## Fase 0.3 — Runtime local operável
+
+- host C++ com ciclo de vida explícito;
+- manifesto de build e snapshot de saúde versionados;
+- integração controlada com event bus, capabilities e timeline;
+- replay determinístico e recuperação após reinício;
+- pacote nativo sem Python, rede ou capacidades de domínio obrigatórias.
+
+Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.

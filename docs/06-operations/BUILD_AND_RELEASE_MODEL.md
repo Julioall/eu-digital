@@ -20,6 +20,10 @@
 - sanitizers em plataformas compatíveis;
 - instalador sem Python.
 
+Na Fase 0.3, o primeiro artefato operacional é um host de console controlado
+explicitamente. Serviço Windows, auto-start, interface gráfica e modelos
+empacotados permanecem fora do pacote até possuírem SPEC própria.
+
 ## Pipelines de CI
 
 ```text

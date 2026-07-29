@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RuntimeHealth",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "runtime_id",
+    "session_id",
+    "observed_at",
+    "state",
+    "event_bus",
+    "timeline",
+    "capabilities",
+    "errors"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "runtime_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "minLength": 1},
+    "state": {"type": "string", "enum": ["starting", "ready", "degraded", "stopping", "stopped", "failed"]},
+    "event_bus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "published_events", "dead_letters"],
+      "properties": {
+        "state": {"type": "string", "enum": ["starting", "ready", "stopped", "failed"]},
+        "published_events": {"type": "integer", "minimum": 0},
+        "dead_letters": {"type": "integer", "minimum": 0}
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "path", "recovered_events"],
+      "properties": {
+        "state": {"type": "string", "enum": ["unavailable", "ready", "degraded", "stopped", "failed"]},
+        "path": {"type": ["string", "null"]},
+        "recovered_events": {"type": "integer", "minimum": 0}
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability_id", "state", "required"],
+        "properties": {
+          "capability_id": {"type": "string", "minLength": 1},
+          "state": {"type": "string", "enum": ["unknown", "discovered", "calibrating", "available", "degraded", "temporarily_unavailable", "disabled", "failed", "removed", "incompatible"]},
+          "required": {"type": "boolean"},
+          "reason_code": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "message", "fatal"],
+        "properties": {
+          "code": {"type": "string", "minLength": 1},
+          "message": {"type": "string", "minLength": 1},
+          "fatal": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}
