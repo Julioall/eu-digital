@@ -86,3 +86,9 @@ serializes heavy inference through one worker, supports stable priority or FIFO
 ablation, cancellation, timeout and unloading, and validates structured
 `kind`/`fields` output. It does not select or download a model, import an
 inference runtime, send data to an API, or perform dialogue or actions.
+
+The SPEC-014 dialogue-and-avatar reference is in
+`eu_digital_lab/dialogue_avatar.py`. It presents validated contextual notices,
+keeps feedback history, and supports correction, defer and silence through an
+injected presenter port. Its view state never blocks work, captures input or
+claims emotion; no desktop framework is required by the laboratory reference.

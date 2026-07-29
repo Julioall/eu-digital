@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DialogueFeedback",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["feedback_id", "schema_version", "notice_id", "action", "occurred_at", "correction"],
+  "properties": {
+    "feedback_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "notice_id": {"type": "string", "minLength": 1},
+    "action": {"type": "string", "enum": ["correct", "defer", "silence"]},
+    "occurred_at": {"type": "string", "minLength": 1},
+    "correction": {"type": ["string", "null"]}
+  }
+}

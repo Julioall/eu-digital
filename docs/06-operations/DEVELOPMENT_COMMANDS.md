@@ -218,3 +218,14 @@ The tests use an injected deterministic backend fixture. They verify one heavy
 inference at a time, priority/FIFO controls, timeout/cancel/unload, structured
 output rejection and backend substitution. No concrete model, runtime or API
 is downloaded or selected by this command.
+
+The SPEC-014 dialogue-and-avatar reference is exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_dialogue_avatar -v
+```
+
+The test presenter is an injected local port. It verifies contextual question
+fields, non-blocking view invariants, interruption budget, correction, defer,
+silence and feedback history without opening a desktop window.

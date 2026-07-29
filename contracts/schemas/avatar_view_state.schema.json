@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AvatarViewState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["view_id", "schema_version", "state", "blocks_work", "captures_input", "has_focus", "notice_id"],
+  "properties": {
+    "view_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "state": {"type": "string", "enum": ["hidden", "quiet", "notice", "question"]},
+    "blocks_work": {"type": "boolean", "const": false},
+    "captures_input": {"type": "boolean", "const": false},
+    "has_focus": {"type": "boolean", "const": false},
+    "notice_id": {"type": ["string", "null"]}
+  }
+}

@@ -94,3 +94,15 @@ Os requisitos de gateway foram resolvidos por ADR-0015 e contratos locais:
 4. backend e política de fila são selecionáveis pela mesma configuração, com
    FIFO como controle. A questão aberta 5 permanece necessária para escolher
    um modelo multimodal compatível em uma SPEC posterior.
+
+## Resoluções registradas pela SPEC-014
+
+ADR-0016 e os contratos locais definem uma porta de apresentação substituível:
+
+1. a referência não escolhe Tauri, Qt ou outro framework, e não abre janela em
+   testes;
+2. estados visuais são limitados e sempre não bloqueiam trabalho, não capturam
+   input e não recebem foco;
+3. perguntas/notificações carregam hipótese, confiança, contexto e motivo;
+4. feedback permite `correct`, `defer` e `silence`, preservando histórico sem
+   declarar emoção, consciência ou personalidade.

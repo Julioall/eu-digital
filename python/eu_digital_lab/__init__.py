@@ -8,6 +8,16 @@ from .capabilities import (
     ModuleLifecycleManager,
     PluginDiscovery,
 )
+from .dialogue_avatar import (
+    AvatarPresenter,
+    AvatarState,
+    AvatarViewState,
+    DialogueAvatarController,
+    DialogueAvatarError,
+    DialogueFeedback,
+    DialogueNotice,
+    FeedbackAction,
+)
 from .episode_segmentation import (
     BoundaryDecision,
     SegmentationError,
@@ -85,6 +95,9 @@ from .validation import ValidationGateRunner, ValidationProtocol
 
 __all__ = [
     "AssertionClassification",
+    "AvatarPresenter",
+    "AvatarState",
+    "AvatarViewState",
     "BoundaryDecision",
     "CapabilityDescriptor",
     "CapabilityEntry",
@@ -97,11 +110,16 @@ __all__ = [
     "CuriosityResponse",
     "DatasetRepository",
     "DecisionPolicy",
+    "DialogueAvatarController",
+    "DialogueAvatarError",
+    "DialogueFeedback",
+    "DialogueNotice",
     "EpisodicMemory",
     "EpisodicMemoryError",
     "ExperimentConfig",
     "ExperimentReport",
     "ExperimentRunner",
+    "FeedbackAction",
     "FunctionalSelfModelError",
     "FunctionalSelfModelSnapshot",
     "GatewayConfig",

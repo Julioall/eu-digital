@@ -36,6 +36,10 @@ Os contratos do gateway de modelo local da SPEC-013 estão em
 `local_model_response.schema.json`. A semântica está documentada em
 `docs/03-contracts/LOCAL_MODEL_GATEWAY_SCHEMA.md`.
 
+Os contratos locais da SPEC-014 estão em `dialogue_notice.schema.json`,
+`dialogue_feedback.schema.json` e `avatar_view_state.schema.json`. A semântica
+está documentada em `docs/03-contracts/DIALOGUE_AVATAR_SCHEMA.md`.
+
 Os schemas executáveis de capacidades da SPEC-023 são:
 
 - `capability_descriptor.schema.json`;
