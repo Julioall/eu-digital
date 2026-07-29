@@ -214,14 +214,23 @@ foreach ($SpecFile in $SpecFiles) {
         }
     }
 
-    $ContractDirectory = Join-Path $RepositoryRoot 'docs\03-contracts'
+    $ContractDirectories = @(
+        (Join-Path $RepositoryRoot 'docs\03-contracts'),
+        (Join-Path $RepositoryRoot 'contracts\schemas')
+    )
     foreach ($Contract in @($Metadata['contracts'])) {
         if ($Contract -notmatch [string]$Schema.properties.contracts.items.pattern) {
             $Errors.Add("$($SpecFile.Name): nome de contrato inválido: $Contract.")
             continue
         }
-        $ContractPath = Join-Path $ContractDirectory $Contract
-        if (-not (Test-Path -LiteralPath $ContractPath -PathType Leaf)) {
+        $ContractMatches = @(
+            $ContractDirectories |
+                ForEach-Object {
+                    $Candidate = Join-Path $_ $Contract
+                    if (Test-Path -LiteralPath $Candidate -PathType Leaf) { $Candidate }
+                }
+        )
+        if ($ContractMatches.Count -ne 1) {
             $Errors.Add("$($SpecFile.Name): contrato não localizado: $Contract.")
         }
     }

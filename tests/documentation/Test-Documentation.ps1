@@ -21,12 +21,16 @@ function Invoke-ValidationScript {
         [string[]]$Arguments = @()
     )
 
-    $PreviousPreference = $ErrorActionPreference
-    $ErrorActionPreference = 'SilentlyContinue'
-    & $PowerShellExecutable -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $ScriptPath @Arguments *> $null
-    $ExitCode = $LASTEXITCODE
-    $ErrorActionPreference = $PreviousPreference
-    return $ExitCode
+    $ProcessArguments = @(
+        '-NoProfile',
+        '-NonInteractive',
+        '-ExecutionPolicy',
+        'Bypass',
+        '-File',
+        $ScriptPath
+    ) + $Arguments
+    $Process = Start-Process -FilePath $PowerShellExecutable -ArgumentList $ProcessArguments -Wait -PassThru -NoNewWindow
+    return [int]$Process.ExitCode
 }
 
 function Assert-ExitCode {
