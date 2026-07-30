@@ -1,7 +1,7 @@
 ---
 id: SPEC-038
 title: Promoção nativa do self-model funcional
-status: future
+status: done
 phase: beta
 dependencies: [SPEC-012, SPEC-023, SPEC-026, SPEC-027, SPEC-029, SPEC-037]
 adrs: [ADR-0005, ADR-0008, ADR-0009, ADR-0010, ADR-0011]
@@ -35,11 +35,11 @@ capacidade ausente. Falsificação: não reduzir incompatibilidades.
 
 ## Critérios de aceite
 
-- [ ] Contratos de snapshot/decisão são reproduzidos por C++.
-- [ ] Ausência, falha, remoção e reinstalação atualizam versão e histórico.
-- [ ] Decisões explicam limitações sem inventar observações.
-- [ ] Holdout, ablação, replay e benchmarks passam.
-- [ ] O mecanismo é removível e não declara estados mentais reais.
+- [x] Contratos de snapshot/decisão são reproduzidos por C++.
+- [x] Ausência, falha, remoção e reinstalação atualizam versão e histórico.
+- [x] Decisões explicam limitações sem inventar observações.
+- [x] Holdout, ablação, replay e benchmarks passam.
+- [x] O mecanismo é removível e não declara estados mentais reais.
 
 ## Saída
 

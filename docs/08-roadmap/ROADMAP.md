@@ -95,6 +95,11 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
   FIFO, ablação, broadcast local e holdout. O componente permanece
   `product_status: unavailable` até revisão humana; SPEC-038 é o próximo
   incremento nativo.
+- **SPEC-038 concluída nos gates automatizados:** self-model funcional nativo
+  com snapshots imutáveis, histórico causal, decisões condicionadas a
+  capabilities, remoção/reinstalação, baseline, ablação e holdout. O componente
+  permanece `product_status: unavailable` até revisão humana; SPEC-039 é o
+  próximo incremento nativo.
 - **V1 GA:** permanece condicionada a modelo local aprovado, shell/avatar,
   sugestões corrigíveis, MSIX assinado, atualização/rollback e gates de
   privacidade/operacionais.

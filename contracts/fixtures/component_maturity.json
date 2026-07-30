@@ -179,13 +179,17 @@
     {
       "component_id": "cognition.functional_self_model",
       "spec_id": "SPEC-012",
-      "reference_status": "python",
-      "native_status": "none",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
       "product_status": "unavailable",
-      "promotion_id": null,
+      "promotion_id": "cognition.functional_self_model.v1",
       "evidence_refs": [
         "specs/SPEC-012-self-model.md",
-        "python/eu_digital_lab/functional_self_model.py"
+        "specs/SPEC-038-functional-self-model-native-promotion.md",
+        "python/eu_digital_lab/functional_self_model.py",
+        "cpp/core/functional_self_model.hpp",
+        "promotions/cognition.functional_self_model.v1.json",
+        "validation/reports/functional_self_model_v1.json"
       ]
     },
     {

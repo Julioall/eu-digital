@@ -15,3 +15,15 @@ permanece proposicional e `configuration` descreve escolha de operação. A
 ausência de capacidade no snapshot é `unverified`: não é convertida em prova
 de indisponibilidade. Estados explicitamente declarados como degradado,
 indisponível ou removido explicam a limitação correspondente.
+
+## Promoção nativa SPEC-038
+
+O candidato C++ recebe os mesmos JSON-lines da referência Python pelo runner
+promotion_fixture_runner --functional-self-model. Cada evento interno cria
+um snapshot imutável; decisões somente consultam o estado funcional e não
+executam ferramentas, planos ou ações.
+
+A referência, os fixtures de desenvolvimento e o holdout estão registrados em
+promotions/cognition.functional_self_model.v1.json. Equivalência, replay,
+baseline, ablação e desempenho são verificações operacionais; não afirmam
+identidade, consciência, emoção ou experiência subjetiva.

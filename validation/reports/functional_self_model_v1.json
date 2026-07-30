@@ -1,0 +1,172 @@
+{
+  "ablation": {
+    "decision_count": 12.0,
+    "explainability_rate": 1.0,
+    "incompatibility_count": 9.0,
+    "interpretation": "operational ablation only",
+    "policy": "unconstrained_decision_v0",
+    "recovery_rate": 1.0,
+    "snapshot_consultation": false,
+    "stability_rate": 1.0
+  },
+  "baseline": {
+    "decision_count": 12.0,
+    "explainability_rate": 1.0,
+    "incompatibility_count": 9.0,
+    "interpretation": "operational baseline only",
+    "policy": "unconstrained_decision_v0",
+    "recovery_rate": 1.0,
+    "stability_rate": 1.0
+  },
+  "commits": {
+    "cpp": "working-tree",
+    "python": "frozen-2026-07-30"
+  },
+  "component_id": "cognition.functional_self_model",
+  "dataset": {
+    "case_count": 5,
+    "fixture_set": "validation/equivalence/functional_self_model_v1.jsonl",
+    "hash": "94dd346fd9c97dcc35d9cab8221d74da87c8983c5063d36bd402332b845859e8"
+  },
+  "equivalence": {
+    "divergences": [],
+    "input_sha256": {
+      "cpp": "94dd346fd9c97dcc35d9cab8221d74da87c8983c5063d36bd402332b845859e8",
+      "python": "94dd346fd9c97dcc35d9cab8221d74da87c8983c5063d36bd402332b845859e8"
+    },
+    "output_sha256": {
+      "cpp": "7002840a99d729bc59d663c3697da55b9f7dd57ccabbb8ffa4645622997600e7",
+      "python": "7002840a99d729bc59d663c3697da55b9f7dd57ccabbb8ffa4645622997600e7"
+    },
+    "passed": true
+  },
+  "hardware": {
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 165 Stepping 3, GenuineIntel",
+    "release": "11",
+    "system": "Windows"
+  },
+  "holdout": {
+    "case_count": 3,
+    "equivalence_passed": true,
+    "fixture_set": "validation/holdout/functional_self_model_v1_holdout.jsonl",
+    "metrics": {
+      "decision_count": 5.0,
+      "explainability_rate": 1.0,
+      "incompatibility_count": 2.0,
+      "recovery_rate": 1.0,
+      "stability_rate": 1.0
+    },
+    "sha256": "57084fa167847c64c2574f84b6fa0e82ed00ca7fe1f7b514460dc0351834ded4"
+  },
+  "hypothesis": {
+    "id": "H6-SELF-MODEL-CAUSAL",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "invariants": {
+    "failures": {},
+    "passed": true
+  },
+  "manifest": {
+    "candidate": {
+      "build_profile": "Debug",
+      "commit": "working-tree",
+      "compiler": "C++23 native",
+      "language": "cpp",
+      "target": "promotion_fixture_runner"
+    },
+    "component_id": "cognition.functional_self_model",
+    "component_version": "1.0.0",
+    "contract": {
+      "clock_semantics": "ordered timezone-aware internal event timestamps",
+      "error_schema": "contracts/schemas/self_model_decision.schema.json",
+      "input_schema": "docs/03-contracts/FUNCTIONAL_SELF_MODEL_SCHEMA.md",
+      "output_schema": "contracts/schemas/functional_self_model_snapshot.schema.json",
+      "random_seed_policy": "no randomness",
+      "state_schema": "contracts/schemas/functional_self_model_snapshot.schema.json"
+    },
+    "dataset": {
+      "case_count": 5,
+      "fixture_set": "validation/equivalence/functional_self_model_v1.jsonl",
+      "hash": "94dd346fd9c97dcc35d9cab8221d74da87c8983c5063d36bd402332b845859e8"
+    },
+    "equivalence": {
+      "absolute_tolerance": 1e-12,
+      "acceptance_metrics": {
+        "holdout_numeric_semantic_match": 1.0,
+        "invariant_pass_rate": 1.0,
+        "semantic_match": 1.0
+      },
+      "invariants": [
+        "history_versions_monotonic",
+        "prior_links_are_explicit",
+        "gate_matches_declared_capability",
+        "absence_is_unverified",
+        "decision_snapshot_provenance",
+        "no_mental_state_claims"
+      ],
+      "relative_tolerance": 1e-12,
+      "type": "numeric"
+    },
+    "hypothesis": {
+      "id": "H6-SELF-MODEL-CAUSAL",
+      "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+    },
+    "performance": {
+      "baseline_hardware": "captured by validation/reports/functional_self_model_v1.json",
+      "maximum_latency_ms": 100.0,
+      "maximum_memory_mb": 512.0,
+      "minimum_throughput": 10.0
+    },
+    "promotion_id": "cognition.functional_self_model.v1",
+    "reference": {
+      "commit": "frozen-2026-07-30",
+      "entrypoint": "eu_digital_lab.functional_self_model.VersionedFunctionalSelfModel",
+      "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414145626d3503b77fe89",
+      "language": "python",
+      "package": "eu_digital_lab"
+    },
+    "status": "reference_frozen",
+    "validation": {
+      "ablation": "unconstrained_decision_v0 without snapshot consultation",
+      "baseline_id": "unconstrained_decision_v0",
+      "ground_truth": "fixture lifecycle annotations plus immutable-history, provenance, compatibility and explanation invariants",
+      "holdout_fixture_set": "validation/holdout/functional_self_model_v1_holdout.jsonl",
+      "holdout_hash": "57084fa167847c64c2574f84b6fa0e82ed00ca7fe1f7b514460dc0351834ded4",
+      "holdout_status": "locked-before-evaluation"
+    }
+  },
+  "operational_measurement": {
+    "interpretation": "operational only; no cognitive claim",
+    "metrics": {
+      "latency_max_ms": 54.5716,
+      "latency_ms": 21.93078,
+      "latency_p50_ms": 20.1801,
+      "latency_p95_ms": 21.93078,
+      "memory_mb": 0.0,
+      "throughput": 230.1812557694932
+    }
+  },
+  "performance": {
+    "failures": [],
+    "metrics": {
+      "latency_max_ms": 54.5716,
+      "latency_ms": 21.93078,
+      "latency_p50_ms": 20.1801,
+      "latency_p95_ms": 21.93078,
+      "memory_mb": 0.0,
+      "throughput": 230.1812557694932
+    },
+    "passed": true
+  },
+  "promotion_id": "cognition.functional_self_model.v1",
+  "scientific_evidence_boundary": "equivalence and holdout are computational verification, not ground truth",
+  "treatment_metrics": {
+    "decision_count": 12.0,
+    "explainability_rate": 1.0,
+    "incompatibility_count": 2.0,
+    "policy": "self_model_gate_v1",
+    "recovery_rate": 1.0,
+    "stability_rate": 1.0
+  }
+}

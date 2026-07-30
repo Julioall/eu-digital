@@ -411,6 +411,16 @@ configuration separation, capability explanations and causal decision gating.
 `unconstrained_decision_v0` is an ablation control only: both policies emit a
 structural decision and neither executes an action.
 
+The SPEC-038 native candidate is validated with the frozen fixtures:
+
+    cmake --build build/dev --target functional_self_model_test promotion_fixture_runner
+    ctest --test-dir build/dev -R functional_self_model --output-on-failure
+    python tools/validate_functional_self_model_promotion.py
+
+The validator compares immutable history, capability-gated decisions and
+version replay against Python, then records the unconstrained baseline and
+snapshot-removal ablation separately from scientific claims.
+
 The SPEC-013 local-model gateway reference is exercised with:
 
 ```powershell

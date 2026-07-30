@@ -1,5 +1,6 @@
 #include "core/episode_segmenter.hpp"
 #include "core/episodic_memory.hpp"
+#include "core/functional_self_model.hpp"
 #include "core/global_workspace.hpp"
 #include "core/pattern_learner.hpp"
 #include "core/promotion_registry.hpp"
@@ -812,6 +813,203 @@ int run_global_workspace() {
     return std::cout.good() ? 0 : 1;
 }
 
+eu_digital::FunctionalSelfModelAssertion parse_self_model_assertion(
+    const JsonValue::Object& object, const std::vector<std::string>& fallback_sources,
+    const std::string& path) {
+    eu_digital::FunctionalSelfModelAssertion assertion;
+    assertion.assertion_id = required_string(object, "assertion_id", path);
+    assertion.subject = required_string(object, "subject", path);
+    assertion.predicate = required_string(object, "predicate", path);
+    assertion.value = required_string(object, "value", path);
+    assertion.classification = required_string(object, "classification", path);
+    assertion.explanation = required_string(object, "explanation", path);
+    const auto found = object.find("source_event_ids");
+    assertion.source_event_ids = found == object.end()
+        ? fallback_sources
+        : string_array(found->second, path + ".source_event_ids");
+    assertion.validate();
+    return assertion;
+}
+
+eu_digital::FunctionalSelfModelEvent parse_self_model_event(
+    const JsonValue& value, const std::string& path) {
+    const auto& object = runtime_detail::object(value, path);
+    eu_digital::FunctionalSelfModelEvent event;
+    event.event_id = required_string(object, "event_id", path);
+    event.schema_version = optional_string(object, "schema_version", path)
+        .value_or(eu_digital::FUNCTIONAL_SELF_MODEL_SCHEMA_VERSION);
+    event.occurred_at = eu_digital::workspace_format_utc(
+        parse_timestamp(required_string(object, "occurred_at", path)));
+    event.kind = required_string(object, "kind", path);
+    event.reason = required_string(object, "reason", path);
+    event.source_event_ids = string_array(
+        runtime_detail::required(object, "source_event_ids", path),
+        path + ".source_event_ids");
+    if (const auto* capability = optional_object(object, "capability", path)) {
+        eu_digital::FunctionalSelfModelCapability parsed;
+        parsed.capability_id = required_string(*capability, "capability_id", path + ".capability");
+        parsed.status = required_string(*capability, "status", path + ".capability");
+        parsed.explanation = required_string(*capability, "explanation", path + ".capability");
+        parsed.source_event_ids = event.source_event_ids;
+        event.capability = std::move(parsed);
+    }
+    if (const auto* assertion = optional_object(object, "assertion", path)) {
+        event.assertion = parse_self_model_assertion(
+            *assertion, event.source_event_ids, path + ".assertion");
+    }
+    event.validate();
+    return event;
+}
+
+std::string serialize_self_model_assertion(
+    const eu_digital::FunctionalSelfModelAssertion& assertion) {
+    std::ostringstream output;
+    output << "{\"assertion_id\":" << json_string(assertion.assertion_id)
+           << ",\"classification\":" << json_string(assertion.classification)
+           << ",\"explanation\":" << json_string(assertion.explanation)
+           << ",\"predicate\":" << json_string(assertion.predicate)
+           << ",\"source_event_ids\":" << json_array(assertion.source_event_ids)
+           << ",\"subject\":" << json_string(assertion.subject)
+           << ",\"value\":" << json_string(assertion.value) << '}';
+    return output.str();
+}
+
+std::string serialize_self_model_capability(
+    const eu_digital::FunctionalSelfModelCapability& capability) {
+    std::ostringstream output;
+    output << "{\"capability_id\":" << json_string(capability.capability_id)
+           << ",\"explanation\":" << json_string(capability.explanation)
+           << ",\"source_event_ids\":" << json_array(capability.source_event_ids)
+           << ",\"status\":" << json_string(capability.status) << '}';
+    return output.str();
+}
+
+std::string serialize_self_model_assertion_array(
+    const std::vector<eu_digital::FunctionalSelfModelAssertion>& values) {
+    std::ostringstream output;
+    output << '[';
+    for (std::size_t index = 0; index < values.size(); ++index) {
+        if (index) output << ',';
+        output << serialize_self_model_assertion(values[index]);
+    }
+    output << ']';
+    return output.str();
+}
+
+std::string serialize_self_model_capability_array(
+    const std::vector<eu_digital::FunctionalSelfModelCapability>& values) {
+    std::ostringstream output;
+    output << '[';
+    for (std::size_t index = 0; index < values.size(); ++index) {
+        if (index) output << ',';
+        output << serialize_self_model_capability(values[index]);
+    }
+    output << ']';
+    return output.str();
+}
+
+std::string serialize_self_model_snapshot(
+    const eu_digital::FunctionalSelfModelSnapshot& snapshot) {
+    std::ostringstream output;
+    output << "{\"capabilities\":" << serialize_self_model_capability_array(snapshot.capabilities)
+           << ",\"configuration\":" << serialize_self_model_assertion_array(snapshot.configuration)
+           << ",\"facts\":" << serialize_self_model_assertion_array(snapshot.facts)
+           << ",\"history_hash\":" << json_string(snapshot.history_hash)
+           << ",\"hypotheses\":" << serialize_self_model_assertion_array(snapshot.hypotheses)
+           << ",\"prior_snapshot_id\":" << json_optional_string(snapshot.prior_snapshot_id)
+           << ",\"schema_version\":" << json_string(snapshot.schema_version)
+           << ",\"snapshot_id\":" << json_string(snapshot.snapshot_id)
+           << ",\"trigger_event_id\":" << json_optional_string(snapshot.trigger_event_id)
+           << ",\"updated_at\":" << json_string(snapshot.updated_at)
+           << ",\"version\":" << snapshot.version << '}';
+    return output.str();
+}
+
+std::string serialize_self_model_decision(
+    const eu_digital::FunctionalSelfModelDecision& decision) {
+    std::ostringstream output;
+    output << "{\"allowed\":" << (decision.allowed ? "true" : "false")
+           << ",\"decision_id\":" << json_string(decision.decision_id)
+           << ",\"explanation\":" << json_string(decision.explanation)
+           << ",\"policy_id\":" << json_string(decision.policy_id)
+           << ",\"reason_code\":" << json_string(decision.reason_code)
+           << ",\"requested_capability_id\":" << json_string(decision.requested_capability_id)
+           << ",\"schema_version\":" << json_string(decision.schema_version)
+           << ",\"snapshot_id\":" << json_string(decision.snapshot_id) << '}';
+    return output.str();
+}
+
+std::string serialize_self_model_metrics(
+    const eu_digital::VersionedFunctionalSelfModel& model) {
+    std::ostringstream output;
+    output << "{\"ablation\":" << json_string(eu_digital::FUNCTIONAL_SELF_MODEL_ABLATION)
+           << ",\"applied_event_count\":" << model.applied_event_count()
+           << ",\"baseline_policy_id\":" << json_string(eu_digital::FUNCTIONAL_SELF_MODEL_BASELINE_ID)
+           << ",\"falsification\":" << json_string(eu_digital::FUNCTIONAL_SELF_MODEL_FALSIFICATION)
+           << ",\"history_version_count\":" << model.history_version_count()
+           << ",\"hypothesis\":" << json_string(eu_digital::FUNCTIONAL_SELF_MODEL_HYPOTHESIS)
+           << ",\"policy_id\":" << json_string(model.decision_policy()) << '}';
+    return output.str();
+}
+
+int run_functional_self_model() {
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
+        const auto root = runtime_detail::JsonParser(line).parse();
+        const auto& object = runtime_detail::object(root, "fixture");
+        const auto model_id = required_string(object, "model_id", "fixture");
+        const auto initial_at = eu_digital::workspace_format_utc(
+            parse_timestamp(required_string(object, "initial_at", "fixture")));
+        const auto policy = optional_string(object, "decision_policy", "fixture")
+            .value_or(eu_digital::FUNCTIONAL_SELF_MODEL_POLICY_ID);
+        eu_digital::VersionedFunctionalSelfModel model(model_id, initial_at, policy);
+        std::vector<eu_digital::FunctionalSelfModelDecision> decisions;
+        std::vector<eu_digital::FunctionalSelfModelSnapshot> version_reads;
+        const auto& operations = runtime_detail::array(
+            runtime_detail::required(object, "operations", "fixture"), "fixture.operations");
+        for (std::size_t index = 0; index < operations.size(); ++index) {
+            const auto path = "fixture.operations[" + std::to_string(index) + "]";
+            const auto& operation = runtime_detail::object(operations[index], path);
+            const auto type = required_string(operation, "type", path);
+            if (type == "apply") {
+                model.apply(parse_self_model_event(
+                    runtime_detail::required(operation, "event", path), path + ".event"));
+            } else if (type == "decide") {
+                decisions.push_back(model.decide(
+                    required_string(operation, "requested_capability_id", path)));
+            } else if (type == "version") {
+                const auto version = static_cast<int>(runtime_detail::unsigned_number(
+                    runtime_detail::required(operation, "version", path), path + ".version"));
+                version_reads.push_back(model.version(version));
+            } else {
+                throw std::runtime_error("unsupported functional self-model operation: " + type);
+            }
+        }
+        std::ostringstream output;
+        output << "{\"decisions\":[";
+        for (std::size_t index = 0; index < decisions.size(); ++index) {
+            if (index) output << ',';
+            output << serialize_self_model_decision(decisions[index]);
+        }
+        output << "],\"model\":{\"history\":[";
+        for (std::size_t index = 0; index < model.history().size(); ++index) {
+            if (index) output << ',';
+            output << serialize_self_model_snapshot(model.history()[index]);
+        }
+        output << "],\"metrics\":" << serialize_self_model_metrics(model)
+               << ",\"model_id\":" << json_string(model.model_id())
+               << ",\"schema_version\":\"1.0\"},\"schema_version\":\"1.0\",\"version_reads\":[";
+        for (std::size_t index = 0; index < version_reads.size(); ++index) {
+            if (index) output << ',';
+            output << serialize_self_model_snapshot(version_reads[index]);
+        }
+        output << "]}\n";
+        std::cout << output.str();
+    }
+    return std::cout.good() ? 0 : 1;
+}
+
 int run_episodic_memory() {
     std::string line;
     while (std::getline(std::cin, line)) {
@@ -915,6 +1113,7 @@ int main(int argc, char** argv) {
         if (argc > 1 && std::string(argv[1]) == "--pattern-learning") return run_pattern_learning();
         if (argc > 1 && std::string(argv[1]) == "--world-model") return run_world_model();
         if (argc > 1 && std::string(argv[1]) == "--global-workspace") return run_global_workspace();
+        if (argc > 1 && std::string(argv[1]) == "--functional-self-model") return run_functional_self_model();
         const std::string fixture_bytes{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
         std::cout << eu_digital::PromotionFixtureRunner::echo(fixture_bytes);
         return std::cout.good() ? 0 : 1;
