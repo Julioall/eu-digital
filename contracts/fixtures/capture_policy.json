@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "capture.local.low-risk",
+  "policy_version": "1",
+  "capture_window_title": false,
+  "capture_clipboard": false,
+  "global_pause": false,
+  "allowlist": [],
+  "denylist": ["keepass", "1password", "bitwarden", "lastpass", "dashlane", "password", "private", "incognito", "inprivate", "tor"],
+  "mandatory_denylist": ["keepass", "1password", "bitwarden", "lastpass", "dashlane", "password", "private", "incognito", "inprivate", "tor"],
+  "redaction_version": "length-only-v1"
+}

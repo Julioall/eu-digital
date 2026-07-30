@@ -15,7 +15,7 @@ if (-not $OutputPath) {
 }
 $OutputPath = [System.IO.Path]::GetFullPath($OutputPath)
 
-$ExcludedSegments = @('.git', '.venv', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'build', 'out')
+$ExcludedSegments = @('.git', '.venv', '.vs', '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', 'build', 'out')
 $Files = Get-ChildItem -LiteralPath $RepositoryRoot -Recurse -Force -File | Where-Object {
     $Relative = $_.FullName.Substring($RepositoryRoot.Length + 1)
     $Segments = $Relative -split '[\\/]'

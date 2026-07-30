@@ -1,0 +1,158 @@
+{
+  "ablation_metrics": {
+    "mrr": 0.875,
+    "provenance_precision": 1.0,
+    "recall_at_k": 1.0
+  },
+  "baseline_metrics": {
+    "mrr": 0.875,
+    "provenance_precision": 1.0,
+    "recall_at_k": 1.0
+  },
+  "commits": {
+    "cpp": "working-tree",
+    "python": "frozen-2026-07-29"
+  },
+  "component_id": "cognition.episodic_memory",
+  "dataset": {
+    "case_count": 4,
+    "fixture_set": "validation/equivalence/episodic_memory_v1.jsonl",
+    "hash": "645abae8b00a500b43e9c9158a6001326319bcea874f05b557990fe2f4ffac51"
+  },
+  "equivalence": {
+    "divergences": [],
+    "input_sha256": {
+      "cpp": "645abae8b00a500b43e9c9158a6001326319bcea874f05b557990fe2f4ffac51",
+      "python": "645abae8b00a500b43e9c9158a6001326319bcea874f05b557990fe2f4ffac51"
+    },
+    "output_sha256": {
+      "cpp": "79b82acc4c0fb5f2fbbfa7bf8b3e1635041bc19be335c890cb1e16605d7501a6",
+      "python": "d2a3344886fa1b07437f0586e55c2361b92dd0bee45a90c1aafa8e9699aa734b"
+    },
+    "passed": true
+  },
+  "hardware": {
+    "machine": "x86_64",
+    "processor": "x86_64",
+    "release": "6.6.87.2-microsoft-standard-WSL2",
+    "system": "Linux"
+  },
+  "holdout": {
+    "case_count": 2,
+    "equivalence_passed": true,
+    "fixture_set": "validation/holdout/episodic_memory_v1_holdout.jsonl",
+    "metrics": {
+      "mrr": 0.5,
+      "provenance_precision": 1.0,
+      "recall_at_k": 1.0
+    },
+    "sha256": "b160b549f186888393a7119321b2b1d6b94a2ab85462c12765c204a6c60efc3f"
+  },
+  "hypothesis": {
+    "id": "H-SPEC008-EPISODIC-MEMORY",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "invariants": {
+    "failures": {},
+    "passed": true
+  },
+  "manifest": {
+    "candidate": {
+      "build_profile": "Debug",
+      "commit": "working-tree",
+      "compiler": "C++23 native",
+      "language": "cpp",
+      "target": "promotion_fixture_runner"
+    },
+    "component_id": "cognition.episodic_memory",
+    "component_version": "1.0.0",
+    "contract": {
+      "clock_semantics": "ISO-8601 timezone-aware episode and query timestamps",
+      "error_schema": "docs/03-contracts/CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md",
+      "input_schema": "docs/03-contracts/EPISODIC_MEMORY_PROMOTION_CONTRACT.md",
+      "output_schema": "docs/03-contracts/EPISODIC_MEMORY_PROMOTION_CONTRACT.md",
+      "random_seed_policy": "no randomness",
+      "state_schema": "contracts/schemas/episode.schema.json"
+    },
+    "dataset": {
+      "case_count": 4,
+      "fixture_set": "validation/equivalence/episodic_memory_v1.jsonl",
+      "hash": "645abae8b00a500b43e9c9158a6001326319bcea874f05b557990fe2f4ffac51"
+    },
+    "equivalence": {
+      "absolute_tolerance": 1e-12,
+      "acceptance_metrics": {
+        "holdout_numeric_semantic_match": 1.0,
+        "invariant_pass_rate": 1.0,
+        "semantic_match": 1.0
+      },
+      "invariants": [
+        "stored_episode_is_immutable_by_duplicate_id",
+        "retrieval_provenance_matches_episode",
+        "relation_provenance_contains_source_events",
+        "missing_embedding_does_not_become_negative_evidence",
+        "retention_is_bounded_and_deterministic",
+        "no_summary_or_fact_is_generated"
+      ],
+      "relative_tolerance": 1e-12,
+      "type": "numeric"
+    },
+    "hypothesis": {
+      "id": "H-SPEC008-EPISODIC-MEMORY",
+      "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+    },
+    "performance": {
+      "baseline_hardware": "captured by validation/reports/episodic_memory_v1.json",
+      "maximum_latency_ms": 100.0,
+      "maximum_memory_mb": 512.0,
+      "minimum_throughput": 10.0
+    },
+    "promotion_id": "cognition.episodic_memory.v1",
+    "reference": {
+      "commit": "frozen-2026-07-29",
+      "entrypoint": "eu_digital_lab.episodic_memory.EpisodicMemory",
+      "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+      "language": "python",
+      "package": "eu_digital_lab"
+    },
+    "status": "validated",
+    "validation": {
+      "ablation": "chronological fallback without context and embedding signals",
+      "baseline_id": "context_overlap_v1",
+      "ground_truth": "fixture relevance fields plus provenance invariants",
+      "holdout_fixture_set": "validation/holdout/episodic_memory_v1_holdout.jsonl",
+      "holdout_hash": "b160b549f186888393a7119321b2b1d6b94a2ab85462c12765c204a6c60efc3f",
+      "holdout_status": "locked-before-evaluation"
+    }
+  },
+  "operational_measurement": {
+    "interpretation": "operational only; no cognitive claim",
+    "metrics": {
+      "latency_max_ms": 8.654183,
+      "latency_ms": 8.212382,
+      "latency_p50_ms": 7.039535,
+      "latency_p95_ms": 8.212382,
+      "memory_mb": 27.875,
+      "throughput": 559.9152140548305
+    }
+  },
+  "performance": {
+    "failures": [],
+    "metrics": {
+      "latency_max_ms": 8.654183,
+      "latency_ms": 8.212382,
+      "latency_p50_ms": 7.039535,
+      "latency_p95_ms": 8.212382,
+      "memory_mb": 27.875,
+      "throughput": 559.9152140548305
+    },
+    "passed": true
+  },
+  "promotion_id": "cognition.episodic_memory.v1",
+  "scientific_evidence_boundary": "cross-language equivalence is computational verification, not ground truth",
+  "treatment_metrics": {
+    "mrr": 1.0,
+    "provenance_precision": 1.0,
+    "recall_at_k": 1.0
+  }
+}

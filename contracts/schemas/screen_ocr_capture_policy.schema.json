@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ScreenOcrCapturePolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "policy_version",
+    "sensor_id",
+    "purpose",
+    "consent_state",
+    "capture_mode",
+    "request_id",
+    "global_pause",
+    "region_of_interest",
+    "redaction_version",
+    "text_retention_days",
+    "visual_retention_days",
+    "event_payload_mode"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "policy_version": {"type": "string", "minLength": 1},
+    "sensor_id": {"type": "string", "const": "screen.ocr"},
+    "purpose": {"type": "string", "const": "screen_text_observation"},
+    "consent_state": {"type": "string", "enum": ["not_granted", "granted", "revoked"]},
+    "capture_mode": {"type": "string", "enum": ["disabled", "explicit", "on_demand"]},
+    "request_id": {"type": ["string", "null"], "minLength": 1},
+    "global_pause": {"type": "boolean"},
+    "region_of_interest": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": {"type": "integer", "minimum": 0},
+            "y": {"type": "integer", "minimum": 0},
+            "width": {"type": "integer", "minimum": 1},
+            "height": {"type": "integer", "minimum": 1}
+          }
+        }
+      ]
+    },
+    "redaction_version": {"type": "string", "const": "length-only-v1"},
+    "text_retention_days": {"type": "integer", "minimum": 1, "maximum": 7},
+    "visual_retention_days": {"type": "integer", "minimum": 1, "maximum": 30},
+    "event_payload_mode": {"type": "string", "const": "reference-and-hash-only"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"capture_mode": {"const": "explicit"}}},
+      "then": {
+        "properties": {
+          "consent_state": {"const": "granted"},
+          "request_id": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"capture_mode": {"const": "on_demand"}}},
+      "then": {
+        "properties": {
+          "consent_state": {"const": "granted"},
+          "request_id": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"capture_mode": {"const": "disabled"}}},
+      "then": {"properties": {"request_id": {"type": "null"}}}
+    }
+  ]
+}

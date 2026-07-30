@@ -1,7 +1,7 @@
 ---
 id: SPEC-028
 title: Runtime local mínimo do Cérebro Implantado
-status: ready
+status: done
 phase: 0.3
 dependencies: [SPEC-002, SPEC-006, SPEC-023, SPEC-025, SPEC-026, SPEC-027]
 adrs: [ADR-0010, ADR-0011, ADR-0024]
@@ -10,7 +10,7 @@ contracts: [runtime_manifest.schema.json, runtime_health.schema.json]
 
 # SPEC-028 — Runtime local mínimo do Cérebro Implantado
 
-Status: ready
+Status: done
 Fase: 0.3
 Dependências: SPEC-002, SPEC-006, SPEC-023, SPEC-025, SPEC-026, SPEC-027
 ADRs aplicáveis: ADR-0010, ADR-0011, ADR-0024
@@ -75,24 +75,24 @@ experiência ou validade cognitiva.
 
 ## Critérios de aceite
 
-- [ ] `RuntimeHost` inicia em processo nativo sem interpretador Python.
-- [ ] Inicialização sem capacidades opcionais termina em `ready`.
-- [ ] Falha de uma dependência obrigatória termina em `failed` com erro
+- [x] `RuntimeHost` inicia em processo nativo sem interpretador Python.
+- [x] Inicialização sem capacidades opcionais termina em `ready`.
+- [x] Falha de uma dependência obrigatória termina em `failed` com erro
       estruturado e código não zero.
-- [ ] Indisponibilidade de capacidade opcional produz `degraded` sem inventar
+- [x] Indisponibilidade de capacidade opcional produz `degraded` sem inventar
       observação.
-- [ ] `start` e `stop` repetidos não duplicam sessão, evento ou fechamento.
-- [ ] Manifesto válido é carregado e manifesto inválido é rejeitado.
-- [ ] `RuntimeHealth` é serializado e validado contra seu schema.
-- [ ] Um evento canônico aceito é persistido e recuperado pela timeline.
-- [ ] Replay determinístico passa com fixture congelada e relógio controlado.
-- [ ] Reinício recupera o estado permitido sem apagar o histórico.
-- [ ] CTest cobre ciclo de vida, falha, replay, timeline e contratos.
-- [ ] Instalação CMake/CPack contém o binário nativo e não contém arquivos
+- [x] `start` e `stop` repetidos não duplicam sessão, evento ou fechamento.
+- [x] Manifesto válido é carregado e manifesto inválido é rejeitado.
+- [x] `RuntimeHealth` é serializado e validado contra seu schema.
+- [x] Um evento canônico aceito é persistido e recuperado pela timeline.
+- [x] Replay determinístico passa com fixture congelada e relógio controlado.
+- [x] Reinício recupera o estado permitido sem apagar o histórico.
+- [x] CTest cobre ciclo de vida, falha, replay, timeline e contratos.
+- [x] Instalação CMake/CPack contém o binário nativo e não contém arquivos
       Python.
-- [ ] O smoke test funciona no Windows nativo e no ambiente Linux/WSL
+- [x] O smoke test funciona no Windows nativo e no ambiente Linux/WSL
       suportado pelo projeto.
-- [ ] Documentação descreve instalação, operação, diagnóstico e remoção
+- [x] Documentação descreve instalação, operação, diagnóstico e remoção
       reversível.
 
 ## Protocolo operacional e científico

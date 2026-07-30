@@ -1,0 +1,97 @@
+# Relatório de Execução
+
+SPEC: SPEC-034 — Promoção nativa da memória episódica  
+Agente: Codex  
+Data: 2026-07-29  
+Commit: pendente de criação
+
+## Alterações realizadas
+
+- Congelada a referência Python e criado o manifesto
+  `cognition.episodic_memory.v1`.
+- Implementado armazenamento C++ de episódios imutáveis por ID, recuperação
+  contextual/temporal, consulta por embedding opcional e relações explícitas.
+- Implementada retenção limitada determinística sem gerar fatos, resumos ou
+  generalizações semânticas.
+- Exposto plugin C++ removível com `CapabilityDescriptor` próprio.
+- Criados runner JSON-lines, fixtures de equivalência, holdout bloqueado,
+  baseline cronológico, ablação e benchmark operacional.
+
+## Arquivos modificados
+
+- `cpp/core/episodic_memory.hpp`
+- `cpp/app/promotion_fixture_runner.cpp`
+- `cpp/tests/episodic_memory_test.cpp`
+- `CMakeLists.txt`
+- `python/tests/test_episodic_memory_promotion.py`
+- `tools/validate_memory_promotion.py`
+- `validation/equivalence/episodic_memory_v1.jsonl`
+- `validation/holdout/episodic_memory_v1_holdout.jsonl`
+- `validation/holdout/episodic_memory_manifest.json`
+- `validation/reports/episodic_memory_v1.json`
+- `validation/reports/episodic_memory_v1_divergences.json`
+- `promotions/cognition.episodic_memory.v1.json`
+- `docs/03-contracts/EPISODIC_MEMORY_PROMOTION_CONTRACT.md`
+- `docs/04-adrs/ADR-0030-atomic-episodic-memory-promotion.md`
+- `specs/SPEC-034-episodic-memory-native-promotion.md`
+- `contracts/fixtures/component_maturity.json`
+- `docs/06-operations/DEVELOPMENT_COMMANDS.md`
+- `docs/08-roadmap/ROADMAP.md`
+
+## Testes executados
+
+- `cmake --build --preset dev` — aprovado.
+- `ctest --test-dir build/dev --output-on-failure` — 16/16 aprovados.
+- `PYTHONPATH=python python3 tools/validate_memory_promotion.py` — equivalência,
+  holdout, invariantes e performance aprovados.
+- `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — 185/185
+  aprovados.
+- `PYTHONPATH=python python3 tools/validate_hybrid.py` — aprovado; release sem
+  arquivos de runtime Python.
+- CTest Windows/MSVC/vcpkg — 16/16 aprovados.
+- Validação de contratos, maturidade, 35 SPECs e documentação — aprovadas.
+
+## Resultados
+
+O candidato C++ coincidiu semanticamente com a referência nos quatro casos de
+desenvolvimento e nos dois casos do holdout. A última medição registrada
+apresentou p50 de 7,04 ms, p95 de 8,21 ms, máximo de 8,65 ms, RSS máximo
+observado de 27,88 MiB e throughput de aproximadamente 560 casos/s. São
+métricas operacionais, não evidência cognitiva.
+
+## Critérios de aceite
+
+Os gates locais de equivalência, recuperação, proveniência, relações,
+retenção, ablação, holdout, lifecycle e benchmark passaram. O componente foi
+atualizado para `reference_status: frozen`, `native_status: equivalent` e
+`product_status: unavailable`.
+
+## Desvios
+
+A promoção não foi inserida em `promotions/registry.json`, porque esse registro
+exige uma revisão humana com `approval_review_id`. Nenhum identificador foi
+inventado; a capacidade não está disponível no produto.
+
+## Riscos e pendências
+
+- A validade científica requer ground truth independente e avaliação ecológica;
+  equivalência Python/C++ não é prova suficiente.
+- Consolidação semântica e criação de conhecimento permanecem na SPEC-020 e
+  não foram antecipadas.
+- A aprovação final do registry requer decisão humana registrada.
+
+## Decisões tomadas
+
+- Embeddings são vetores locais opcionais de avaliação, não dependência do
+  runtime nem modelo obrigatório.
+- Duplicidade por `episode_id` não substitui a fonte já armazenada.
+- Consulta sem filtros usa fallback cronológico determinístico.
+- Ausência de embedding exclui apenas a pontuação de embedding; não vira
+  observação negativa sobre o episódio.
+
+## Evidências
+
+- `validation/reports/episodic_memory_v1.json`
+- `validation/reports/episodic_memory_v1_divergences.json`
+- `promotions/cognition.episodic_memory.v1.json`
+- `validation/holdout/episodic_memory_manifest.json`

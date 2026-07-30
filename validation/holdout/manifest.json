@@ -1,0 +1,7 @@
+{
+  "fixture_set": "validation/holdout/episode_segmentation_v1_holdout.jsonl",
+  "sha256": "4ea4cd76ec3a7eb1e55299f844c8d61d17147e4027e6f705753d7c2a68caf1a4",
+  "case_count": 2,
+  "status": "locked-before-evaluation",
+  "promotion_id": "cognition.episode_segmentation.v1"
+}

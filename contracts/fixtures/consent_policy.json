@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "consent.local.default-deny",
+  "policy_version": "1",
+  "default_decision": "deny",
+  "global_pause": false,
+  "consents": [
+    {
+      "sensor_id": "system_activity",
+      "purpose": "local_activity_observation",
+      "decision": "grant",
+      "consent_version": "1",
+      "decided_at": "2026-07-29T12:00:00Z"
+    },
+    {
+      "sensor_id": "screen_ocr",
+      "purpose": "screen_text_observation",
+      "decision": "revoke",
+      "consent_version": "1",
+      "decided_at": "2026-07-29T12:01:00Z"
+    }
+  ]
+}

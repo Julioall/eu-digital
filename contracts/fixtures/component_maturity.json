@@ -1,0 +1,272 @@
+{
+  "schema_version": "1.0",
+  "registry_id": "eu-digital-component-maturity",
+  "components": [
+    {
+      "component_id": "runtime.native_host",
+      "spec_id": "SPEC-028",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "experimental",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-028-native-runtime-shell.md",
+        "docs/04-adrs/ADR-0024-native-runtime-host-and-local-lifecycle.md"
+      ]
+    },
+    {
+      "component_id": "runtime.capability_registry",
+      "spec_id": "SPEC-023",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-023-pluggable-capability-runtime.md",
+        "cpp/core/capability_runtime.hpp"
+      ]
+    },
+    {
+      "component_id": "storage.timeline",
+      "spec_id": "SPEC-006",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-006-timeline-store.md",
+        "cpp/core/timeline_store.hpp"
+      ]
+    },
+    {
+      "component_id": "sensor.system_activity",
+      "spec_id": "SPEC-003",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-003-system-activity-sensor.md",
+        "cpp/core/system_activity_sensor.hpp"
+      ]
+    },
+    {
+      "component_id": "sensor.input_interaction",
+      "spec_id": "SPEC-004",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-004-input-interaction-sensor.md",
+        "cpp/core/input_interaction_sensor.hpp"
+      ]
+    },
+    {
+      "component_id": "sensor.screen_ocr",
+      "spec_id": "SPEC-005",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-005-screen-ocr-sensor.md",
+        "specs/SPEC-032-consented-ocr-capability.md",
+        "cpp/core/screen_ocr_sensor.hpp",
+        "docs/04-adrs/ADR-0028-consented-screen-ocr-capability.md"
+      ]
+    },
+    {
+      "component_id": "sensor.audio",
+      "spec_id": "SPEC-015",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-015-audio-sensor.md",
+        "cpp/core/audio_sensor.hpp"
+      ]
+    },
+    {
+      "component_id": "actions.supervised",
+      "spec_id": "SPEC-016",
+      "reference_status": "none",
+      "native_status": "candidate",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-016-supervised-actions.md",
+        "cpp/core/supervised_actions.hpp"
+      ]
+    },
+    {
+      "component_id": "cognition.episode_segmentation",
+      "spec_id": "SPEC-007",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
+      "product_status": "unavailable",
+      "promotion_id": "cognition.episode_segmentation.v1",
+      "evidence_refs": [
+        "specs/SPEC-007-episode-segmentation.md",
+        "specs/SPEC-033-episode-segmentation-native-promotion.md",
+        "python/eu_digital_lab/episode_segmentation.py",
+        "cpp/core/episode_segmenter.hpp",
+        "promotions/cognition.episode_segmentation.v1.json",
+        "validation/reports/episode_segmentation_v1.json"
+      ]
+    },
+    {
+      "component_id": "cognition.episodic_memory",
+      "spec_id": "SPEC-008",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
+      "product_status": "unavailable",
+      "promotion_id": "cognition.episodic_memory.v1",
+      "evidence_refs": [
+        "specs/SPEC-008-episodic-memory.md",
+        "specs/SPEC-034-episodic-memory-native-promotion.md",
+        "python/eu_digital_lab/episodic_memory.py",
+        "cpp/core/episodic_memory.hpp",
+        "promotions/cognition.episodic_memory.v1.json",
+        "validation/reports/episodic_memory_v1.json"
+      ]
+    },
+    {
+      "component_id": "cognition.pattern_learning",
+      "spec_id": "SPEC-009",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
+      "product_status": "unavailable",
+      "promotion_id": "cognition.pattern_learning.v1",
+      "evidence_refs": [
+        "specs/SPEC-009-pattern-learning.md",
+        "specs/SPEC-035-pattern-learning-native-promotion.md",
+        "python/eu_digital_lab/pattern_learning.py",
+        "cpp/core/pattern_learner.hpp",
+        "promotions/cognition.pattern_learning.v1.json",
+        "validation/reports/pattern_learning_v1.json"
+      ]
+    },
+    {
+      "component_id": "cognition.global_workspace",
+      "spec_id": "SPEC-010",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-010-global-workspace.md",
+        "python/eu_digital_lab/global_workspace.py"
+      ]
+    },
+    {
+      "component_id": "cognition.metacognition_curiosity",
+      "spec_id": "SPEC-011",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-011-metacognition-curiosity.md",
+        "python/eu_digital_lab/metacognition_curiosity.py"
+      ]
+    },
+    {
+      "component_id": "cognition.functional_self_model",
+      "spec_id": "SPEC-012",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-012-self-model.md",
+        "python/eu_digital_lab/functional_self_model.py"
+      ]
+    },
+    {
+      "component_id": "inference.local_model_gateway",
+      "spec_id": "SPEC-013",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-013-local-model-gateway.md",
+        "python/eu_digital_lab/local_model_gateway.py"
+      ]
+    },
+    {
+      "component_id": "presentation.dialogue_avatar",
+      "spec_id": "SPEC-014",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-014-dialogue-avatar.md",
+        "python/eu_digital_lab/dialogue_avatar.py"
+      ]
+    },
+    {
+      "component_id": "agency.digital_proprioception",
+      "spec_id": "SPEC-019",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-019-digital-proprioception-and-agency.md",
+        "python/eu_digital_lab/digital_proprioception_agency.py"
+      ]
+    },
+    {
+      "component_id": "cognition.memory_consolidation",
+      "spec_id": "SPEC-020",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-020-memory-consolidation-forgetting.md",
+        "python/eu_digital_lab/memory_consolidation.py"
+      ]
+    },
+    {
+      "component_id": "cognition.world_model",
+      "spec_id": "SPEC-021",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-021-world-model-prediction-error.md",
+        "python/eu_digital_lab/world_model.py"
+      ]
+    },
+    {
+      "component_id": "evaluation.longitudinal",
+      "spec_id": "SPEC-022",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-022-longitudinal-cognitive-evaluation.md",
+        "python/eu_digital_lab/longitudinal_evaluation.py"
+      ]
+    },
+    {
+      "component_id": "capability.adaptation",
+      "spec_id": "SPEC-024",
+      "reference_status": "python",
+      "native_status": "none",
+      "product_status": "unavailable",
+      "promotion_id": null,
+      "evidence_refs": [
+        "specs/SPEC-024-capability-adaptation-and-graceful-degradation.md",
+        "python/eu_digital_lab/capability_adaptation.py"
+      ]
+    }
+  ]
+}

@@ -12,9 +12,11 @@ using eu_digital::CapabilityState;
 using eu_digital::ModuleLifecycleManager;
 using eu_digital::ProcessInfo;
 using eu_digital::SystemActivityAdapter;
+using eu_digital::SystemActivityConfig;
 using eu_digital::SystemActivityPlugin;
 using eu_digital::SystemActivitySensor;
 using eu_digital::SystemActivitySnapshot;
+using eu_digital::WindowsSystemActivityAdapter;
 using eu_digital::WindowInfo;
 
 class FakeSystemActivityAdapter final : public SystemActivityAdapter {
@@ -70,6 +72,9 @@ int main() {
     assert(events[0].payload.find("browser.exe") != std::string::npos);
     assert(events[1].payload.find("browser.exe") != std::string::npos);
     assert(events[2].payload.find("worker.exe") != std::string::npos);
+    assert(events[0].payload.find("window_title\":\"\"") != std::string::npos);
+    assert(events[0].payload.find("text_content_observed\":false") != std::string::npos);
+    assert(events[0].payload.find("application_category\":\"browser\"") != std::string::npos);
     assert(sensor.health().available);
     assert(sensor.health().average_cpu_percent <= sensor.config().cpu_budget_percent);
     assert(sensor.health_check());
@@ -99,4 +104,35 @@ int main() {
     assert(!denied_sensor.health().available);
     assert(denied_sensor.health().consecutive_failures == 1);
     assert(denied_sensor.health().permission_denied);
+
+    eu_digital::ObservationPrivacyPolicy restricted_policy;
+    restricted_policy.allowlist = {"editor.exe"};
+    SystemActivityConfig restricted_config;
+    restricted_config.privacy_policy = restricted_policy;
+    FakeSystemActivityAdapter restricted;
+    restricted.snapshots.push_back(snapshot(
+        {10, "password-manager.exe", "Vault"},
+        {{10, {10, "password-manager.exe"}}, {20, {20, "editor.exe"}}}));
+    std::vector<CanonicalEvent> restricted_events;
+    SystemActivitySensor restricted_sensor(
+        restricted, [&](const CanonicalEvent& event) { restricted_events.push_back(event); }, restricted_config);
+    assert(restricted_sensor.poll());
+    assert(restricted_events.empty());
+    assert(restricted_sensor.health().suppressed_observations > 0);
+    assert(restricted_sensor.health().last_suppression_reason == "application_denylist");
+
+    SystemActivityConfig paused_config;
+    paused_config.privacy_policy.global_pause = true;
+    FakeSystemActivityAdapter paused_adapter;
+    std::vector<CanonicalEvent> paused_events;
+    SystemActivitySensor paused_sensor(
+        paused_adapter, [&](const CanonicalEvent& event) { paused_events.push_back(event); }, paused_config);
+    assert(paused_sensor.poll());
+    assert(paused_events.empty());
+    assert(paused_sensor.health().paused);
+
+    WindowsSystemActivityAdapter default_windows_adapter;
+    assert(!default_windows_adapter.captures_window_title());
+    WindowsSystemActivityAdapter explicit_title_adapter(true);
+    assert(explicit_title_adapter.captures_window_title());
 }

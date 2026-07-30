@@ -93,10 +93,156 @@ components recorded with status `promoted` and a review identifier in
 covered by the CTest target `promotion_registry` and the
 `promotion_fixture_runner` executable.
 
+The SPEC-029 component maturity registry is validated independently from the
+promotion registry:
+
+```powershell
+$env:PYTHONPATH = "python"
+python tools/validate_component_maturity.py
+python -m unittest python.tests.test_component_maturity -v
+```
+
+The SPEC-030 privacy and storage contracts are validated independently from
+the cognitive promotion registry:
+
+```powershell
+$env:PYTHONPATH = "python"
+python tools/validate_privacy_storage.py
+python -m unittest python.tests.test_privacy_storage -v
+ctest --test-dir build/dev -R privacy_storage --output-on-failure
+```
+
+`StorageHealth` is emitted separately from `RuntimeHealth` 1.0. On Windows,
+consent snapshots use DPAPI; WSL/Linux reports that DPAPI is unavailable and
+does not silently write an unprotected snapshot.
+
+The SPEC-032 consented screen/OCR policy is validated independently:
+
+```powershell
+$env:PYTHONPATH = "python"
+python tools/validate_screen_ocr_policy.py
+python -m unittest python.tests.test_screen_ocr_policy -v
+ctest --test-dir build/dev -R screen_ocr_sensor --output-on-failure
+```
+
+The sensor is denied by default. The Windows capture adapter and a concrete
+OCR backend remain separate future integrations.
+
+The SPEC-033 episode-segmentation promotion is evaluated independently. It
+does not add the mechanism to the approved product registry:
+
+```bash
+cmake --build --preset dev
+ctest --test-dir build/dev -R episode_segmentation --output-on-failure
+PYTHONPATH=python python3 tools/validate_episode_promotion.py
+PYTHONPATH=python python3 -m unittest python.tests.test_episode_promotion -v
+```
+
+The development fixture and locked holdout hashes are recorded in
+`promotions/cognition.episode_segmentation.v1.json`. A successful equivalence
+run classifies the component as `native_status: equivalent`; only a reviewed
+manifest with `approval_review_id` may enter `promotions/registry.json`.
+
+The SPEC-034 episodic-memory promotion is evaluated separately:
+
+```bash
+cmake --build --preset dev
+ctest --test-dir build/dev -R episodic_memory --output-on-failure
+PYTHONPATH=python python3 tools/validate_memory_promotion.py
+PYTHONPATH=python python3 -m unittest python.tests.test_episodic_memory_promotion -v
+```
+
+Its embedding vectors are local fixture data only; no model is required. The
+component remains unavailable until a reviewed promotion enters the registry.
+
+The SPEC-035 pattern-learning promotion is evaluated independently:
+
+```bash
+cmake --build --preset dev
+ctest --test-dir build/dev -R pattern_learning --output-on-failure
+PYTHONPATH=python python3 tools/validate_pattern_promotion.py
+```
+
+The learner's `promoted` status is operational only; it is not a semantic fact
+or an authorization to execute an action.
+
 Ele executa testes Python, configura/compila/testa o C++ e instala uma release
 mínima, verificando que nenhum arquivo Python é empacotado.
 
 Nenhuma tarefa deve ser marcada como concluída sem executar a sequência aplicável.
+
+## Runtime Preview nativo (SPEC-028)
+
+O host C++ é local e não inicia automaticamente. Configure, compile e execute
+somente quando o runtime for solicitado explicitamente:
+
+```bash
+cmake --preset dev
+cmake --build --preset dev
+ctest --test-dir build/dev --output-on-failure
+
+./build/dev/eu_digital_runtime contracts/fixtures/canonical_event.json
+./build/dev/eu_digital_runtime --run contracts/fixtures/runtime_manifest.json runtime.sqlite contracts/fixtures/canonical_event.json runtime-session 2026-07-29T12:00:00Z
+./build/dev/eu_digital_runtime --replay contracts/fixtures/runtime_manifest.json runtime.sqlite runtime-session 2026-07-29T12:00:00Z
+```
+
+`--run` e `--replay` emitem um `RuntimeHealth` JSON em stdout. Erros de CLI
+são JSON estruturado em stderr e retornam código diferente de zero. Para
+remover o diagnóstico local, encerre o processo e apague apenas o arquivo de
+timeline escolhido, por exemplo `rm runtime.sqlite`; nenhuma configuração de
+auto-start, serviço ou tráfego de rede é criada por esses comandos.
+
+Para inspecionar o artefato nativo sem instalar no sistema:
+
+```bash
+cmake --install build/dev --prefix build/release
+cpack --config build/dev/CPackConfig.cmake -B build/package
+```
+
+O instalador CMake contém apenas `eu_digital_runtime`; o pacote ZIP da fase
+0.3 não contém Python, ambientes virtuais, notebooks, datasets nem pesos.
+
+No Windows nativo, use o preset separado para não reutilizar o cache Linux/WSL:
+
+```powershell
+cmake --preset windows-dev
+cmake --build --preset windows-dev
+ctest --preset windows-dev
+```
+
+Esse smoke test requer compilador C++ para Windows, CMake, Ninja e SQLite
+instalados localmente (por exemplo, pelo vcpkg). Sem esse toolchain, o gate
+Windows permanece pendente; o host não deve ser declarado pronto para Windows
+apenas pela execução no WSL.
+
+Exemplo de preparação local do toolchain Windows, executado em PowerShell de
+desenvolvedor do Visual Studio:
+
+```powershell
+$sdkBin = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64" -Directory |
+  Sort-Object Name -Descending | Select-Object -First 1
+$env:Path = "$($sdkBin.FullName);$env:Path"
+
+git clone https://github.com/microsoft/vcpkg.git C:\src\vcpkg
+& C:\src\vcpkg\bootstrap-vcpkg.bat
+& C:\src\vcpkg\vcpkg.exe install sqlite3:x64-windows
+$env:VCPKG_INSTALLATION_ROOT = 'C:\src\vcpkg'
+
+cmake --fresh --preset windows-dev `
+  -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+cmake --build --preset windows-dev
+ctest --preset windows-dev
+```
+
+O clone e o bootstrap são preparação do ambiente de desenvolvimento; não
+fazem parte do pacote do produto. O usuário deve verificar a licença do
+SQLite/vcpkg antes de distribuir artefatos.
+
+Depois dessa preparação, a validação pode ser repetida pelo helper versionado:
+
+```powershell
+.\tools\Invoke-WindowsRuntimeValidation.ps1 -VcpkgRoot C:\src\vcpkg
+```
 The SPEC-027 independent validation gates are exercised with:
 
 ```powershell

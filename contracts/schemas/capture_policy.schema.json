@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CapturePolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "policy_version", "capture_window_title", "capture_clipboard", "global_pause", "allowlist", "denylist", "mandatory_denylist", "redaction_version"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "policy_version": {"type": "string", "minLength": 1},
+    "capture_window_title": {"type": "boolean"},
+    "capture_clipboard": {"type": "boolean"},
+    "global_pause": {"type": "boolean"},
+    "allowlist": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "denylist": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "mandatory_denylist": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "redaction_version": {"type": "string", "minLength": 1}
+  }
+}

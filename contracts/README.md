@@ -79,6 +79,25 @@ Os schemas executáveis de capacidades da SPEC-023 são:
 - `self_model.schema.json`;
 - `plugin_manifest.schema.json`.
 
+Os contratos de privacidade e armazenamento da SPEC-030 são:
+
+- `consent_policy.schema.json`;
+- `storage_policy.schema.json`;
+- `storage_health.schema.json`;
+- `data_management_request.schema.json`.
+
+A semântica está documentada em
+`docs/03-contracts/PRIVACY_STORAGE_CONTRACTS.md`. Defaults de retenção e quota
+são versionados e não autorizam exclusão automática.
+
+O contrato de política de captura de baixo risco da SPEC-031 é
+`capture_policy.schema.json`, documentado em
+`docs/03-contracts/OBSERVATION_POLICY_CONTRACT.md`.
+
+O contrato de captura visual e OCR consentidos da SPEC-032 é
+`screen_ocr_capture_policy.schema.json`, documentado em
+`docs/03-contracts/SCREEN_OCR_CAPTURE_CONTRACT.md`.
+
 Python e C++ consomem esses contratos; nenhum plugin concreto faz parte do
 núcleo.
 

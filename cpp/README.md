@@ -8,8 +8,23 @@ Consulte:
 - `docs/04-adrs/ADR-0010-python-laboratory-cpp-deployed-brain.md`
 - `specs/SPEC-025-hybrid-monorepo-foundation.md`
 
-O executável mínimo lê `contracts/fixtures/canonical_event.json`. O build não
-carrega interpretador Python nem módulos do laboratório.
+Na SPEC-028, `cpp/core/runtime_host.hpp` fornece um host local de ciclo de
+vida explícito. Ele carrega `RuntimeManifest`, publica `RuntimeHealth`, usa o
+event bus e persiste somente eventos `CanonicalEvent` válidos na timeline
+SQLite. O build não carrega interpretador Python nem módulos do laboratório.
+
+Após compilar, os modos locais são:
+
+```bash
+./build/dev/eu_digital_runtime contracts/fixtures/canonical_event.json
+./build/dev/eu_digital_runtime --run contracts/fixtures/runtime_manifest.json runtime.sqlite contracts/fixtures/canonical_event.json runtime-session 2026-07-29T12:00:00Z
+./build/dev/eu_digital_runtime --replay contracts/fixtures/runtime_manifest.json runtime.sqlite runtime-session 2026-07-29T12:00:00Z
+```
+
+Os dois últimos modos escrevem um `RuntimeHealth` JSON em stdout. O host não
+inicia sensores, interface, modelo, rede, ações ou qualquer capacidade de
+domínio; uma capacidade opcional declarada, porém ausente, é reportada como
+`temporarily_unavailable` e leva o host a `degraded`.
 
 O registry e o lifecycle nativos da SPEC-023 estão em
 `cpp/core/capability_runtime.hpp`, com teste em
@@ -34,12 +49,15 @@ clipboard callbacks, emits versioned payloads, aggregates counters without
 discarding metrics, associates events with the supplied active-window context,
 and does not interpret intent or execute input actions.
 The initial SPEC-005 screen/OCR sensor is in
-`cpp/core/screen_ocr_sensor.hpp`. It receives frames from a local capture
-adapter, stores image bytes behind `ImageStore`, applies an average-hash
-deduplication policy with an interval fallback, and invokes an injected local
-`OcrEngine`. Visual and OCR events reference the stored image and persist word
-coordinates; event payloads never duplicate screen pixels. OCR failures keep
-the visual event and expose structured health state.
+`cpp/core/screen_ocr_sensor.hpp`, with the consent contract in
+`cpp/core/screen_ocr_policy.hpp`. It receives frames from a local capture
+adapter only after resolved consent, explicit enablement or a matching
+on-demand request; stores only a validated region behind `ImageStore`, applies
+an average-hash deduplication policy with an interval fallback, and invokes an
+injected local `OcrEngine`. Visual and OCR events reference the stored image
+and persist redacted word coordinates; event payloads never duplicate screen
+pixels or raw OCR text. OCR failures keep the visual event and expose a
+distinct `screen.ocr_unavailable` health/event state.
 The SPEC-006 timeline store is in `cpp/core/timeline_store.hpp`. It uses a
 local SQLite file with versioned migrations, append-only event IDs, temporal
 and context indexes, deterministic pagination, JSON export, and ordered replay.

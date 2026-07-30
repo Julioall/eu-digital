@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "screen.ocr.local",
+  "policy_version": "1",
+  "sensor_id": "screen.ocr",
+  "purpose": "screen_text_observation",
+  "consent_state": "granted",
+  "capture_mode": "explicit",
+  "request_id": null,
+  "global_pause": false,
+  "region_of_interest": {"x": 10, "y": 20, "width": 800, "height": 600},
+  "redaction_version": "length-only-v1",
+  "text_retention_days": 7,
+  "visual_retention_days": 30,
+  "event_payload_mode": "reference-and-hash-only"
+}

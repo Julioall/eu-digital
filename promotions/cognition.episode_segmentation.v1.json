@@ -1,0 +1,68 @@
+{
+  "candidate": {
+    "build_profile": "Debug",
+    "compiler": "C++23 native",
+    "commit": "working-tree",
+    "language": "cpp",
+    "target": "promotion_fixture_runner"
+  },
+  "component_id": "cognition.episode_segmentation",
+  "component_version": "1.0.0",
+  "contract": {
+    "clock_semantics": "ISO-8601 timezone-aware timestamps converted to UTC seconds",
+    "error_schema": "docs/03-contracts/CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md",
+    "input_schema": "docs/03-contracts/EPISODE_PROMOTION_CONTRACT.md",
+    "output_schema": "contracts/schemas/episode.schema.json",
+    "random_seed_policy": "no randomness",
+    "state_schema": null
+  },
+  "dataset": {
+    "case_count": 4,
+    "fixture_set": "validation/equivalence/episode_segmentation_v1.jsonl",
+    "hash": "35479083f825f7f6deeda043de6d08f4f44f2601a4c7afcc53a3e4aff94b59fe"
+  },
+  "equivalence": {
+    "absolute_tolerance": null,
+    "acceptance_metrics": {
+      "exact_json_semantic_match": 1.0,
+      "holdout_exact_json_semantic_match": 1.0,
+      "invariant_pass_rate": 1.0
+    },
+    "invariants": [
+      "all_event_ids_are_covered_once",
+      "episodes_are_non_empty_and_contiguous",
+      "first_boundary_is_episode_start",
+      "every_boundary_has_reason",
+      "missing_context_does_not_create_negative_evidence"
+    ],
+    "relative_tolerance": null,
+    "type": "exact"
+  },
+  "hypothesis": {
+    "id": "H-SPEC007-EPISODE-SEGMENTATION",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "performance": {
+    "baseline_hardware": "captured by validation/episode_segmentation_v1.json",
+    "maximum_latency_ms": 100.0,
+    "maximum_memory_mb": 512.0,
+    "minimum_throughput": 10.0
+  },
+  "promotion_id": "cognition.episode_segmentation.v1",
+  "reference": {
+    "commit": "frozen-2026-07-29",
+    "entrypoint": "eu_digital_lab.episode_segmentation.segment_events",
+    "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+    "language": "python",
+    "package": "eu_digital_lab"
+  },
+  "status": "validated",
+  "validation": {
+    "ablation": "split_on_application_change=false, split_on_document_change=false",
+    "baseline_id": "time_context_threshold_v1",
+    "ground_truth": "fixture case ground_truth fields plus documented invariants",
+    "holdout_fixture_set": "validation/holdout/episode_segmentation_v1_holdout.jsonl",
+    "holdout_hash": "4ea4cd76ec3a7eb1e55299f844c8d61d17147e4027e6f705753d7c2a68caf1a4",
+    "holdout_status": "locked-before-evaluation"
+  }
+}

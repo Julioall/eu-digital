@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "capture.invalid",
+  "policy_version": "1",
+  "capture_window_title": true,
+  "capture_clipboard": true,
+  "global_pause": false,
+  "allowlist": [],
+  "denylist": ["password"],
+  "mandatory_denylist": ["password", "keepass"],
+  "redaction_version": "length-only-v1"
+}

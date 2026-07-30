@@ -67,3 +67,28 @@ Políticas, orçamento de ação, permissões, auditoria e desligamento seguro.
 - pacote nativo sem Python, rede ou capacidades de domínio obrigatórias.
 
 Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
+
+## Sequência de releases atual
+
+- **Runtime Preview:** SPEC-028 RuntimeHost, SPEC-029 maturidade de
+  componentes e SPEC-030 privacidade/armazenamento local.
+- **Product Beta — observação:** SPEC-031 observação Windows de baixo risco e
+  SPEC-032 OCR consentido independente.
+- **Próximo incremento:** SPEC-033, primeira promoção cognitiva atômica;
+  nenhuma capacidade cognitiva é disponibilizada no produto apenas por estar
+  concluída no laboratório Python.
+- **SPEC-033 em validação:** segmentação nativa de episódios, com referência
+  congelada, equivalência C++/Python, baseline, ablação e holdout bloqueado.
+  O componente permanece `product_status: unavailable` até aprovação humana.
+- **SPEC-034 em validação:** memória episódica nativa, com recuperação
+  explicável, proveniência, embedding opcional, retenção limitada e holdout
+  bloqueado. Consolidação semântica continua fora desta promoção.
+- **SPEC-035 em validação:** padrões nativos com suporte, feedback, drift,
+  baseline de chave exata e holdout bloqueado. O status `promoted` do cluster
+  não significa verdade, nomeação ou ação.
+- **V1 GA:** permanece condicionada a modelo local aprovado, shell/avatar,
+  sugestões corrigíveis, MSIX assinado, atualização/rollback e gates de
+  privacidade/operacionais.
+
+O status documental das SPECs não substitui `reference_status`,
+`native_status` e `product_status` do registro de maturidade.

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StoragePolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "policy_version", "raw_event_retention_days", "derived_memory_retention_days", "quarantine_retention_days", "user_storage_quota_gib", "included_buckets", "model_accounting", "quota_exceeded_action"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "policy_version": {"type": "string", "minLength": 1},
+    "raw_event_retention_days": {"type": "integer", "minimum": 1},
+    "derived_memory_retention_days": {"type": "integer", "minimum": 1},
+    "quarantine_retention_days": {"type": "integer", "minimum": 1},
+    "user_storage_quota_gib": {"type": "integer", "minimum": 1},
+    "included_buckets": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["database", "wal", "indexes", "quarantine", "backups", "payloads"]}
+    },
+    "model_accounting": {"type": "string", "enum": ["separate"]},
+    "quota_exceeded_action": {"type": "string", "enum": ["suspend_capture_and_request_user_decision"]}
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ConsentPolicy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "policy_id", "policy_version", "default_decision", "global_pause", "consents"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "policy_id": {"type": "string", "minLength": 1},
+    "policy_version": {"type": "string", "minLength": 1},
+    "default_decision": {"type": "string", "enum": ["deny"]},
+    "global_pause": {"type": "boolean"},
+    "consents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sensor_id", "purpose", "decision", "consent_version", "decided_at"],
+        "properties": {
+          "sensor_id": {"type": "string", "minLength": 1},
+          "purpose": {"type": "string", "minLength": 1},
+          "decision": {"type": "string", "enum": ["grant", "revoke"]},
+          "consent_version": {"type": "string", "minLength": 1},
+          "decided_at": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

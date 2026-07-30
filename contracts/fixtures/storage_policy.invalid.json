@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "policy_id": "storage.invalid",
+  "policy_version": "1",
+  "raw_event_retention_days": 30,
+  "derived_memory_retention_days": 365,
+  "quarantine_retention_days": 14,
+  "user_storage_quota_gib": 10,
+  "included_buckets": ["database", "payloads"],
+  "model_accounting": "included",
+  "quota_exceeded_action": "delete_oldest"
+}

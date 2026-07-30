@@ -2,6 +2,7 @@
 
 #include "capability_runtime.hpp"
 #include "event_bus.hpp"
+#include "observation_privacy.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -62,6 +63,7 @@ struct WindowContext {
     std::uint32_t process_id{};
     std::string process_name;
     std::string window_title;
+    std::string application_category;
 
     bool operator==(const WindowContext&) const = default;
 };
@@ -71,6 +73,13 @@ struct InputInteractionConfig {
     bool capture_key_codes{false};
     std::uint64_t aggregate_window_ms{1000};
     std::uint64_t pause_threshold_ms{1000};
+    ObservationPrivacyPolicy privacy_policy{};
+};
+
+struct InputInteractionHealth {
+    bool paused{false};
+    std::uint64_t suppressed_observations{0};
+    std::string last_suppression_reason;
 };
 
 class InputInteractionSensor {
@@ -91,21 +100,47 @@ public:
 
     const CapabilityDescriptor& descriptor() const { return descriptor_; }
     const InputInteractionConfig& config() const { return config_; }
+    const InputInteractionHealth& health() const { return health_; }
+    bool health_check() const { return true; }
 
     void ingest(const RawInputEvent& input, const WindowContext& context) {
+        if (config_.privacy_policy.global_pause) {
+            health_.paused = true;
+            health_.last_suppression_reason = "global_pause";
+            ++health_.suppressed_observations;
+            return;
+        }
+        health_.paused = false;
+        if (!config_.privacy_policy.application_allowed(context.process_name)) {
+            health_.last_suppression_reason = "application_denylist";
+            ++health_.suppressed_observations;
+            return;
+        }
+        WindowContext sanitized_context = context;
+        if (sanitized_context.application_category.empty()) {
+            sanitized_context.application_category = ObservationPrivacyPolicy::application_category(
+                sanitized_context.process_name);
+        }
+        sanitized_context.window_title = config_.privacy_policy.redact_window_title(
+            sanitized_context.process_name, sanitized_context.window_title);
         if (input.kind == RawInputKind::clipboard) {
-            emit_clipboard(input, context);
+            if (!config_.privacy_policy.capture_clipboard) {
+                health_.last_suppression_reason = "clipboard_disabled";
+                ++health_.suppressed_observations;
+                return;
+            }
+            emit_clipboard(input, sanitized_context);
             return;
         }
         if (!aggregate_start_ms_ || input.timestamp_ms < *aggregate_start_ms_ ||
             input.timestamp_ms - *aggregate_start_ms_ >= config_.aggregate_window_ms ||
-            (aggregate_context_ && *aggregate_context_ != context)) {
+            (aggregate_context_ && *aggregate_context_ != sanitized_context)) {
             flush();
             aggregate_start_ms_ = input.timestamp_ms;
-            aggregate_context_ = context;
+            aggregate_context_ = sanitized_context;
         }
-        if (!aggregate_context_) aggregate_context_ = context;
-        if (config_.emit_raw_events) emit_raw(input, context);
+        if (!aggregate_context_) aggregate_context_ = sanitized_context;
+        if (config_.emit_raw_events) emit_raw(input, sanitized_context);
         update_aggregate(input);
         last_timestamp_ms_ = input.timestamp_ms;
     }
@@ -175,7 +210,11 @@ private:
                 << (context.process_id != 0 ? "true" : "false")
                 << ",\"process_id\":" << context.process_id
                 << ",\"process_name\":\"" << json_escape(context.process_name)
-                << "\",\"window_title\":\"" << json_escape(context.window_title) << "\"}";
+                << "\",\"application_category\":\""
+                << json_escape(context.application_category)
+                << "\",\"window_title\":\"" << json_escape(context.window_title)
+                << "\",\"text_content_observed\":"
+                << (config_.privacy_policy.capture_window_title ? "true" : "false") << "}";
         return payload.str();
     }
 
@@ -203,7 +242,8 @@ private:
         std::ostringstream payload;
         payload << base_payload(context)
                 << ",\"content_length\":" << input.clipboard_length
-                << ",\"content_digest\":\"" << json_escape(input.clipboard_digest) << "\"}";
+                << ",\"content_digest\":\"" << json_escape(input.clipboard_digest)
+                << "\",\"text_content_observed\":true}";
         emit("input.clipboard", payload.str(), input.timestamp_ms);
     }
 
@@ -246,6 +286,7 @@ private:
     std::uint64_t last_timestamp_ms_{0};
     std::optional<WindowContext> aggregate_context_;
     Aggregate aggregate_;
+    InputInteractionHealth health_;
     std::uint64_t next_event_id_{1};
 };
 
@@ -262,7 +303,7 @@ public:
     void configure() override {}
     void initialize() override {}
     void calibrate() override {}
-    bool health_check() override { return true; }
+    bool health_check() override { return sensor_.health_check(); }
     void start() override {}
     void drain() override { sensor_.flush(); }
     std::map<std::string, std::string> checkpoint() override { return {}; }
@@ -280,7 +321,10 @@ class WindowsInputCaptureAdapter {
 public:
     using Sink = std::function<void(const RawInputEvent&, const WindowContext&)>;
 
-    explicit WindowsInputCaptureAdapter(Sink sink) : sink_(std::move(sink)) {}
+    explicit WindowsInputCaptureAdapter(Sink sink, bool capture_window_title = false)
+        : sink_(std::move(sink)), capture_window_title_(capture_window_title) {}
+
+    bool captures_window_title() const noexcept { return capture_window_title_; }
 
     bool start() {
 #ifdef _WIN32
@@ -351,18 +395,21 @@ public:
 
 private:
 #ifdef _WIN32
-    static WindowContext foreground_context() {
+    WindowContext foreground_context() const {
         WindowContext context;
         const HWND window = GetForegroundWindow();
         if (window == nullptr) return context;
         DWORD process_id = 0;
         GetWindowThreadProcessId(window, &process_id);
         context.process_id = process_id;
-        const int title_length = GetWindowTextLengthW(window);
-        if (title_length > 0) {
-            std::vector<wchar_t> buffer(static_cast<std::size_t>(title_length) + 1);
-            GetWindowTextW(window, buffer.data(), static_cast<int>(buffer.size()));
-            context.window_title = wide_to_utf8(std::wstring(buffer.data()));
+        context.process_name = process_name_for_id(process_id);
+        if (capture_window_title_) {
+            const int title_length = GetWindowTextLengthW(window);
+            if (title_length > 0) {
+                std::vector<wchar_t> buffer(static_cast<std::size_t>(title_length) + 1);
+                GetWindowTextW(window, buffer.data(), static_cast<int>(buffer.size()));
+                context.window_title = wide_to_utf8(std::wstring(buffer.data()));
+            }
         }
         return context;
     }
@@ -377,6 +424,19 @@ private:
         return result;
     }
 
+    static std::string process_name_for_id(DWORD process_id) {
+        const HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, process_id);
+        if (process == nullptr) return {};
+        std::vector<wchar_t> buffer(1024);
+        DWORD length = static_cast<DWORD>(buffer.size());
+        const bool read = QueryFullProcessImageNameW(process, 0, buffer.data(), &length) != FALSE;
+        CloseHandle(process);
+        if (!read) return {};
+        std::wstring path(buffer.data(), length);
+        const auto separator = path.find_last_of(L"\\/");
+        return wide_to_utf8(separator == std::wstring::npos ? path : path.substr(separator + 1));
+    }
+
     static LRESULT CALLBACK keyboard_proc(int code, WPARAM message, LPARAM data) {
         if (active_ != nullptr && code == HC_ACTION) {
             const auto* keyboard = reinterpret_cast<const KBDLLHOOKSTRUCT*>(data);
@@ -388,7 +448,7 @@ private:
                     (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0,
                     (GetAsyncKeyState(VK_MENU) & 0x8000) != 0,
                     (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0,
-                    foreground_context());
+                    active_->foreground_context());
             }
         }
         return CallNextHookEx(nullptr, code, message, data);
@@ -397,7 +457,7 @@ private:
     static LRESULT CALLBACK mouse_proc(int code, WPARAM message, LPARAM data) {
         if (active_ != nullptr && code == HC_ACTION) {
             const auto* mouse = reinterpret_cast<const MSLLHOOKSTRUCT*>(data);
-            const WindowContext context = foreground_context();
+            const WindowContext context = active_->foreground_context();
             const std::uint64_t timestamp = GetTickCount64();
             if (message == WM_MOUSEMOVE) {
                 const int delta_x = active_->last_mouse_position_
@@ -423,6 +483,7 @@ private:
 #endif
 
     Sink sink_;
+    bool capture_window_title_{false};
 };
 
 }  // namespace eu_digital

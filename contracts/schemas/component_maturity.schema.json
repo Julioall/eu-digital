@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ComponentMaturityRegistry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_id", "components"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "components": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "component_id",
+          "spec_id",
+          "reference_status",
+          "native_status",
+          "product_status",
+          "promotion_id",
+          "evidence_refs"
+        ],
+        "properties": {
+          "component_id": {"type": "string", "minLength": 1},
+          "spec_id": {"type": "string", "pattern": "^SPEC-[0-9]{3}$"},
+          "reference_status": {"enum": ["none", "python", "frozen"]},
+          "native_status": {"enum": ["none", "candidate", "equivalent", "promoted"]},
+          "product_status": {"enum": ["unavailable", "experimental", "beta", "released"]},
+          "promotion_id": {"type": ["string", "null"]},
+          "evidence_refs": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    }
+  }
+}

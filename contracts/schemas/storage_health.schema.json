@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StorageHealth",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "quota_bytes", "user_bytes", "model_bytes", "capture_suspended", "user_decision_required", "reason_code"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "status": {"type": "string", "enum": ["ready", "degraded"]},
+    "quota_bytes": {"type": "integer", "minimum": 1},
+    "user_bytes": {"type": "integer", "minimum": 0},
+    "model_bytes": {"type": "integer", "minimum": 0},
+    "capture_suspended": {"type": "boolean"},
+    "user_decision_required": {"type": "boolean"},
+    "reason_code": {"type": "string", "enum": ["", "storage_quota_exceeded", "storage_recovery_required"]}
+  }
+}

@@ -2,6 +2,7 @@
 
 #include "capability_runtime.hpp"
 #include "event_bus.hpp"
+#include "observation_privacy.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -15,8 +16,8 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <tlhelp32.h>
 #include <windows.h>
+#include <tlhelp32.h>
 #endif
 
 namespace eu_digital {
@@ -24,6 +25,7 @@ namespace eu_digital {
 struct ProcessInfo {
     std::uint32_t process_id{};
     std::string process_name;
+    std::string application_category;
 
     bool operator==(const ProcessInfo&) const = default;
 };
@@ -32,6 +34,7 @@ struct WindowInfo {
     std::uint32_t process_id{};
     std::string process_name;
     std::string window_title;
+    std::string application_category;
 
     bool operator==(const WindowInfo&) const = default;
 };
@@ -53,6 +56,7 @@ struct SystemActivityConfig {
     std::uint32_t poll_interval_ms{100};
     double cpu_budget_percent{5.0};
     std::uint32_t max_reconnect_attempts{1};
+    ObservationPrivacyPolicy privacy_policy{};
 };
 
 struct SystemActivityHealth {
@@ -61,6 +65,9 @@ struct SystemActivityHealth {
     std::uint32_t consecutive_failures{0};
     double average_cpu_percent{0.0};
     bool cpu_budget_exceeded{false};
+    bool paused{false};
+    std::uint64_t suppressed_observations{0};
+    std::string last_suppression_reason;
     std::string last_error;
 };
 
@@ -89,6 +96,14 @@ public:
     }
 
     bool poll() {
+        if (config_.privacy_policy.global_pause) {
+            health_.available = true;
+            health_.paused = true;
+            health_.last_suppression_reason = "global_pause";
+            ++health_.suppressed_observations;
+            return true;
+        }
+        health_.paused = false;
         const auto started = std::chrono::steady_clock::now();
         SystemActivitySnapshot current;
         bool captured = adapter_.capture(current);
@@ -106,6 +121,7 @@ public:
             return false;
         }
 
+        current = sanitize_snapshot(std::move(current));
         health_.available = true;
         health_.permission_denied = false;
         health_.consecutive_failures = 0;
@@ -147,6 +163,37 @@ private:
         return escaped;
     }
 
+    SystemActivitySnapshot sanitize_snapshot(SystemActivitySnapshot current) {
+        SystemActivitySnapshot sanitized;
+        for (auto& [process_id, process] : current.processes) {
+            if (!config_.privacy_policy.application_allowed(process.process_name)) {
+                ++health_.suppressed_observations;
+                health_.last_suppression_reason = "application_denylist";
+                continue;
+            }
+            if (process.application_category.empty()) {
+                process.application_category = ObservationPrivacyPolicy::application_category(process.process_name);
+            }
+            sanitized.processes.emplace(process_id, std::move(process));
+        }
+        if (current.active_window) {
+            auto window = *current.active_window;
+            if (config_.privacy_policy.application_allowed(window.process_name) &&
+                sanitized.processes.contains(window.process_id)) {
+                if (window.application_category.empty()) {
+                    window.application_category = ObservationPrivacyPolicy::application_category(window.process_name);
+                }
+                window.window_title = config_.privacy_policy.redact_window_title(
+                    window.process_name, window.window_title);
+                sanitized.active_window = std::move(window);
+            } else {
+                ++health_.suppressed_observations;
+                health_.last_suppression_reason = "application_denylist";
+            }
+        }
+        return sanitized;
+    }
+
     static std::uint64_t monotonic_now_ns() {
         return static_cast<std::uint64_t>(std::chrono::duration_cast<std::chrono::nanoseconds>(
             std::chrono::steady_clock::now().time_since_epoch()).count());
@@ -158,14 +205,20 @@ private:
         std::ostringstream payload;
         payload << "{\"process_id\":" << current->process_id
                 << ",\"process_name\":\"" << json_escape(current->process_name)
-                << "\",\"window_title\":\"" << json_escape(current->window_title) << "\"}";
+                << "\",\"application_category\":\""
+                << json_escape(current->application_category)
+                << "\",\"window_title\":\"" << json_escape(current->window_title)
+                << "\",\"text_content_observed\":"
+                << (config_.privacy_policy.capture_window_title ? "true" : "false") << "}";
         emit("system.window_focus_changed", payload.str());
     }
 
     void emit_process_event(const std::string& event_type, const ProcessInfo& process) {
         std::ostringstream payload;
         payload << "{\"process_id\":" << process.process_id
-                << ",\"process_name\":\"" << json_escape(process.process_name) << "\"}";
+                << ",\"process_name\":\"" << json_escape(process.process_name)
+                << "\",\"application_category\":\""
+                << json_escape(process.application_category) << "\"}";
         emit(event_type, payload.str());
     }
 
@@ -231,6 +284,11 @@ private:
 
 class WindowsSystemActivityAdapter final : public SystemActivityAdapter {
 public:
+    explicit WindowsSystemActivityAdapter(bool capture_window_title = false)
+        : capture_window_title_(capture_window_title) {}
+
+    bool captures_window_title() const noexcept { return capture_window_title_; }
+
     bool capture(SystemActivitySnapshot& output) override {
 #ifdef _WIN32
         output = {};
@@ -254,11 +312,13 @@ public:
             DWORD process_id = 0;
             GetWindowThreadProcessId(foreground, &process_id);
             std::wstring title;
-            const int title_length = GetWindowTextLengthW(foreground);
-            if (title_length > 0) {
-                std::vector<wchar_t> buffer(static_cast<std::size_t>(title_length) + 1);
-                GetWindowTextW(foreground, buffer.data(), static_cast<int>(buffer.size()));
-                title.assign(buffer.data());
+            if (capture_window_title_) {
+                const int title_length = GetWindowTextLengthW(foreground);
+                if (title_length > 0) {
+                    std::vector<wchar_t> buffer(static_cast<std::size_t>(title_length) + 1);
+                    GetWindowTextW(foreground, buffer.data(), static_cast<int>(buffer.size()));
+                    title.assign(buffer.data());
+                }
             }
             const auto process = output.processes.find(process_id);
             output.active_window = WindowInfo{
@@ -288,6 +348,7 @@ public:
     std::string last_error() const override { return last_error_; }
 
 private:
+    bool capture_window_title_{false};
 #ifdef _WIN32
     static std::string wide_to_utf8(const std::wstring& value) {
         if (value.empty()) return {};

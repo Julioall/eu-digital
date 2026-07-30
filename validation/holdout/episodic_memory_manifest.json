@@ -1,0 +1,7 @@
+{
+  "fixture_set": "validation/holdout/episodic_memory_v1_holdout.jsonl",
+  "sha256": "b160b549f186888393a7119321b2b1d6b94a2ab85462c12765c204a6c60efc3f",
+  "case_count": 2,
+  "status": "locked-before-evaluation",
+  "promotion_id": "cognition.episodic_memory.v1"
+}

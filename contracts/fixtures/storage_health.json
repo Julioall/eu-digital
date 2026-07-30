@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "status": "degraded",
+  "quota_bytes": 10737418240,
+  "user_bytes": 10737418240,
+  "model_bytes": 0,
+  "capture_suspended": true,
+  "user_decision_required": true,
+  "reason_code": "storage_quota_exceeded"
+}

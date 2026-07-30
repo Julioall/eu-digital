@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "runtime_id": "eu-digital-runtime",
+  "runtime_version": "0.1.0",
+  "build": {
+    "platform": "fixture",
+    "compiler": "fixture",
+    "profile": "Debug",
+    "commit": "fixture",
+    "python_runtime_dependency": true
+  },
+  "contract_versions": {
+    "canonical_event": "1.0",
+    "runtime_health": "1.0",
+    "runtime_manifest": "1.0"
+  },
+  "promoted_components": [],
+  "optional_capabilities": []
+}

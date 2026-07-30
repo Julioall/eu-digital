@@ -10,12 +10,14 @@ using eu_digital::InputInteractionSensor;
 using eu_digital::RawInputEvent;
 using eu_digital::RawInputKind;
 using eu_digital::WindowContext;
+using eu_digital::WindowsInputCaptureAdapter;
 
 int main() {
     std::vector<CanonicalEvent> events;
     InputInteractionConfig config;
     config.emit_raw_events = true;
     config.capture_key_codes = true;
+    config.privacy_policy.capture_clipboard = true;
     config.aggregate_window_ms = 2000;
     config.pause_threshold_ms = 500;
     InputInteractionSensor sensor(
@@ -55,6 +57,38 @@ int main() {
     assert(events.back().payload.find("content_length\":42") != std::string::npos);
     assert(events.back().payload.find("digest") != std::string::npos);
 
+    InputInteractionSensor default_privacy(
+        [&](const CanonicalEvent& event) { events.push_back(event); });
+    const std::size_t before_suppressed_clipboard = events.size();
+    default_privacy.ingest(RawInputEvent::clipboard(1300, 9, "digest"), editor);
+    assert(events.size() == before_suppressed_clipboard);
+    assert(default_privacy.health().suppressed_observations == 1);
+    assert(default_privacy.health().last_suppression_reason == "clipboard_disabled");
+
+    eu_digital::ObservationPrivacyPolicy title_policy;
+    title_policy.capture_window_title = true;
+    title_policy.allowlist = {"editor.exe"};
+    InputInteractionConfig redacted_config;
+    redacted_config.emit_raw_events = true;
+    redacted_config.privacy_policy = title_policy;
+    InputInteractionSensor redacted_sensor(
+        [&](const CanonicalEvent& event) { events.push_back(event); }, redacted_config);
+    redacted_sensor.ingest(RawInputEvent::key_down(65, 0, false, false, false), editor);
+    assert(events.back().payload.find("window_title\":\"[redacted:length=6]\"") != std::string::npos);
+    assert(events.back().payload.find("Editor") == std::string::npos);
+
+    eu_digital::ObservationPrivacyPolicy paused_policy;
+    paused_policy.global_pause = true;
+    InputInteractionConfig paused_config;
+    paused_config.privacy_policy = paused_policy;
+    InputInteractionSensor paused_sensor(
+        [&](const CanonicalEvent& event) { events.push_back(event); }, paused_config);
+    const std::size_t before_paused = events.size();
+    paused_sensor.ingest(RawInputEvent::key_down(65, 0, false, false, false), editor);
+    assert(events.size() == before_paused);
+    assert(paused_sensor.health().paused);
+    assert(paused_sensor.health().last_suppression_reason == "global_pause");
+
     InputInteractionConfig aggregate_only;
     aggregate_only.emit_raw_events = false;
     InputInteractionSensor aggregate_sensor([&](const CanonicalEvent& event) { events.push_back(event); }, aggregate_only);
@@ -64,4 +98,10 @@ int main() {
     aggregate_sensor.flush();
     assert(events.size() == before_aggregate_only + 1);
     assert(events.back().event_type == "input.aggregate");
+
+    WindowsInputCaptureAdapter default_windows_adapter([](const RawInputEvent&, const WindowContext&) {});
+    assert(!default_windows_adapter.captures_window_title());
+    WindowsInputCaptureAdapter explicit_title_adapter(
+        [](const RawInputEvent&, const WindowContext&) {}, true);
+    assert(explicit_title_adapter.captures_window_title());
 }

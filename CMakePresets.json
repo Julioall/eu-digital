@@ -16,18 +16,35 @@
         "CMAKE_CXX_STANDARD": "23",
         "CMAKE_CXX_STANDARD_REQUIRED": "ON"
       }
+    },
+    {
+      "name": "windows-dev",
+      "displayName": "Windows Development",
+      "inherits": "dev",
+      "binaryDir": "${sourceDir}/build/windows-dev"
     }
   ],
   "buildPresets": [
     {
       "name": "dev",
       "configurePreset": "dev"
+    },
+    {
+      "name": "windows-dev",
+      "configurePreset": "windows-dev"
     }
   ],
   "testPresets": [
     {
       "name": "dev",
       "configurePreset": "dev",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-dev",
+      "configurePreset": "windows-dev",
       "output": {
         "outputOnFailure": true
       }

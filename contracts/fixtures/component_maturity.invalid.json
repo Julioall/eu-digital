@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "registry_id": "eu-digital-component-maturity-invalid",
+  "components": [
+    {
+      "component_id": "cognition.invalid",
+      "spec_id": "SPEC-010",
+      "reference_status": "python",
+      "native_status": "promoted",
+      "product_status": "released",
+      "promotion_id": null,
+      "evidence_refs": []
+    }
+  ]
+}
