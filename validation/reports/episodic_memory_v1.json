@@ -1,6 +1,6 @@
 {
   "ablation_metrics": {
-    "mrr": 0.875,
+    "mrr": 1.0,
     "provenance_precision": 1.0,
     "recall_at_k": 1.0
   },
@@ -30,6 +30,18 @@
       "python": "d2a3344886fa1b07437f0586e55c2361b92dd0bee45a90c1aafa8e9699aa734b"
     },
     "passed": true
+  },
+  "ground_truth": {
+    "development": {
+      "mrr": 1.0,
+      "provenance_precision": 1.0,
+      "recall_at_k": 1.0
+    },
+    "holdout": {
+      "mrr": 0.5,
+      "provenance_precision": 1.0,
+      "recall_at_k": 1.0
+    }
   },
   "hardware": {
     "machine": "AMD64",
@@ -113,7 +125,9 @@
       "entrypoint": "eu_digital_lab.episodic_memory.EpisodicMemory",
       "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
       "language": "python",
-      "package": "eu_digital_lab"
+      "package": "eu_digital_lab",
+      "source_path": "python/eu_digital_lab/episodic_memory.py",
+      "source_sha256": "016b56ceae8084c76c2ad382bf59f076f37a9416dc5f94c23066daae73370794"
     },
     "status": "validated",
     "validation": {
@@ -125,30 +139,38 @@
       "holdout_status": "locked-before-evaluation"
     }
   },
+  "metamorphic": {
+    "failures": [],
+    "passed": true
+  },
   "operational_measurement": {
-    "interpretation": "operational only; no cognitive claim",
+    "interpretation": "operational only; POSIX child RSS or Windows validator working set; no cognitive claim",
     "metrics": {
-      "latency_max_ms": 17.8301,
-      "latency_ms": 15.8789,
-      "latency_p50_ms": 13.1875,
-      "latency_p95_ms": 15.8789,
+      "latency_max_ms": 13.6067,
+      "latency_ms": 11.4027,
+      "latency_p50_ms": 10.5473,
+      "latency_p95_ms": 11.4027,
       "memory_mb": 0.1953125,
-      "throughput": 293.8985197801051
+      "throughput": 377.01291910169886
     }
   },
   "performance": {
     "failures": [],
     "metrics": {
-      "latency_max_ms": 17.8301,
-      "latency_ms": 15.8789,
-      "latency_p50_ms": 13.1875,
-      "latency_p95_ms": 15.8789,
+      "latency_max_ms": 13.6067,
+      "latency_ms": 11.4027,
+      "latency_p50_ms": 10.5473,
+      "latency_p95_ms": 11.4027,
       "memory_mb": 0.1953125,
-      "throughput": 293.8985197801051
+      "throughput": 377.01291910169886
     },
     "passed": true
   },
   "promotion_id": "cognition.episodic_memory.v1",
+  "reference": {
+    "source_path": "python/eu_digital_lab/episodic_memory.py",
+    "source_sha256": "016b56ceae8084c76c2ad382bf59f076f37a9416dc5f94c23066daae73370794"
+  },
   "scientific_evidence_boundary": "cross-language equivalence is computational verification, not ground truth",
   "treatment_metrics": {
     "mrr": 1.0,

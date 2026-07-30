@@ -55,7 +55,9 @@
     "entrypoint": "eu_digital_lab.episodic_memory.EpisodicMemory",
     "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
     "language": "python",
-    "package": "eu_digital_lab"
+    "package": "eu_digital_lab",
+    "source_path": "python/eu_digital_lab/episodic_memory.py",
+    "source_sha256": "016b56ceae8084c76c2ad382bf59f076f37a9416dc5f94c23066daae73370794"
   },
   "status": "validated",
   "validation": {

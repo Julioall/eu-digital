@@ -133,7 +133,12 @@
         "specs/SPEC-034-episodic-memory-native-promotion.md",
         "python/eu_digital_lab/episodic_memory.py",
         "cpp/core/episodic_memory.hpp",
+        "docs/03-contracts/EPISODIC_MEMORY_PROMOTION_CONTRACT.md",
+        "tools/validate_memory_promotion.py",
         "promotions/cognition.episodic_memory.v1.json",
+        "validation/equivalence/episodic_memory_v1.jsonl",
+        "validation/holdout/episodic_memory_v1_holdout.jsonl",
+        "validation/holdout/episodic_memory_manifest.json",
         "validation/reports/episodic_memory_v1.json"
       ]
     },

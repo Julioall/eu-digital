@@ -81,9 +81,10 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
   episódios com hash da referência, equivalência C++/Python, schema, baseline,
   ablação, invariantes, metamórficos e holdout bloqueado. O componente permanece
   `product_status: unavailable` até aprovação humana.
-- **SPEC-034 em validação:** memória episódica nativa, com recuperação
-  explicável, proveniência, embedding opcional, retenção limitada e holdout
-  bloqueado. Consolidação semântica continua fora desta promoção.
+- **SPEC-034 concluída nos gates automatizados:** memória episódica nativa com
+  recuperação explicável, proveniência, embedding opcional, retenção limitada,
+  schema, ablação e holdout bloqueado. Consolidação semântica continua fora
+  desta promoção; o componente permanece `product_status: unavailable`.
 - **SPEC-035 em validação:** padrões nativos com suporte, feedback, drift,
   baseline de chave exata e holdout bloqueado. O status `promoted` do cluster
   não significa verdade, nomeação ou ação.

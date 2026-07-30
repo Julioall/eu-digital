@@ -550,3 +550,17 @@ The validator records the frozen Python source hash, development/holdout hashes,
 episode schema validation, invariants, context ablation, deterministic replay
 and operational p50/p95/maximum metrics. It does not add the component to the
 approved promotion registry.
+
+The SPEC-034 native episodic-memory promotion is validated with the local
+fixture runner:
+
+```powershell
+cmake --build build/dev-vcpkg --target promotion_fixture_runner
+$env:PYTHONPATH = "python"
+python tools/validate_memory_promotion.py --candidate build/dev-vcpkg/promotion_fixture_runner
+```
+
+The validator records the frozen Python source hash, development/holdout hashes,
+Episode schema validation, provenance and retention invariants, chronological
+baseline, context/embedding ablation, deterministic replay and operational
+p50/p95/maximum metrics. It does not add the component to the approved registry.

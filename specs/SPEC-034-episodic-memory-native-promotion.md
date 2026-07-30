@@ -1,7 +1,7 @@
 ---
 id: SPEC-034
 title: Promoção nativa da memória episódica
-status: in_progress
+status: done
 phase: beta
 dependencies: [SPEC-008, SPEC-023, SPEC-026, SPEC-027, SPEC-029, SPEC-033]
 adrs: [ADR-0005, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0029, ADR-0030]
@@ -43,21 +43,21 @@ avaliação. O candidato expõe um `CapabilityDescriptor` removível.
 
 ## Critérios de aceite
 
-- [ ] A referência, o conjunto de equivalência e o holdout possuem hashes
+- [x] A referência, o conjunto de equivalência e o holdout possuem hashes
       registrados antes da avaliação final.
-- [ ] O candidato armazena episódios válidos, rejeita IDs duplicados sem
+- [x] O candidato armazena episódios válidos, rejeita IDs duplicados sem
       substituir a fonte e mantém o contrato de episódio completo.
-- [ ] Consultas por aplicação, documento, modalidade, sessão, tempo e embedding
+- [x] Consultas por aplicação, documento, modalidade, sessão, tempo e embedding
       opcional reproduzem a referência e retornam razões/proveniência.
-- [ ] Relações de similaridade são explícitas e carregam os eventos de origem;
+- [x] Relações de similaridade são explícitas e carregam os eventos de origem;
       nenhuma relação vira fato ou resumo.
-- [ ] Retenção limitada é determinística e não apaga a semântica da fonte por
+- [x] Retenção limitada é determinística e não apaga a semântica da fonte por
       uma operação de consolidação.
-- [ ] Existem baseline cronológico, ablação sem contexto/embedding, ground truth,
+- [x] Existem baseline cronológico, ablação sem contexto/embedding, ground truth,
       invariantes, holdout bloqueado e benchmark p50/p95/máximo.
-- [ ] O componente é removível via lifecycle e não torna o produto disponível
+- [x] O componente é removível via lifecycle e não torna o produto disponível
       sem promoção aprovada.
-- [ ] CTest, suíte Python, equivalência, contratos, documentação e relatório
+- [x] CTest, suíte Python, equivalência, contratos, documentação e relatório
       passam em Linux e Windows.
 
 ## Saída
@@ -65,3 +65,16 @@ avaliação. O candidato expõe um `CapabilityDescriptor` removível.
 Um candidato C++ equivalente e auditável para memória episódica. Enquanto a
 revisão humana não inserir a promoção no registry, a capacidade permanece
 `product_status: unavailable` e o runtime não a trata como disponível.
+
+## Evidence
+
+The manifest records hashes for the frozen Python reference, the development
+equivalence set and the locked holdout. The validator checks input and native
+retrieved episodes against `episode.schema.json`, then evaluates equivalence,
+context/time/embedding queries, explicit relations and provenance, bounded
+retention, chronological baseline, context/embedding ablation, invariants,
+deterministic replay and p50/p95/maximum operational benchmarks.
+
+The component remains `reference_status: frozen`, `native_status: equivalent`
+and `product_status: unavailable`; no promotion was inserted into the registry
+without human review.

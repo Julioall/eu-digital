@@ -11,9 +11,11 @@ import statistics
 import subprocess
 import sys
 import time
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+resource: Any
 try:
     import resource
 except ModuleNotFoundError:  # pragma: no cover - exercised on Windows
@@ -31,6 +33,7 @@ from eu_digital_lab.promotion import (
     compare_outputs,
     python_runner,
 )
+from eu_digital_lab.schema_validation import validate_shared_schema
 
 
 def cases(path: Path) -> list[dict[str, Any]]:
@@ -43,9 +46,25 @@ def canonical_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
 
 
+def output_objects(value: bytes) -> list[dict[str, Any]]:
+    return [json.loads(line) for line in value.splitlines() if line.strip()]
+
+
+def validate_episode_records(records: list[dict[str, Any]]) -> None:
+    for record in records:
+        validate_shared_schema(record["episode"], "episode.schema.json")
+
+
+def validate_memory_outputs(outputs: list[dict[str, Any]]) -> None:
+    for result in outputs:
+        for item in result.get("retrieval", []):
+            validate_shared_schema(item["episode"], "episode.schema.json")
+
+
 def current_process_memory_mb() -> float:
     if resource is not None:
-        return resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024.0
+        value = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+        return value / (1024.0 * 1024.0) if platform.system() == "Darwin" else value / 1024.0
     if platform.system() == "Windows":
         import ctypes
         from ctypes import wintypes
@@ -79,14 +98,20 @@ def current_process_memory_mb() -> float:
     return 0.0
 
 
-def reference_transform(case: dict[str, Any]) -> dict[str, Any]:
-    embeddings = {
-        record["episode"]["episode_id"]: record.get("embedding")
-        for record in case["records"]
-    }
+def reference_transform(
+    case: dict[str, Any], *, disable_context: bool = False, disable_embedding: bool = False
+) -> dict[str, Any]:
+    provider: Callable[[Mapping[str, Any]], Sequence[float]] | None = None
+    if not disable_embedding:
+        embeddings = {
+            record["episode"]["episode_id"]: record.get("embedding")
+            for record in case["records"]
+        }
 
-    def provider(episode: dict[str, Any]) -> list[float]:
-        return list(embeddings.get(episode["episode_id"]) or [])
+        def embedding_provider(episode: Mapping[str, Any]) -> Sequence[float]:
+            return list(embeddings.get(episode["episode_id"]) or [])
+
+        provider = embedding_provider
 
     memory = EpisodicMemory(
         embedding_provider=provider,
@@ -96,7 +121,7 @@ def reference_transform(case: dict[str, Any]) -> dict[str, Any]:
     for record in case["records"]:
         store_results.append(memory.store(record["episode"]).value)
     consolidated = memory.consolidate() if case.get("consolidate", False) else []
-    query_data = case.get("query", {})
+    query_data = {} if disable_context else case.get("query", {})
     query = MemoryQuery(
         session_id=query_data.get("session_id"),
         applications=tuple(query_data.get("applications", [])),
@@ -104,7 +129,11 @@ def reference_transform(case: dict[str, Any]) -> dict[str, Any]:
         modalities=tuple(query_data.get("modalities", [])),
         start_at=query_data.get("start_at"),
         end_at=query_data.get("end_at"),
-        embedding=tuple(float(item) for item in query_data["embedding"]) if "embedding" in query_data else None,
+        embedding=(
+            tuple(float(item) for item in query_data["embedding"])
+            if "embedding" in query_data and not disable_embedding
+            else None
+        ),
         limit=int(query_data.get("limit", 10)),
     )
     retrieval = []
@@ -144,19 +173,37 @@ def invariant_failures(case: dict[str, Any], result: dict[str, Any]) -> list[str
     for item in result.get("retrieval", []):
         episode = item.get("episode", {})
         episode_id = episode.get("episode_id")
-        if episode_id not in records or item.get("provenance", {}).get("event_ids") != episode.get("event_ids"):
+        provenance = item.get("provenance", {})
+        if episode_id not in records or provenance.get("event_ids") != episode.get("event_ids"):
             failures.append("retrieval_provenance_matches_episode")
-        if item.get("provenance", {}).get("created_by") != episode.get("created_by"):
+        if provenance.get("episode_id") != episode_id or provenance.get("created_by") != episode.get("created_by"):
             failures.append("retrieval_provenance_matches_episode")
-        if not item.get("reason_codes") or "summary" not in episode or episode.get("summary") is not None:
+        if provenance.get("schema_version") != episode.get("schema_version"):
+            failures.append("retrieval_provenance_matches_episode")
+        if not item.get("reason_codes") or not item.get("explanation") or "summary" not in episode or episode.get("summary") is not None:
             failures.append("no_summary_or_fact_is_generated")
+        if episode_id not in records:
+            continue
+        if (
+            case.get("query", {}).get("embedding")
+            and not any(record.get("embedding") for record in case["records"])
+            and "embedding.cosine" in item.get("reason_codes", [])
+        ):
+            failures.append("missing_embedding_does_not_become_negative_evidence")
     for relation in result.get("relations", []):
-        left = records.get(relation.get("episode_a"), {})
-        right = records.get(relation.get("episode_b"), {})
+        left_id = relation.get("episode_a")
+        right_id = relation.get("episode_b")
+        left = records.get(left_id, {})
+        right = records.get(right_id, {})
         expected = list(left.get("event_ids", [])) + list(right.get("event_ids", []))
-        if relation.get("provenance", {}).get("event_ids") != expected:
+        if left_id == right_id or not left or not right or relation.get("provenance", {}).get("event_ids") != expected:
             failures.append("relation_provenance_contains_source_events")
-    if result.get("size", 0) > int(case.get("max_episodes", 10000)):
+        if not relation.get("reason_codes"):
+            failures.append("relation_has_explicit_reason")
+    consolidated = result.get("consolidated", [])
+    if any(episode_id not in records for episode_id in consolidated):
+        failures.append("retention_is_bounded_and_deterministic")
+    if case.get("consolidate") and result.get("size", 0) > int(case.get("max_episodes", 10000)):
         failures.append("retention_is_bounded_and_deterministic")
     expected_duplicates = sum(1 for item in result.get("store_results", []) if item == "duplicate")
     input_duplicates = len(case["records"]) - len(records)
@@ -218,10 +265,27 @@ def main() -> int:
     manifest = PromotionManifest.load(args.manifest)
     development_bytes = args.fixture.read_bytes()
     holdout_bytes = args.holdout.read_bytes()
+    development_cases = cases(args.fixture)
+    holdout_cases = cases(args.holdout)
     if canonical_sha256(args.fixture) != manifest.data["dataset"]["hash"]:
         raise RuntimeError("development fixture hash does not match manifest")
     if canonical_sha256(args.holdout) != manifest.data["validation"]["holdout_hash"]:
         raise RuntimeError("holdout fixture hash does not match manifest")
+    if len(development_cases) != int(manifest.data["dataset"]["case_count"]):
+        raise RuntimeError("development case count does not match frozen manifest")
+    development_ids = {str(case["case_id"]) for case in development_cases}
+    holdout_ids = {str(case["case_id"]) for case in holdout_cases}
+    if not development_ids.isdisjoint(holdout_ids):
+        raise RuntimeError("development and holdout case IDs overlap")
+    for case in development_cases + holdout_cases:
+        validate_episode_records(case["records"])
+    reference_data = manifest.data["reference"]
+    reference_path = ROOT / str(reference_data.get("source_path", "python/eu_digital_lab/episodic_memory.py"))
+    if not reference_path.exists():
+        raise RuntimeError(f"frozen Python reference source not found: {reference_path}")
+    reference_source_hash = canonical_sha256(reference_path)
+    if reference_source_hash != reference_data.get("source_sha256"):
+        raise RuntimeError("Python reference source hash does not match frozen manifest")
     if not args.candidate.exists() and os.name == "nt" and args.candidate.suffix == "":
         windows_candidate = args.candidate.with_suffix(".exe")
         if windows_candidate.exists():
@@ -256,15 +320,21 @@ def main() -> int:
     )
     if not result.equivalence_passed or not result.performance_passed:
         raise RuntimeError(f"development gate failed: equivalence={result.equivalence_passed}, performance={result.performance}")
-    development_cases = cases(args.fixture)
-    holdout_cases = cases(args.holdout)
     holdout_reference = reference(holdout_bytes)
     holdout_candidate = candidate(holdout_bytes)
     holdout_divergences = compare_outputs(holdout_reference, holdout_candidate, manifest.data["equivalence"])
     if holdout_divergences:
         raise RuntimeError(f"holdout gate failed: {holdout_divergences}")
-    development_outputs = [json.loads(line) for line in result_output(candidate(development_bytes))]
-    holdout_outputs = [json.loads(line) for line in result_output(holdout_candidate)]
+    development_reference_objects = output_objects(reference(development_bytes))
+    development_outputs = output_objects(candidate(development_bytes))
+    holdout_reference_objects = output_objects(holdout_reference)
+    holdout_outputs = output_objects(holdout_candidate)
+    if len(development_outputs) != len(development_cases) or len(holdout_outputs) != len(holdout_cases):
+        raise RuntimeError("candidate output count does not match fixture count")
+    validate_memory_outputs(development_reference_objects)
+    validate_memory_outputs(development_outputs)
+    validate_memory_outputs(holdout_reference_objects)
+    validate_memory_outputs(holdout_outputs)
     failures = {}
     for case, output in zip(development_cases + holdout_cases, development_outputs + holdout_outputs, strict=True):
         case_failures = invariant_failures(case, output)
@@ -272,6 +342,10 @@ def main() -> int:
             failures[case["case_id"]] = case_failures
     if failures:
         raise RuntimeError(f"invariant gate failed: {failures}")
+    replay_first = candidate(development_bytes)
+    replay_second = candidate(development_bytes)
+    if replay_first != replay_second:
+        raise RuntimeError("metamorphic gate failed: same input produced different outputs")
     report = result.to_dict()
     report["scientific_evidence_boundary"] = "cross-language equivalence is computational verification, not ground truth"
     report["holdout"] = {
@@ -281,20 +355,32 @@ def main() -> int:
         "equivalence_passed": not holdout_divergences,
         "metrics": metric_summary(holdout_cases, holdout_outputs),
     }
+    report["reference"] = {
+        "source_path": reference_path.relative_to(ROOT).as_posix(),
+        "source_sha256": reference_source_hash,
+    }
+    report["ground_truth"] = {
+        "development": metric_summary(development_cases, development_outputs),
+        "holdout": metric_summary(holdout_cases, holdout_outputs),
+    }
     report["treatment_metrics"] = metric_summary(development_cases, development_outputs)
-    report["baseline_metrics"] = metric_summary(development_cases, [chronological_baseline(case) for case in development_cases])
-    report["ablation_metrics"] = report["baseline_metrics"]
+    report["baseline_metrics"] = metric_summary(
+        development_cases, [chronological_baseline(case) for case in development_cases]
+    )
+    report["ablation_metrics"] = metric_summary(
+        development_cases,
+        [reference_transform(case, disable_context=True, disable_embedding=True) for case in development_cases],
+    )
     report["invariants"] = {"passed": True, "failures": failures}
-    report["operational_measurement"] = {"metrics": metrics, "interpretation": "operational only; no cognitive claim"}
+    report["metamorphic"] = {"passed": True, "failures": []}
+    report["operational_measurement"] = {
+        "metrics": metrics,
+        "interpretation": "operational only; POSIX child RSS or Windows validator working set; no cognitive claim",
+    }
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"promotion_id": manifest.data["promotion_id"], "equivalence": True, "holdout": True, "performance": result.performance}, indent=2))
     return 0
-
-
-def result_output(value: bytes) -> list[str]:
-    return [line for line in value.decode("utf-8").splitlines() if line.strip()]
-
 
 if __name__ == "__main__":
     raise SystemExit(main())
