@@ -38,6 +38,7 @@ contracts/schemas/agency_action_outcome.schema.json
 contracts/schemas/agency_attribution.schema.json
 contracts/schemas/audio_segment.schema.json
 contracts/schemas/audio_transcription.schema.json
+contracts/schemas/avatar_presentation_profile.schema.json
 contracts/schemas/avatar_view_state.schema.json
 contracts/schemas/canonical_event.schema.json
 contracts/schemas/capability_adaptation_event.schema.json
@@ -106,6 +107,7 @@ cpp/core/metacognition_curiosity.hpp
 cpp/core/observation_privacy.hpp
 cpp/core/pattern_learner.hpp
 cpp/core/privacy_storage.hpp
+cpp/core/procedural_avatar.hpp
 cpp/core/promotion_registry.hpp
 cpp/core/runtime_host.hpp
 cpp/core/screen_ocr_policy.hpp
@@ -133,6 +135,7 @@ cpp/tests/local_model_gateway_test.cpp
 cpp/tests/metacognition_curiosity_test.cpp
 cpp/tests/pattern_learning_test.cpp
 cpp/tests/privacy_storage_test.cpp
+cpp/tests/procedural_avatar_test.cpp
 cpp/tests/promotion_registry_test.cpp
 cpp/tests/runtime_host_test.cpp
 cpp/tests/runtime_install_tree_test.cmake
@@ -308,6 +311,7 @@ python/prototypes/.gitkeep
 python/README.md
 python/reference/.gitkeep
 python/tests/.gitkeep
+python/tests/test_avatar_presentation_profile.py
 python/tests/test_capabilities.py
 python/tests/test_capability_adaptation.py
 python/tests/test_component_maturity.py
@@ -385,6 +389,7 @@ reports/SPEC-038-execution-report.md
 reports/SPEC-039-execution-report.md
 reports/SPEC-040-execution-report.md
 reports/SPEC-041-execution-report.md
+reports/SPEC-042-headless-preparation-report.md
 REPOSITORY_TREE.txt
 schemas/agreement.schema.json
 schemas/annotation.schema.json

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -57,6 +58,16 @@ def _validate(
     ):
         raise SchemaValidationError(f"{name}{path}: string is too short")
     if (
+        isinstance(value, str)
+        and "maxLength" in schema
+        and len(value) > schema["maxLength"]
+    ):
+        raise SchemaValidationError(f"{name}{path}: string is too long")
+    if isinstance(value, str) and "pattern" in schema:
+        pattern = schema["pattern"]
+        if not isinstance(pattern, str) or re.fullmatch(pattern, value) is None:
+            raise SchemaValidationError(f"{name}{path}: string does not match pattern")
+    if (
         isinstance(value, (int, float))
         and not isinstance(value, bool)
         and "minimum" in schema
@@ -89,6 +100,10 @@ def _validate(
             if key in value:
                 _validate(value[key], child_schema, root, f"{path}.{key}", name)
     elif isinstance(value, list):
+        if "minItems" in schema and len(value) < schema["minItems"]:
+            raise SchemaValidationError(f"{name}{path}: array has too few items")
+        if "maxItems" in schema and len(value) > schema["maxItems"]:
+            raise SchemaValidationError(f"{name}{path}: array has too many items")
         item_schema = schema.get("items")
         if item_schema:
             for index, item in enumerate(value):

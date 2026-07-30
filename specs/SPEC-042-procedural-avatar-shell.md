@@ -5,7 +5,7 @@ status: future
 phase: beta
 dependencies: [SPEC-040, SPEC-041]
 adrs: [ADR-0006, ADR-0009, ADR-0010, ADR-0011]
-contracts: [DIALOGUE_AVATAR_SCHEMA.md, avatar_view_state.schema.json, dialogue_notice.schema.json, dialogue_feedback.schema.json]
+contracts: [DIALOGUE_AVATAR_SCHEMA.md, avatar_view_state.schema.json, avatar_presentation_profile.schema.json, dialogue_notice.schema.json, dialogue_feedback.schema.json]
 ---
 
 # SPEC-042 — Avatar procedural e shell local
@@ -46,3 +46,11 @@ misturar apresentação com emoção/decisão.
 ## Saída
 
 Shell local com avatar procedural independente do núcleo cognitivo.
+
+## Incremento headless permitido
+
+O perfil sidecar e o renderer nativo CPU-first podem ser preparados sem um
+host desktop. Essa camada expõe consentimento, pausa global, quota, health,
+feedback e histórico local, mas não abre janela nem declara a SPEC concluída.
+O shell Qt/QML e os critérios de acessibilidade continuam condicionados à
+revisão humana da ADR-0032 e à matriz manual Windows.

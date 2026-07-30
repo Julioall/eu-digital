@@ -11,6 +11,21 @@ The SPEC-014 contracts are local and represent presentation, not personality:
 The desktop host is an optional port. Its absence does not erase history and is
 not treated as a negative observation.
 
+## SPEC-042 headless presentation boundary
+
+`avatar_presentation_profile.schema.json` is a versioned sidecar to
+`avatar_view_state.schema.json`; it does not change the public 1.0 view-state
+schema. The profile accepts only bounded procedural parameters: shape, density,
+turbulence, glow, palette, speed and cohesion. Its source and override audit
+fields are mandatory so a visual profile cannot be mistaken for emotion,
+intention or a cognitive state.
+
+The native headless renderer exposes consent, global pause, health, frame quota,
+feedback controls and local history. It renders CPU-only deterministic frames
+without a model, downloaded asset, focus, input capture or action port. This is
+only the replaceable rendering core; a desktop host remains gated by
+ADR-0032.
+
 ## SPEC-041 desktop boundary
 
 The desktop spike is an optional development target. It does not change the

@@ -40,6 +40,11 @@ Os contratos locais da SPEC-014 estão em `dialogue_notice.schema.json`,
 `dialogue_feedback.schema.json` e `avatar_view_state.schema.json`. A semântica
 está documentada em `docs/03-contracts/DIALOGUE_AVATAR_SCHEMA.md`.
 
+O perfil procedural sidecar da SPEC-042 está em
+`avatar_presentation_profile.schema.json`. Ele não altera o schema 1.0 de
+`AvatarViewState`; a implementação nativa headless permanece separada do host
+desktop e da escolha de toolkit.
+
 Os contratos locais da SPEC-015 estão em `audio_segment.schema.json` e
 `audio_transcription.schema.json`. A semântica está documentada em
 `docs/03-contracts/AUDIO_SENSOR_SCHEMA.md`.

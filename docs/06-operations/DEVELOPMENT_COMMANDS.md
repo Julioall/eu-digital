@@ -537,6 +537,20 @@ The probe is a hidden-window SDL2/ImGui integration check, not a product shell.
 Read the complete scenario matrix and the substitutive ADR before implementing
 the future Qt/QML adapter.
 
+The permitted pre-shell increment of SPEC-042 is the dependency-free native
+procedural renderer. It is headless and does not complete the desktop-shell
+acceptance criteria:
+
+```powershell
+cmake --build build/dev --target procedural_avatar_test
+ctest --test-dir build/dev -R procedural_avatar --output-on-failure
+$env:PYTHONPATH = "python"
+python -m unittest python.tests.test_avatar_presentation_profile -v
+```
+
+Do not enable a product host or add Qt until ADR-0032 has human review and the
+manual Windows matrix is captured.
+
 The SPEC-033 native episode-segmentation promotion is validated with the local
 fixture runner:
 

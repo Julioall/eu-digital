@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:avatar-presentation-profile:1",
+  "title": "AvatarPresentationProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "profile_id",
+    "schema_version",
+    "source",
+    "motif",
+    "profile_version",
+    "shape",
+    "density",
+    "turbulence",
+    "glow",
+    "palette",
+    "speed",
+    "cohesion",
+    "override"
+  ],
+  "properties": {
+    "profile_id": {"type": "string", "minLength": 1},
+    "schema_version": {"type": "string", "const": "1.0"},
+    "source": {"type": "string", "const": "procedural"},
+    "motif": {"type": "string", "minLength": 1},
+    "profile_version": {"type": "string", "const": "1.0"},
+    "shape": {"type": "string", "enum": ["particles", "filament", "smoke", "metaball"]},
+    "density": {"type": "number", "minimum": 0, "maximum": 1},
+    "turbulence": {"type": "number", "minimum": 0, "maximum": 1},
+    "glow": {"type": "number", "minimum": 0, "maximum": 1},
+    "palette": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {"type": "string", "pattern": "^#[0-9A-Fa-f]{6}$"}
+    },
+    "speed": {"type": "number", "minimum": 0, "maximum": 1},
+    "cohesion": {"type": "number", "minimum": 0, "maximum": 1},
+    "override": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active", "override_id", "reason", "version"],
+      "properties": {
+        "active": {"type": "boolean"},
+        "override_id": {"type": ["string", "null"]},
+        "reason": {"type": ["string", "null"]},
+        "version": {"type": "string", "const": "1.0"}
+      }
+    }
+  }
+}

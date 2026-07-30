@@ -71,6 +71,10 @@ add_executable(metacognition_curiosity_test cpp/tests/metacognition_curiosity_te
 target_include_directories(metacognition_curiosity_test PRIVATE cpp)
 target_compile_features(metacognition_curiosity_test PRIVATE cxx_std_23)
 
+add_executable(procedural_avatar_test cpp/tests/procedural_avatar_test.cpp)
+target_include_directories(procedural_avatar_test PRIVATE cpp)
+target_compile_features(procedural_avatar_test PRIVATE cxx_std_23)
+
 add_executable(local_model_gateway_test cpp/tests/local_model_gateway_test.cpp)
 target_include_directories(local_model_gateway_test PRIVATE cpp)
 target_compile_features(local_model_gateway_test PRIVATE cxx_std_23)
@@ -141,6 +145,7 @@ add_test(NAME world_model COMMAND world_model_test)
 add_test(NAME global_workspace COMMAND global_workspace_test)
 add_test(NAME functional_self_model COMMAND functional_self_model_test)
 add_test(NAME metacognition_curiosity COMMAND metacognition_curiosity_test)
+add_test(NAME procedural_avatar COMMAND procedural_avatar_test)
 add_test(NAME local_model_gateway COMMAND local_model_gateway_test)
 if(EU_DIGITAL_BUILD_DESKTOP_INTERFACE_SPIKE)
     add_test(NAME desktop_interface_spike COMMAND desktop_interface_spike)
