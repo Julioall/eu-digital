@@ -5,7 +5,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import resource
+import os
+import platform
 import statistics
 import subprocess
 import sys
@@ -13,17 +14,69 @@ import time
 from pathlib import Path
 from typing import Any
 
+try:
+    import resource
+except ModuleNotFoundError:  # pragma: no cover - exercised on Windows
+    resource = None
+
 ROOT = Path(__file__).resolve().parents[1]
 LAB_ROOT = ROOT / "python"
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
 from eu_digital_lab.episodic_memory import EpisodicMemory, MemoryQuery
-from eu_digital_lab.promotion import PromotionManifest, PromotionPipeline, compare_outputs, python_runner
+from eu_digital_lab.promotion import (
+    PromotionManifest,
+    PromotionPipeline,
+    compare_outputs,
+    python_runner,
+)
 
 
 def cases(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def canonical_sha256(path: Path) -> str:
+    """Hash fixture content independently of Git's platform newline conversion."""
+
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def current_process_memory_mb() -> float:
+    if resource is not None:
+        return resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024.0
+    if platform.system() == "Windows":
+        import ctypes
+        from ctypes import wintypes
+
+        class ProcessMemoryCounters(ctypes.Structure):
+            _fields_ = [
+                ("cb", wintypes.DWORD),
+                ("PageFaultCount", wintypes.DWORD),
+                ("PeakWorkingSetSize", ctypes.c_size_t),
+                ("WorkingSetSize", ctypes.c_size_t),
+                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                ("PagefileUsage", ctypes.c_size_t),
+                ("PeakPagefileUsage", ctypes.c_size_t),
+            ]
+
+        counters = ProcessMemoryCounters()
+        counters.cb = ctypes.sizeof(counters)
+        process = ctypes.windll.kernel32.GetCurrentProcess()
+        if ctypes.windll.psapi.GetProcessMemoryInfo(process, ctypes.byref(counters), counters.cb):
+            return counters.WorkingSetSize / (1024.0 * 1024.0)
+        minimum = ctypes.c_size_t()
+        maximum = ctypes.c_size_t()
+        get_working_set = ctypes.windll.kernel32.GetProcessWorkingSetSize
+        get_working_set.argtypes = [wintypes.HANDLE, ctypes.POINTER(ctypes.c_size_t), ctypes.POINTER(ctypes.c_size_t)]
+        get_working_set.restype = wintypes.BOOL
+        if get_working_set(process, ctypes.byref(minimum), ctypes.byref(maximum)):
+            return minimum.value / (1024.0 * 1024.0)
+    return 0.0
 
 
 def reference_transform(case: dict[str, Any]) -> dict[str, Any]:
@@ -165,10 +218,14 @@ def main() -> int:
     manifest = PromotionManifest.load(args.manifest)
     development_bytes = args.fixture.read_bytes()
     holdout_bytes = args.holdout.read_bytes()
-    if hashlib.sha256(development_bytes).hexdigest() != manifest.data["dataset"]["hash"]:
+    if canonical_sha256(args.fixture) != manifest.data["dataset"]["hash"]:
         raise RuntimeError("development fixture hash does not match manifest")
-    if hashlib.sha256(holdout_bytes).hexdigest() != manifest.data["validation"]["holdout_hash"]:
+    if canonical_sha256(args.holdout) != manifest.data["validation"]["holdout_hash"]:
         raise RuntimeError("holdout fixture hash does not match manifest")
+    if not args.candidate.exists() and os.name == "nt" and args.candidate.suffix == "":
+        windows_candidate = args.candidate.with_suffix(".exe")
+        if windows_candidate.exists():
+            args.candidate = windows_candidate
     if not args.candidate.exists():
         raise RuntimeError(f"candidate runner not found: {args.candidate}")
     reference = python_runner(reference_transform)
@@ -178,7 +235,7 @@ def main() -> int:
         started = time.perf_counter_ns()
         candidate(development_bytes)
         timings.append((time.perf_counter_ns() - started) / 1_000_000.0)
-    rss_mb = resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss / 1024.0
+    rss_mb = current_process_memory_mb()
     sorted_timings = sorted(timings)
     p95 = sorted_timings[min(len(sorted_timings) - 1, int(len(sorted_timings) * 0.95))]
     metrics = {
@@ -218,8 +275,8 @@ def main() -> int:
     report = result.to_dict()
     report["scientific_evidence_boundary"] = "cross-language equivalence is computational verification, not ground truth"
     report["holdout"] = {
-        "fixture_set": str(args.holdout.relative_to(ROOT)),
-        "sha256": hashlib.sha256(holdout_bytes).hexdigest(),
+        "fixture_set": args.holdout.relative_to(ROOT).as_posix(),
+        "sha256": canonical_sha256(args.holdout),
         "case_count": len(holdout_cases),
         "equivalence_passed": not holdout_divergences,
         "metrics": metric_summary(holdout_cases, holdout_outputs),

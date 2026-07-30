@@ -431,7 +431,7 @@ class DatasetRepository:
         for item in self._entries(split):
             path = self.root / item["path"]
             content = path.read_bytes()
-            digest = hashlib.sha256(content).hexdigest()
+            digest = hashlib.sha256(content.replace(b"\r\n", b"\n")).hexdigest()
             if digest != item["sha256"]:
                 raise EvaluationError(f"dataset hash mismatch: {item['path']}")
             loaded.append(json.loads(content.decode("utf-8")))

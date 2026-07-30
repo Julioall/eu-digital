@@ -562,7 +562,7 @@ def _copy_data(value: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def _sha256(value: bytes) -> str:
-    return hashlib.sha256(value).hexdigest()
+    return hashlib.sha256(value.replace(b"\r\n", b"\n")).hexdigest()
 
 
 def _count_json_lines(value: bytes) -> int:

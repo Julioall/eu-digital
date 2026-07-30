@@ -35,6 +35,24 @@ struct MemoryEpisode {
     double coherence{1.0};
     double confidence{1.0};
     std::string created_by;
+
+    void validate() const {
+        if (episode_id.empty()) throw std::invalid_argument("episode_id is required");
+        if (schema_version != "1.0") throw std::invalid_argument("unsupported episode schema_version");
+        if (session_id.empty()) throw std::invalid_argument("session_id is required");
+        if (start_at.empty() || end_at.empty()) throw std::invalid_argument("episode timestamps are required");
+        if (created_by.empty()) throw std::invalid_argument("created_by is required");
+        if (std::any_of(boundary_reasons.begin(), boundary_reasons.end(), [](const auto& reason) { return reason.empty(); })) {
+            throw std::invalid_argument("episode boundary reasons must not be empty");
+        }
+        if (!std::isfinite(start_epoch) || !std::isfinite(end_epoch) || end_epoch < start_epoch) {
+            throw std::invalid_argument("episode time range is invalid");
+        }
+        if (!std::isfinite(coherence) || coherence < 0.0 || coherence > 1.0 ||
+            !std::isfinite(confidence) || confidence < 0.0 || confidence > 1.0) {
+            throw std::invalid_argument("episode quality must be between zero and one");
+        }
+    }
 };
 
 struct MemoryQuery {
@@ -44,13 +62,16 @@ struct MemoryQuery {
     std::vector<std::string> modalities;
     std::optional<double> start_epoch;
     std::optional<double> end_epoch;
-    std::vector<double> embedding;
+    std::optional<std::vector<double>> embedding;
     std::size_t limit{10};
 
     void validate() const {
         if (limit == 0) throw std::invalid_argument("memory query limit must be positive");
-        for (const auto value : embedding) {
-            if (!std::isfinite(value)) throw std::invalid_argument("embedding must contain finite values");
+        if (embedding && embedding->empty()) throw std::invalid_argument("embedding must not be empty");
+        if (embedding) {
+            for (const auto value : *embedding) {
+                if (!std::isfinite(value)) throw std::invalid_argument("embedding must contain finite values");
+            }
         }
     }
 };
@@ -77,7 +98,8 @@ public:
     }
 
     std::string store(MemoryEpisode episode, std::optional<std::vector<double>> embedding = std::nullopt) {
-        if (episode.episode_id.empty()) throw std::invalid_argument("episode_id is required");
+        episode.validate();
+        if (embedding && !valid_vector(*embedding)) throw std::invalid_argument("embedding must contain finite values");
         const auto episode_id = episode.episode_id;
         if (episodes_.contains(episode_id)) return "duplicate";
         episodes_.emplace(episode_id, std::move(episode));
@@ -190,10 +212,10 @@ private:
             reasons.emplace_back("temporal.overlap");
             score += 0.05;
         }
-        if (!query.embedding.empty()) {
+        if (query.embedding) {
             const auto found = embeddings_.find(episode.episode_id);
-            if (found == embeddings_.end() || found->second.size() != query.embedding.size()) return std::nullopt;
-            const double similarity = cosine(found->second, query.embedding);
+            if (found == embeddings_.end() || found->second.size() != query.embedding->size()) return std::nullopt;
+            const double similarity = cosine(found->second, *query.embedding);
             if (similarity <= 0.0) return std::nullopt;
             reasons.emplace_back("embedding.cosine");
             score += similarity;

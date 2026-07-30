@@ -2,7 +2,7 @@
 
 SPEC: SPEC-034 — Promoção nativa da memória episódica  
 Agente: Codex  
-Data: 2026-07-29  
+Data: 2026-07-30
 Commit: pendente de criação
 
 ## Alterações realizadas
@@ -41,23 +41,23 @@ Commit: pendente de criação
 ## Testes executados
 
 - `cmake --build --preset dev` — aprovado.
-- `ctest --test-dir build/dev --output-on-failure` — 16/16 aprovados.
+- `ctest --test-dir build/dev --output-on-failure` — 17/17 aprovados.
 - `PYTHONPATH=python python3 tools/validate_memory_promotion.py` — equivalência,
   holdout, invariantes e performance aprovados.
-- `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — 185/185
+- `PYTHONPATH=python python3 -m unittest discover -s python/tests -v` — 187/187
   aprovados.
 - `PYTHONPATH=python python3 tools/validate_hybrid.py` — aprovado; release sem
   arquivos de runtime Python.
-- CTest Windows/MSVC/vcpkg — 16/16 aprovados.
-- Validação de contratos, maturidade, 35 SPECs e documentação — aprovadas.
+- CTest Windows/MSVC/vcpkg — 17/17 aprovados.
+- Validação de contratos, maturidade, 45 SPECs e documentação — aprovadas.
 
 ## Resultados
 
 O candidato C++ coincidiu semanticamente com a referência nos quatro casos de
 desenvolvimento e nos dois casos do holdout. A última medição registrada
-apresentou p50 de 7,04 ms, p95 de 8,21 ms, máximo de 8,65 ms, RSS máximo
-observado de 27,88 MiB e throughput de aproximadamente 560 casos/s. São
-métricas operacionais, não evidência cognitiva.
+apresentou p50 de 13,1875 ms, p95 de 15,8789 ms, máximo de 17,8301 ms,
+memória de 0,1953 MiB e throughput de 293,90 casos/s. São métricas
+operacionais, não evidência cognitiva.
 
 ## Critérios de aceite
 
@@ -88,6 +88,22 @@ inventado; a capacidade não está disponível no produto.
 - Consulta sem filtros usa fallback cronológico determinístico.
 - Ausência de embedding exclui apenas a pontuação de embedding; não vira
   observação negativa sobre o episódio.
+
+## Continuação da execução — 2026-07-30
+
+- Corrigida a validação C++ para rejeitar episódios incompletos e consultas
+  com embedding vazio.
+- Hashes de fixtures agora são estáveis entre LF e CRLF; o pipeline Python,
+  o harness de datasets e os testes de promoção usam a mesma semântica.
+- `python -m unittest discover -s python/tests -v`: 187/187 aprovados.
+- Runner isolado C++ e teste nativo de memória: aprovados.
+- Validação SPEC-034: equivalência, holdout, invariantes e performance
+  aprovados; p50 13,1875 ms, p95 15,8789 ms, máximo 17,8301 ms,
+  memória 0,1953 MiB e throughput 293,90 casos/s.
+- Validação híbrida MSVC com SQLite3 nativo via vcpkg: 187/187 testes Python,
+  17/17 testes CTest e instalação do runtime sem arquivos Python.
+
+As métricas acima são operacionais e não constituem evidência cognitiva.
 
 ## Evidências
 

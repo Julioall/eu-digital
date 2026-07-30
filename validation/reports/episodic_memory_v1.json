@@ -32,10 +32,10 @@
     "passed": true
   },
   "hardware": {
-    "machine": "x86_64",
-    "processor": "x86_64",
-    "release": "6.6.87.2-microsoft-standard-WSL2",
-    "system": "Linux"
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 165 Stepping 3, GenuineIntel",
+    "release": "11",
+    "system": "Windows"
   },
   "holdout": {
     "case_count": 2,
@@ -128,23 +128,23 @@
   "operational_measurement": {
     "interpretation": "operational only; no cognitive claim",
     "metrics": {
-      "latency_max_ms": 8.654183,
-      "latency_ms": 8.212382,
-      "latency_p50_ms": 7.039535,
-      "latency_p95_ms": 8.212382,
-      "memory_mb": 27.875,
-      "throughput": 559.9152140548305
+      "latency_max_ms": 17.8301,
+      "latency_ms": 15.8789,
+      "latency_p50_ms": 13.1875,
+      "latency_p95_ms": 15.8789,
+      "memory_mb": 0.1953125,
+      "throughput": 293.8985197801051
     }
   },
   "performance": {
     "failures": [],
     "metrics": {
-      "latency_max_ms": 8.654183,
-      "latency_ms": 8.212382,
-      "latency_p50_ms": 7.039535,
-      "latency_p95_ms": 8.212382,
-      "memory_mb": 27.875,
-      "throughput": 559.9152140548305
+      "latency_max_ms": 17.8301,
+      "latency_ms": 15.8789,
+      "latency_p50_ms": 13.1875,
+      "latency_p95_ms": 15.8789,
+      "memory_mb": 0.1953125,
+      "throughput": 293.8985197801051
     },
     "passed": true
   },

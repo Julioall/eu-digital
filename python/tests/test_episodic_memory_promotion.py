@@ -13,12 +13,16 @@ from eu_digital_lab.promotion import PromotionManifest
 
 
 class EpisodicMemoryPromotionTests(unittest.TestCase):
+    @staticmethod
+    def canonical_sha256(path: Path) -> str:
+        return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
     def test_development_and_holdout_hashes_are_frozen_and_disjoint(self) -> None:
         manifest = PromotionManifest.load(REPOSITORY_ROOT / "promotions" / "cognition.episodic_memory.v1.json")
         development = REPOSITORY_ROOT / manifest.data["dataset"]["fixture_set"]
         holdout = REPOSITORY_ROOT / manifest.data["validation"]["holdout_fixture_set"]
-        self.assertEqual(hashlib.sha256(development.read_bytes()).hexdigest(), manifest.data["dataset"]["hash"])
-        self.assertEqual(hashlib.sha256(holdout.read_bytes()).hexdigest(), manifest.data["validation"]["holdout_hash"])
+        self.assertEqual(self.canonical_sha256(development), manifest.data["dataset"]["hash"])
+        self.assertEqual(self.canonical_sha256(holdout), manifest.data["validation"]["holdout_hash"])
         development_ids = {json.loads(line)["case_id"] for line in development.read_text().splitlines() if line.strip()}
         holdout_ids = {json.loads(line)["case_id"] for line in holdout.read_text().splitlines() if line.strip()}
         self.assertTrue(development_ids.isdisjoint(holdout_ids))

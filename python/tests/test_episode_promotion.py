@@ -17,8 +17,8 @@ class EpisodePromotionTests(unittest.TestCase):
         manifest = PromotionManifest.load(REPOSITORY_ROOT / "promotions" / "cognition.episode_segmentation.v1.json")
         development = REPOSITORY_ROOT / manifest.data["dataset"]["fixture_set"]
         holdout = REPOSITORY_ROOT / manifest.data["validation"]["holdout_fixture_set"]
-        self.assertEqual(hashlib.sha256(development.read_bytes()).hexdigest(), manifest.data["dataset"]["hash"])
-        self.assertEqual(hashlib.sha256(holdout.read_bytes()).hexdigest(), manifest.data["validation"]["holdout_hash"])
+        self.assertEqual(hashlib.sha256(development.read_bytes().replace(b"\r\n", b"\n")).hexdigest(), manifest.data["dataset"]["hash"])
+        self.assertEqual(hashlib.sha256(holdout.read_bytes().replace(b"\r\n", b"\n")).hexdigest(), manifest.data["validation"]["holdout_hash"])
         development_ids = {json.loads(line)["case_id"] for line in development.read_text().splitlines() if line.strip()}
         holdout_ids = {json.loads(line)["case_id"] for line in holdout.read_text().splitlines() if line.strip()}
         self.assertTrue(development_ids)

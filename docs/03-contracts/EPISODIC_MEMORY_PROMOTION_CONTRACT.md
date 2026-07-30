@@ -10,6 +10,9 @@ Cada linha de fixture contém `case_id`, `records`, `query`, opcionalmente
 embedding é um vetor local de avaliação, não um modelo nem uma dependência do
 runtime.
 
+Fixture SHA-256 values are computed after normalizing `CRLF` to `LF`, so the
+frozen hashes remain independent of Git newline conversion on Windows.
+
 O resultado contém `store_results`, `size`, `retrieval`, `relations` e
 `consolidated`. Cada resultado de recuperação preserva o episódio original,
 `reason_codes`, uma explicação determinística e `provenance` com

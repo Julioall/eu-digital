@@ -17,8 +17,8 @@ class PatternPromotionTests(unittest.TestCase):
         manifest = PromotionManifest.load(REPOSITORY_ROOT / "promotions" / "cognition.pattern_learning.v1.json")
         development = REPOSITORY_ROOT / manifest.data["dataset"]["fixture_set"]
         holdout = REPOSITORY_ROOT / manifest.data["validation"]["holdout_fixture_set"]
-        self.assertEqual(hashlib.sha256(development.read_bytes()).hexdigest(), manifest.data["dataset"]["hash"])
-        self.assertEqual(hashlib.sha256(holdout.read_bytes()).hexdigest(), manifest.data["validation"]["holdout_hash"])
+        self.assertEqual(hashlib.sha256(development.read_bytes().replace(b"\r\n", b"\n")).hexdigest(), manifest.data["dataset"]["hash"])
+        self.assertEqual(hashlib.sha256(holdout.read_bytes().replace(b"\r\n", b"\n")).hexdigest(), manifest.data["validation"]["holdout_hash"])
 
     def test_equivalent_patterns_are_not_product_available(self) -> None:
         registry = json.loads((REPOSITORY_ROOT / "contracts" / "fixtures" / "component_maturity.json").read_text())
