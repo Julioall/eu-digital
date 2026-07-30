@@ -118,3 +118,7 @@ O status documental das SPECs não substitui `reference_status`,
   modelo. O componente permanece `product_status: unavailable`; modelo,
   runtime de inferencia e assinatura assimetrica de release exigem decisao
   posterior conforme ADR-0015.
+- **SPEC-041 concluida como spike de decisão:** SDL2/Dear ImGui validou a
+  fundação opcional, mas a matriz registrou lacunas de acessibilidade, tray,
+  click-through, lifecycle e fullscreen. ADR-0032 propõe Qt 6/QML como
+  substituto para o shell futuro; nenhum shell de produto foi iniciado.

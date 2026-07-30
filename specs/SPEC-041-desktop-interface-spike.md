@@ -1,10 +1,10 @@
 ---
 id: SPEC-041
 title: Spike de interface desktop Windows
-status: future
+status: done
 phase: beta
 dependencies: [SPEC-028, SPEC-040]
-adrs: [ADR-0009, ADR-0010, ADR-0011]
+adrs: [ADR-0009, ADR-0010, ADR-0011, ADR-0032]
 contracts: [DIALOGUE_AVATAR_SCHEMA.md, avatar_view_state.schema.json]
 ---
 
@@ -35,11 +35,26 @@ Windows essencial.
 
 ## Critérios de aceite
 
-- [ ] Matriz de testes Windows documenta cada cenário e resultado.
-- [ ] Renderer continua substituível atrás de `AvatarPresentationPort`.
-- [ ] Não rouba foco, não captura clipboard e não bloqueia fullscreen.
-- [ ] Se falhar, ADR substitutiva é aberta antes da implementação do shell.
+- [x] Matriz de testes Windows documenta cada cenário e resultado em
+      `docs/06-operations/DESKTOP_INTERFACE_SPIKE_MATRIX.md` e no relatório
+      JSON gerado pelo probe.
+- [x] O probe é um alvo opcional isolado e não altera a porta
+      `AvatarPresentationPort`.
+- [x] O probe validou ausência de foco e clipboard; a limitação de fullscreen
+      foi reproduzida e registrada como resultado negativo, sem iniciar shell
+      de produto.
+- [x] Como SDL2/ImGui não cobre acessibilidade, tray, click-through e
+      lifecycle completo, a ADR substitutiva ADR-0032 foi aberta antes de
+      qualquer implementação do shell.
 
 ## Saída
 
 Decisão técnica de interface, não um shell de produto concluído.
+
+## Evidência
+
+O alvo opcional `desktop_interface_spike` exercita SDL2 2.32.10 e Dear ImGui
+1.92.8 em Windows/MSVC. A matriz e o resultado negativo ficam registrados em
+`docs/06-operations/DESKTOP_INTERFACE_SPIKE_MATRIX.md`,
+`validation/reports/desktop_interface_spike_windows.json` e
+`docs/04-adrs/ADR-0032-desktop-interface-substitution.md`.

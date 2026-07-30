@@ -221,7 +221,11 @@
       "promotion_id": null,
       "evidence_refs": [
         "specs/SPEC-014-dialogue-avatar.md",
-        "python/eu_digital_lab/dialogue_avatar.py"
+        "python/eu_digital_lab/dialogue_avatar.py",
+        "specs/SPEC-041-desktop-interface-spike.md",
+        "docs/04-adrs/ADR-0032-desktop-interface-substitution.md",
+        "docs/06-operations/DESKTOP_INTERFACE_SPIKE_MATRIX.md",
+        "validation/reports/desktop_interface_spike_windows.json"
       ]
     },
     {

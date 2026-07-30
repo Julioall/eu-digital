@@ -66,6 +66,16 @@ versionados:
 A questão aberta 10 continua necessária para validar utilidade humana em
 estudo posterior, mas não altera a semântica contratual desta SPEC.
 
+## Resolução provisória da questão 7 pela SPEC-041
+
+O spike Windows de SDL2 + Dear ImGui validou apenas a fundação de janela,
+contexto ImGui, foco, clipboard, opacidade e loop ocioso. A matriz registrou
+lacunas de UI Automation/leitor de tela, tray, click-through, ciclo de
+suspensão/retomada e fullscreen seguro. A ADR-0032 foi aberta como decisão
+substitutiva: Qt 6/QML é o candidato para o shell futuro, atrás da porta de
+apresentação existente. A escolha exige revisão humana e não habilita produto
+nem altera contratos nesta SPEC.
+
 ## Resoluções registradas pela SPEC-012
 
 Os requisitos arquiteturais da SPEC-012 foram resolvidos por ADR-0014 e

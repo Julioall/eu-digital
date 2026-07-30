@@ -519,3 +519,20 @@ the GGUF/hash/license/Portuguese artifact policy, structured response schema,
 single-heavy-model bound, model-absent degradation, unload ablation, replay and
 disjoint holdout. No model is downloaded or selected and no network endpoint is
 contacted.
+
+The SPEC-041 Windows desktop-interface spike is built only when its optional
+toolkit dependencies are available:
+
+```powershell
+cmake -S . -B build/windows-msvc-vcpkg -G Ninja `
+  -DEU_DIGITAL_BUILD_DESKTOP_INTERFACE_SPIKE=ON `
+  -DSDL2_DIR=C:/Users/Julio/vcpkg/installed/x64-windows/share/SDL2 `
+  -Dimgui_DIR=C:/Users/Julio/vcpkg/installed/x64-windows/share/imgui
+cmake --build build/windows-msvc-vcpkg --target desktop_interface_spike --config Debug
+$env:PATH = "C:\Users\Julio\vcpkg\installed\x64-windows\debug\bin;$env:PATH"
+.\build\windows-msvc-vcpkg\desktop_interface_spike.exe validation/reports/desktop_interface_spike_windows.json
+```
+
+The probe is a hidden-window SDL2/ImGui integration check, not a product shell.
+Read the complete scenario matrix and the substitutive ADR before implementing
+the future Qt/QML adapter.

@@ -87,6 +87,7 @@ contracts/schemas/workspace_item.schema.json
 contracts/schemas/workspace_snapshot.schema.json
 contracts/schemas/world_model_prediction.schema.json
 cpp/app/.gitkeep
+cpp/app/desktop_interface_spike.cpp
 cpp/app/main.cpp
 cpp/app/promotion_fixture_runner.cpp
 cpp/benchmarks/.gitkeep
@@ -224,10 +225,12 @@ docs/04-adrs/ADR-0028-consented-screen-ocr-capability.md
 docs/04-adrs/ADR-0029-atomic-episode-segmentation-promotion.md
 docs/04-adrs/ADR-0030-atomic-episodic-memory-promotion.md
 docs/04-adrs/ADR-0031-atomic-pattern-learning-promotion.md
+docs/04-adrs/ADR-0032-desktop-interface-substitution.md
 docs/05-governance/CHANGE_CONTROL.md
 docs/05-governance/OPEN_QUESTIONS.md
 docs/05-governance/RISK_REGISTER.md
 docs/06-operations/BUILD_AND_RELEASE_MODEL.md
+docs/06-operations/DESKTOP_INTERFACE_SPIKE_MATRIX.md
 docs/06-operations/DEVELOPMENT_COMMANDS.md
 docs/06-operations/OBSERVABILITY.md
 docs/07-research/BIBLIOGRAPHY.md
@@ -308,6 +311,7 @@ python/tests/.gitkeep
 python/tests/test_capabilities.py
 python/tests/test_capability_adaptation.py
 python/tests/test_component_maturity.py
+python/tests/test_desktop_interface_spike.py
 python/tests/test_dialogue_avatar.py
 python/tests/test_digital_proprioception_agency.py
 python/tests/test_episode_promotion.py
@@ -380,6 +384,7 @@ reports/SPEC-037-execution-report.md
 reports/SPEC-038-execution-report.md
 reports/SPEC-039-execution-report.md
 reports/SPEC-040-execution-report.md
+reports/SPEC-041-execution-report.md
 REPOSITORY_TREE.txt
 schemas/agreement.schema.json
 schemas/annotation.schema.json
@@ -465,6 +470,9 @@ tools/validate_workspace_promotion.py
 tools/validate_world_model_promotion.py
 uv.lock
 validation/ablations/.gitkeep
+validation/ablations/desktop_interface_spike_baseline.json
+validation/ablations/desktop_interface_spike_no_imgui.json
+validation/ablations/desktop_interface_spike_no_transparency.json
 validation/equivalence/.gitkeep
 validation/equivalence/episode_segmentation_v1.jsonl
 validation/equivalence/episodic_memory_v1.jsonl
@@ -487,6 +495,7 @@ validation/holdout/world_model_prediction_v1_holdout.jsonl
 validation/longitudinal/.gitkeep
 validation/README.md
 validation/reports/.gitkeep
+validation/reports/desktop_interface_spike_windows.json
 validation/reports/episode_segmentation_v1.json
 validation/reports/episode_segmentation_v1_divergences.json
 validation/reports/episodic_memory_v1.json
