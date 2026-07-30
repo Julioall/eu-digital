@@ -112,7 +112,12 @@
         "specs/SPEC-033-episode-segmentation-native-promotion.md",
         "python/eu_digital_lab/episode_segmentation.py",
         "cpp/core/episode_segmenter.hpp",
+        "docs/03-contracts/EPISODE_PROMOTION_CONTRACT.md",
+        "tools/validate_episode_promotion.py",
         "promotions/cognition.episode_segmentation.v1.json",
+        "validation/equivalence/episode_segmentation_v1.jsonl",
+        "validation/holdout/episode_segmentation_v1_holdout.jsonl",
+        "validation/holdout/manifest.json",
         "validation/reports/episode_segmentation_v1.json"
       ]
     },

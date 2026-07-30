@@ -54,7 +54,9 @@
     "entrypoint": "eu_digital_lab.episode_segmentation.segment_events",
     "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
     "language": "python",
-    "package": "eu_digital_lab"
+    "package": "eu_digital_lab",
+    "source_path": "python/eu_digital_lab/episode_segmentation.py",
+    "source_sha256": "ca1d2ced08f6aa9fc096c4391c631a3980f75d491e47f599e609320de476316a"
   },
   "status": "validated",
   "validation": {

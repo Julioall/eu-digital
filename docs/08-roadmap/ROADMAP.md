@@ -74,12 +74,13 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
   componentes e SPEC-030 privacidade/armazenamento local.
 - **Product Beta — observação:** SPEC-031 observação Windows de baixo risco e
   SPEC-032 OCR consentido independente.
-- **Próximo incremento:** SPEC-033, primeira promoção cognitiva atômica;
+- **Próximo incremento:** SPEC-034, promoção atômica da memória episódica;
   nenhuma capacidade cognitiva é disponibilizada no produto apenas por estar
   concluída no laboratório Python.
-- **SPEC-033 em validação:** segmentação nativa de episódios, com referência
-  congelada, equivalência C++/Python, baseline, ablação e holdout bloqueado.
-  O componente permanece `product_status: unavailable` até aprovação humana.
+- **SPEC-033 concluída nos gates automatizados:** segmentação nativa de
+  episódios com hash da referência, equivalência C++/Python, schema, baseline,
+  ablação, invariantes, metamórficos e holdout bloqueado. O componente permanece
+  `product_status: unavailable` até aprovação humana.
 - **SPEC-034 em validação:** memória episódica nativa, com recuperação
   explicável, proveniência, embedding opcional, retenção limitada e holdout
   bloqueado. Consolidação semântica continua fora desta promoção.

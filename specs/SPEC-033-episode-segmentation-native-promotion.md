@@ -1,7 +1,7 @@
 ---
 id: SPEC-033
 title: Promoção nativa da segmentação de episódios
-status: in_progress
+status: done
 phase: beta
 dependencies: [SPEC-007, SPEC-023, SPEC-026, SPEC-027, SPEC-029]
 adrs: [ADR-0005, ADR-0008, ADR-0009, ADR-0010, ADR-0011, ADR-0029]
@@ -40,23 +40,36 @@ testes metamórficos/invariantes, benchmark operacional e manifesto de promoçã
 
 ## Critérios de aceite
 
-- [ ] A referência Python e o conjunto de equivalência possuem hash registrado.
-- [ ] O candidato C++ produz o contrato `episode.schema.json` completo e IDs
+- [x] A referência Python e o conjunto de equivalência possuem hash registrado.
+- [x] O candidato C++ produz o contrato `episode.schema.json` completo e IDs
       determinísticos para as mesmas entradas.
-- [ ] A equivalência usa bytes de entrada idênticos e não contém divergências.
-- [ ] Existem casos para mudança de aplicação/documento, gap temporal, contexto
+- [x] A equivalência usa bytes de entrada idênticos e não contém divergências.
+- [x] Existem casos para mudança de aplicação/documento, gap temporal, contexto
       ausente e ablação de contexto.
-- [ ] Há ground truth/invariantes e holdout separado, bloqueado antes da avaliação.
-- [ ] Os testes verificam cobertura de eventos, ausência de episódios vazios,
+- [x] Há ground truth/invariantes e holdout separado, bloqueado antes da avaliação.
+- [x] Os testes verificam cobertura de eventos, ausência de episódios vazios,
       explicação das fronteiras e ausência de observação não tratada como negativa.
-- [ ] O benchmark reporta mediana, p95 e máximo, sem apresentá-los como evidência
+- [x] O benchmark reporta mediana, p95 e máximo, sem apresentá-los como evidência
       cognitiva.
-- [ ] O registro de maturidade não declara disponibilidade de produto; a aprovação
+- [x] O registro de maturidade não declara disponibilidade de produto; a aprovação
       em `promotions/registry.json` requer revisão humana identificável.
-- [ ] CTest, validação Python, contratos, documentação e relatório passam.
+- [x] CTest, validação Python, contratos, documentação e relatório passam.
 
 ## Saída
 
 Um candidato nativo equivalente e auditável, disponível para uma futura decisão
 de promoção. O runtime continua `degraded`/sem a capacidade enquanto não houver
 entrada aprovada no registro de promoções.
+
+## Evidência
+
+O manifesto registra a hash da referência Python, do conjunto de equivalência e
+do holdout bloqueado. O validador executa equivalência semântica, validação do
+`episode.schema.json`, invariantes, ablação de contexto, replay determinístico e
+benchmark p50/p95/máximo em POSIX e Windows. Os resultados ficam em
+`validation/reports/episode_segmentation_v1.json` e
+`validation/reports/episode_segmentation_v1_divergences.json`.
+
+O componente permanece `reference_status: frozen`, `native_status: equivalent` e
+`product_status: unavailable`; nenhuma entrada foi adicionada ao registry de
+promoções sem revisão humana.

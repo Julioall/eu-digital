@@ -536,3 +536,17 @@ $env:PATH = "C:\Users\Julio\vcpkg\installed\x64-windows\debug\bin;$env:PATH"
 The probe is a hidden-window SDL2/ImGui integration check, not a product shell.
 Read the complete scenario matrix and the substitutive ADR before implementing
 the future Qt/QML adapter.
+
+The SPEC-033 native episode-segmentation promotion is validated with the local
+fixture runner:
+
+```powershell
+cmake --build build/dev-vcpkg --target promotion_fixture_runner
+$env:PYTHONPATH = "python"
+python tools/validate_episode_promotion.py --candidate build/dev-vcpkg/promotion_fixture_runner
+```
+
+The validator records the frozen Python source hash, development/holdout hashes,
+episode schema validation, invariants, context ablation, deterministic replay
+and operational p50/p95/maximum metrics. It does not add the component to the
+approved promotion registry.

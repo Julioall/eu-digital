@@ -30,3 +30,8 @@ ao runner de referência e ao candidato.
 O conjunto em `validation/holdout/` é separado do desenvolvimento e sua hash
 é registrada antes da avaliação. Nenhuma alteração no holdout pode ser feita
 para corrigir um resultado sem abrir uma nova versão de promoção.
+
+O manifesto também registra `reference.source_path` e
+`reference.source_sha256` para congelar o arquivo Python do entrypoint antes da
+comparação final. Essa hash identifica a referência computacional; não é um
+oráculo de validade científica.

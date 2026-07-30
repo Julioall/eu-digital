@@ -9,7 +9,7 @@
     "boundary_f1": 0.75,
     "boundary_precision": 0.75,
     "boundary_recall": 0.75,
-    "window_diff": 0.0
+    "window_diff": 0.16666666666666666
   },
   "commits": {
     "cpp": "working-tree",
@@ -33,11 +33,25 @@
     },
     "passed": true
   },
+  "ground_truth": {
+    "development": {
+      "boundary_f1": 1.0,
+      "boundary_precision": 1.0,
+      "boundary_recall": 1.0,
+      "window_diff": 0.0
+    },
+    "holdout": {
+      "boundary_f1": 1.0,
+      "boundary_precision": 1.0,
+      "boundary_recall": 1.0,
+      "window_diff": 0.0
+    }
+  },
   "hardware": {
-    "machine": "x86_64",
-    "processor": "x86_64",
-    "release": "6.6.87.2-microsoft-standard-WSL2",
-    "system": "Linux"
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 165 Stepping 3, GenuineIntel",
+    "release": "11",
+    "system": "Windows"
   },
   "holdout": {
     "case_count": 2,
@@ -115,7 +129,9 @@
       "entrypoint": "eu_digital_lab.episode_segmentation.segment_events",
       "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
       "language": "python",
-      "package": "eu_digital_lab"
+      "package": "eu_digital_lab",
+      "source_path": "python/eu_digital_lab/episode_segmentation.py",
+      "source_sha256": "ca1d2ced08f6aa9fc096c4391c631a3980f75d491e47f599e609320de476316a"
     },
     "status": "validated",
     "validation": {
@@ -127,29 +143,37 @@
       "holdout_status": "locked-before-evaluation"
     }
   },
+  "metamorphic": {
+    "failures": [],
+    "passed": true
+  },
   "operational_measurement": {
-    "interpretation": "operational only; no cognitive claim",
+    "interpretation": "operational only; POSIX child RSS or Windows validator working set; no cognitive claim",
     "metrics": {
-      "latency_max_ms": 7.251438,
-      "latency_ms": 6.988702,
-      "latency_p50_ms": 6.059813,
-      "latency_p95_ms": 6.988702,
-      "memory_mb": 27.625,
-      "throughput": 650.2046509385759
+      "latency_max_ms": 14.1241,
+      "latency_ms": 11.1873,
+      "latency_p50_ms": 10.1464,
+      "latency_p95_ms": 11.1873,
+      "memory_mb": 36.2734375,
+      "throughput": 389.4171982211423
     }
   },
   "performance": {
     "failures": [],
     "metrics": {
-      "latency_max_ms": 7.251438,
-      "latency_ms": 6.988702,
-      "latency_p50_ms": 6.059813,
-      "latency_p95_ms": 6.988702,
-      "memory_mb": 27.625,
-      "throughput": 650.2046509385759
+      "latency_max_ms": 14.1241,
+      "latency_ms": 11.1873,
+      "latency_p50_ms": 10.1464,
+      "latency_p95_ms": 11.1873,
+      "memory_mb": 36.2734375,
+      "throughput": 389.4171982211423
     },
     "passed": true
   },
   "promotion_id": "cognition.episode_segmentation.v1",
+  "reference": {
+    "source_path": "python/eu_digital_lab/episode_segmentation.py",
+    "source_sha256": "ca1d2ced08f6aa9fc096c4391c631a3980f75d491e47f599e609320de476316a"
+  },
   "scientific_evidence_boundary": "cross-language equivalence is computational verification, not ground truth"
 }
