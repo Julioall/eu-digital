@@ -2,6 +2,7 @@
 #include "core/episodic_memory.hpp"
 #include "core/functional_self_model.hpp"
 #include "core/global_workspace.hpp"
+#include "core/metacognition_curiosity.hpp"
 #include "core/pattern_learner.hpp"
 #include "core/promotion_registry.hpp"
 #include "core/runtime_host.hpp"
@@ -1010,6 +1011,184 @@ int run_functional_self_model() {
     return std::cout.good() ? 0 : 1;
 }
 
+eu_digital::HypothesisStatus parse_hypothesis_status(const std::string& value) {
+    if (value == "proposed") return eu_digital::HypothesisStatus::proposed;
+    if (value == "confirmed") return eu_digital::HypothesisStatus::confirmed;
+    if (value == "rejected") return eu_digital::HypothesisStatus::rejected;
+    if (value == "superseded") return eu_digital::HypothesisStatus::superseded;
+    throw std::runtime_error("unsupported hypothesis status: " + value);
+}
+
+eu_digital::QuestionPolicy parse_question_policy(const std::string& value) {
+    if (value == eu_digital::METACOGNITION_INFORMATION_GAIN_POLICY_ID) return eu_digital::QuestionPolicy::information_gain_v1;
+    if (value == eu_digital::METACOGNITION_BASELINE_QUESTION_POLICY_ID) return eu_digital::QuestionPolicy::fixed_gain_v0;
+    throw std::runtime_error("unsupported metacognition question policy: " + value);
+}
+
+eu_digital::ResponseOutcome parse_response_outcome(const std::string& value) {
+    if (value == "confirmed") return eu_digital::ResponseOutcome::confirmed;
+    if (value == "rejected") return eu_digital::ResponseOutcome::rejected;
+    if (value == "inconclusive") return eu_digital::ResponseOutcome::inconclusive;
+    throw std::runtime_error("unsupported curiosity response outcome: " + value);
+}
+
+std::optional<double> optional_number(const JsonValue::Object& object, const std::string& key, const std::string& path) {
+    const auto found = object.find(key);
+    if (found == object.end() || runtime_detail::is_null(found->second)) return std::nullopt;
+    return number_value(found->second, path + "." + key);
+}
+
+eu_digital::HypothesisRecord parse_metacognition_hypothesis(const JsonValue& value, const std::string& path) {
+    const auto& object = runtime_detail::object(value, path);
+    eu_digital::HypothesisRecord hypothesis;
+    hypothesis.hypothesis_id = required_string(object, "hypothesis_id", path);
+    hypothesis.kind = required_string(object, "kind", path);
+    hypothesis.statement = required_string(object, "statement", path);
+    hypothesis.status = parse_hypothesis_status(required_string(object, "status", path));
+    hypothesis.confidence = number_value(runtime_detail::required(object, "confidence", path), path + ".confidence");
+    const auto& evidence = runtime_detail::object(runtime_detail::required(object, "evidence", path), path + ".evidence");
+    hypothesis.supporting_refs = string_array(runtime_detail::required(evidence, "supporting_refs", path + ".evidence"), path + ".evidence.supporting_refs");
+    hypothesis.opposing_refs = string_array(runtime_detail::required(evidence, "opposing_refs", path + ".evidence"), path + ".evidence.opposing_refs");
+    hypothesis.alternatives = string_array(runtime_detail::required(object, "alternatives", path), path + ".alternatives");
+    hypothesis.created_at = required_string(object, "created_at", path);
+    hypothesis.updated_at = required_string(object, "updated_at", path);
+    const auto& verification = runtime_detail::object(runtime_detail::required(object, "verification", path), path + ".verification");
+    hypothesis.verification_question = optional_string(verification, "question", path + ".verification");
+    hypothesis.expected_information_gain = optional_number(verification, "expected_information_gain", path + ".verification");
+    const auto& provenance = runtime_detail::object(runtime_detail::required(object, "provenance", path), path + ".provenance");
+    hypothesis.provenance_module = required_string(provenance, "module", path + ".provenance");
+    hypothesis.model_version = optional_string(provenance, "model_version", path + ".provenance");
+    hypothesis.schema_version = optional_string(object, "schema_version", path).value_or(eu_digital::METACOGNITION_CURIOSITY_SCHEMA_VERSION);
+    hypothesis.validate();
+    return hypothesis;
+}
+
+eu_digital::CuriosityConfig parse_metacognition_config(const JsonValue::Object& root) {
+    eu_digital::CuriosityConfig config;
+    const auto* object = optional_object(root, "config", "fixture");
+    if (object == nullptr) return config;
+    if (const auto found = object->find("calibration_enabled"); found != object->end()) config.calibration_enabled = runtime_detail::boolean(found->second, "fixture.config.calibration_enabled");
+    if (const auto found = object->find("question_policy"); found != object->end()) config.question_policy = parse_question_policy(runtime_detail::string(found->second, "fixture.config.question_policy"));
+    if (const auto found = object->find("interruptions_per_window"); found != object->end()) config.interruptions_per_window = static_cast<int>(runtime_detail::unsigned_number(found->second, "fixture.config.interruptions_per_window"));
+    if (const auto found = object->find("interruption_window_seconds"); found != object->end()) config.interruption_window_seconds = number_value(found->second, "fixture.config.interruption_window_seconds");
+    if (const auto found = object->find("cooldown_seconds"); found != object->end()) config.cooldown_seconds = number_value(found->second, "fixture.config.cooldown_seconds");
+    if (const auto found = object->find("correction_cooldown_seconds"); found != object->end()) config.correction_cooldown_seconds = number_value(found->second, "fixture.config.correction_cooldown_seconds");
+    if (const auto found = object->find("min_information_gain"); found != object->end()) config.min_information_gain = number_value(found->second, "fixture.config.min_information_gain");
+    if (const auto found = object->find("silence_confidence"); found != object->end()) config.silence_confidence = number_value(found->second, "fixture.config.silence_confidence");
+    if (const auto found = object->find("redundancy_suppression_enabled"); found != object->end()) config.redundancy_suppression_enabled = runtime_detail::boolean(found->second, "fixture.config.redundancy_suppression_enabled");
+    if (const auto found = object->find("budget_enabled"); found != object->end()) config.budget_enabled = runtime_detail::boolean(found->second, "fixture.config.budget_enabled");
+    if (const auto found = object->find("cooldown_enabled"); found != object->end()) config.cooldown_enabled = runtime_detail::boolean(found->second, "fixture.config.cooldown_enabled");
+    if (const auto found = object->find("calibration_bucket_count"); found != object->end()) config.calibration_bucket_count = static_cast<int>(runtime_detail::unsigned_number(found->second, "fixture.config.calibration_bucket_count"));
+    config.validate();
+    return config;
+}
+
+std::string metacognition_operation_time(const JsonValue::Object& operation, const std::string& path) {
+    return optional_string(operation, "now", path).value_or("1970-01-01T00:00:00+00:00");
+}
+
+std::string metacognition_operation_id(const JsonValue::Object& operation, const std::string& direct_key,
+                                       const std::string& reference_key, const std::string& last_value,
+                                       const std::string& path) {
+    if (const auto direct = optional_string(operation, direct_key, path)) return *direct;
+    if (const auto reference = optional_string(operation, reference_key, path)) {
+        if (*reference == "last") {
+            if (last_value.empty()) throw std::runtime_error(path + " has no previous " + direct_key);
+            return last_value;
+        }
+        if (*reference == "last_asked" && reference_key == "question_ref") {
+            if (last_value.empty()) throw std::runtime_error(path + " has no previous asked question");
+            return last_value;
+        }
+        throw std::runtime_error("unsupported " + reference_key + ": " + *reference);
+    }
+    throw std::runtime_error(path + " requires " + direct_key + " or " + reference_key);
+}
+
+int run_metacognition_curiosity() {
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
+        const auto root = runtime_detail::JsonParser(line).parse();
+        const auto& object = runtime_detail::object(root, "fixture");
+        auto engine = eu_digital::MetacognitionCuriosityEngine(parse_metacognition_config(object));
+        std::vector<eu_digital::MetacognitiveAssessment> assessments;
+        std::vector<eu_digital::CuriosityQuestion> questions;
+        std::vector<eu_digital::CuriosityResponse> responses;
+        std::vector<std::string> snapshots;
+        std::vector<std::string> metrics_reads;
+        std::string last_assessment_id;
+        std::string last_question_id;
+        std::string last_asked_question_id;
+        const auto& operations = runtime_detail::array(runtime_detail::required(object, "operations", "fixture"), "fixture.operations");
+        for (std::size_t index = 0; index < operations.size(); ++index) {
+            const auto path = "fixture.operations[" + std::to_string(index) + "]";
+            const auto& operation = runtime_detail::object(operations[index], path);
+            const auto type = required_string(operation, "type", path);
+            if (type == "evaluate") {
+                assessments.push_back(engine.evaluate(
+                    parse_metacognition_hypothesis(runtime_detail::required(operation, "hypothesis", path), path + ".hypothesis"),
+                    metacognition_operation_time(operation, path)));
+                last_assessment_id = assessments.back().assessment_id;
+            } else if (type == "propose_question") {
+                questions.push_back(engine.propose_question(
+                    metacognition_operation_id(operation, "assessment_id", "assessment_ref", last_assessment_id, path),
+                    required_string(operation, "prompt", path),
+                    number_value(runtime_detail::required(operation, "expected_resolution", path), path + ".expected_resolution"),
+                    metacognition_operation_time(operation, path)));
+                last_question_id = questions.back().question_id;
+            } else if (type == "ask") {
+                questions.push_back(engine.ask(metacognition_operation_id(operation, "question_id", "question_ref", last_question_id, path), metacognition_operation_time(operation, path)));
+                last_question_id = questions.back().question_id;
+                last_asked_question_id = last_question_id;
+            } else if (type == "record_response") {
+                const auto actor_id = optional_string(operation, "actor_id", path);
+                responses.push_back(engine.record_response(
+                    metacognition_operation_id(operation, "question_id", "question_ref", last_asked_question_id, path),
+                    parse_response_outcome(required_string(operation, "outcome", path)),
+                    runtime_detail::boolean(runtime_detail::required(operation, "correction", path), path + ".correction"),
+                    string_array(runtime_detail::required(operation, "evidence_refs", path), path + ".evidence_refs"),
+                    required_string(operation, "source", path), actor_id, metacognition_operation_time(operation, path)));
+            } else if (type == "snapshot") {
+                snapshots.push_back(engine.snapshot_json());
+            } else if (type == "metrics") {
+                metrics_reads.push_back(engine.metrics_json());
+            } else {
+                throw std::runtime_error("unsupported metacognition-curiosity operation: " + type);
+            }
+        }
+        std::ostringstream output;
+        output << "{\"assessments\":[";
+        for (std::size_t index = 0; index < assessments.size(); ++index) {
+            if (index) output << ',';
+            output << assessments[index].to_json();
+        }
+        output << "],\"metrics_reads\":[";
+        for (std::size_t index = 0; index < metrics_reads.size(); ++index) {
+            if (index) output << ',';
+            output << metrics_reads[index];
+        }
+        output << "],\"questions\":[";
+        for (std::size_t index = 0; index < questions.size(); ++index) {
+            if (index) output << ',';
+            output << questions[index].to_json();
+        }
+        output << "],\"responses\":[";
+        for (std::size_t index = 0; index < responses.size(); ++index) {
+            if (index) output << ',';
+            output << responses[index].to_json();
+        }
+        output << "],\"schema_version\":\"1.0\",\"snapshot\":" << engine.snapshot_json() << ",\"snapshots\":[";
+        for (std::size_t index = 0; index < snapshots.size(); ++index) {
+            if (index) output << ',';
+            output << snapshots[index];
+        }
+        output << "]}\n";
+        std::cout << output.str();
+    }
+    return std::cout.good() ? 0 : 1;
+}
+
 int run_episodic_memory() {
     std::string line;
     while (std::getline(std::cin, line)) {
@@ -1114,6 +1293,7 @@ int main(int argc, char** argv) {
         if (argc > 1 && std::string(argv[1]) == "--world-model") return run_world_model();
         if (argc > 1 && std::string(argv[1]) == "--global-workspace") return run_global_workspace();
         if (argc > 1 && std::string(argv[1]) == "--functional-self-model") return run_functional_self_model();
+        if (argc > 1 && std::string(argv[1]) == "--metacognition-curiosity") return run_metacognition_curiosity();
         const std::string fixture_bytes{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
         std::cout << eu_digital::PromotionFixtureRunner::echo(fixture_bytes);
         return std::cout.good() ? 0 : 1;

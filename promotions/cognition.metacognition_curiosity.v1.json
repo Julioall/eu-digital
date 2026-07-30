@@ -1,0 +1,70 @@
+{
+  "candidate": {
+    "build_profile": "Debug",
+    "compiler": "C++23 native",
+    "commit": "working-tree",
+    "language": "cpp",
+    "target": "promotion_fixture_runner"
+  },
+  "component_id": "cognition.metacognition_curiosity",
+  "component_version": "1.0.0",
+  "contract": {
+    "clock_semantics": "ordered timezone-aware local operation timestamps",
+    "error_schema": "contracts/schemas/curiosity_response.schema.json",
+    "input_schema": "docs/03-contracts/METACOGNITION_CURIOSITY_SCHEMA.md",
+    "output_schema": "contracts/schemas/metacognitive_assessment.schema.json",
+    "question_schema": "contracts/schemas/curiosity_question.schema.json",
+    "response_schema": "contracts/schemas/curiosity_response.schema.json",
+    "random_seed_policy": "no randomness",
+    "state_schema": "docs/03-contracts/METACOGNITION_CURIOSITY_SCHEMA.md"
+  },
+  "dataset": {
+    "case_count": 5,
+    "fixture_set": "validation/equivalence/metacognition_curiosity_v1.jsonl",
+    "hash": "c31d30e904219cad1d80f00ec7df558d9163578155c321fafbf8f63d4b13e3d1"
+  },
+  "equivalence": {
+    "absolute_tolerance": 1e-12,
+    "relative_tolerance": 1e-12,
+    "acceptance_metrics": {
+      "holdout_numeric_semantic_match": 1.0,
+      "invariant_pass_rate": 1.0,
+      "semantic_match": 1.0
+    },
+    "invariants": [
+      "question_assessment_provenance",
+      "inconclusive_not_negative",
+      "budget_cooldown_redundancy_explicit",
+      "baseline_is_selectable",
+      "no_mental_state_claims"
+    ],
+    "type": "numeric"
+  },
+  "hypothesis": {
+    "id": "H4-METACOGNITION-H5-CURIOSITY",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "performance": {
+    "baseline_hardware": "captured by validation/reports/metacognition_curiosity_v1.json",
+    "maximum_latency_ms": 100.0,
+    "maximum_memory_mb": 512.0,
+    "minimum_throughput": 10.0
+  },
+  "promotion_id": "cognition.metacognition_curiosity.v1",
+  "reference": {
+    "commit": "frozen-2026-07-30",
+    "entrypoint": "eu_digital_lab.metacognition_curiosity.MetacognitionCuriosityEngine",
+    "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+    "language": "python",
+    "package": "eu_digital_lab"
+  },
+  "status": "reference_frozen",
+  "validation": {
+    "ablation": "raw_confidence_v0 plus fixed_gain_v0 with budget, cooldown and redundancy suppression disabled",
+    "baseline_id": "fixed_gain_v0",
+    "ground_truth": "fixture lifecycle annotations plus contract validity, provenance, calibration and suppression invariants",
+    "holdout_fixture_set": "validation/holdout/metacognition_curiosity_v1_holdout.jsonl",
+    "holdout_hash": "16a5186057cdbf30847e46e6672f77abb097fa1150ce15ccedca7baf4c6d09bc",
+    "holdout_status": "locked-before-evaluation"
+  }
+}

@@ -167,13 +167,17 @@
     {
       "component_id": "cognition.metacognition_curiosity",
       "spec_id": "SPEC-011",
-      "reference_status": "python",
-      "native_status": "none",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
       "product_status": "unavailable",
-      "promotion_id": null,
+      "promotion_id": "cognition.metacognition_curiosity.v1",
       "evidence_refs": [
         "specs/SPEC-011-metacognition-curiosity.md",
-        "python/eu_digital_lab/metacognition_curiosity.py"
+        "specs/SPEC-039-metacognition-curiosity-native-promotion.md",
+        "python/eu_digital_lab/metacognition_curiosity.py",
+        "cpp/core/metacognition_curiosity.hpp",
+        "promotions/cognition.metacognition_curiosity.v1.json",
+        "validation/reports/metacognition_curiosity_v1.json"
       ]
     },
     {

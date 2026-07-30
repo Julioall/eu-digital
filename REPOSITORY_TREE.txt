@@ -100,6 +100,7 @@ cpp/core/event_bus.hpp
 cpp/core/functional_self_model.hpp
 cpp/core/global_workspace.hpp
 cpp/core/input_interaction_sensor.hpp
+cpp/core/metacognition_curiosity.hpp
 cpp/core/observation_privacy.hpp
 cpp/core/pattern_learner.hpp
 cpp/core/privacy_storage.hpp
@@ -126,6 +127,7 @@ cpp/tests/event_bus_test.cpp
 cpp/tests/functional_self_model_test.cpp
 cpp/tests/global_workspace_test.cpp
 cpp/tests/input_interaction_sensor_test.cpp
+cpp/tests/metacognition_curiosity_test.cpp
 cpp/tests/pattern_learning_test.cpp
 cpp/tests/privacy_storage_test.cpp
 cpp/tests/promotion_registry_test.cpp
@@ -256,6 +258,7 @@ promotions/cognition.episode_segmentation.v1.json
 promotions/cognition.episodic_memory.v1.json
 promotions/cognition.functional_self_model.v1.json
 promotions/cognition.global_workspace.v1.json
+promotions/cognition.metacognition_curiosity.v1.json
 promotions/cognition.pattern_learning.v1.json
 promotions/cognition.world_model.v1.json
 promotions/registry.json
@@ -319,6 +322,7 @@ python/tests/test_local_model_gateway.py
 python/tests/test_longitudinal_evaluation.py
 python/tests/test_memory_consolidation.py
 python/tests/test_metacognition_curiosity.py
+python/tests/test_metacognition_curiosity_promotion.py
 python/tests/test_observation_policy.py
 python/tests/test_pattern_learning.py
 python/tests/test_pattern_promotion.py
@@ -370,6 +374,7 @@ reports/SPEC-035-execution-report.md
 reports/SPEC-036-execution-report.md
 reports/SPEC-037-execution-report.md
 reports/SPEC-038-execution-report.md
+reports/SPEC-039-execution-report.md
 REPOSITORY_TREE.txt
 schemas/agreement.schema.json
 schemas/annotation.schema.json
@@ -443,6 +448,7 @@ tools/validate_episode_promotion.py
 tools/validate_functional_self_model_promotion.py
 tools/validate_hybrid.py
 tools/validate_memory_promotion.py
+tools/validate_metacognition_curiosity_promotion.py
 tools/validate_observation_policy.py
 tools/validate_pattern_promotion.py
 tools/validate_privacy_storage.py
@@ -458,6 +464,7 @@ validation/equivalence/episode_segmentation_v1.jsonl
 validation/equivalence/episodic_memory_v1.jsonl
 validation/equivalence/functional_self_model_v1.jsonl
 validation/equivalence/global_workspace_v1.jsonl
+validation/equivalence/metacognition_curiosity_v1.jsonl
 validation/equivalence/pattern_learning_v1.jsonl
 validation/equivalence/world_model_prediction_v1.jsonl
 validation/holdout/episode_segmentation_v1_holdout.jsonl
@@ -466,6 +473,7 @@ validation/holdout/episodic_memory_v1_holdout.jsonl
 validation/holdout/functional_self_model_v1_holdout.jsonl
 validation/holdout/global_workspace_v1_holdout.jsonl
 validation/holdout/manifest.json
+validation/holdout/metacognition_curiosity_v1_holdout.jsonl
 validation/holdout/pattern_learning_v1_holdout.jsonl
 validation/holdout/world_model_prediction_v1_holdout.jsonl
 validation/longitudinal/.gitkeep
@@ -479,6 +487,8 @@ validation/reports/functional_self_model_v1.json
 validation/reports/functional_self_model_v1_divergences.json
 validation/reports/global_workspace_v1.json
 validation/reports/global_workspace_v1_divergences.json
+validation/reports/metacognition_curiosity_v1.json
+validation/reports/metacognition_curiosity_v1_divergences.json
 validation/reports/pattern_learning_v1.json
 validation/reports/pattern_learning_v1_divergences.json
 validation/reports/world_model_prediction_v1.json

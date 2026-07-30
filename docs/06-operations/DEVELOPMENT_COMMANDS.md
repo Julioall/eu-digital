@@ -491,3 +491,16 @@ python -m unittest python.tests.test_memory_consolidation -v
 Replay derives only observable context keys, keeps source episode IDs, merges
 versions and alternatives, and archives episodes reversibly. The no_replay_v0
 baseline uses the same interface without creating semantic knowledge.
+
+The SPEC-039 native metacognition/curiosity candidate is exercised with:
+
+```powershell
+cmake --build build/dev --target metacognition_curiosity_test promotion_fixture_runner
+ctest --test-dir build/dev -R metacognition_curiosity --output-on-failure
+python tools/validate_metacognition_curiosity_promotion.py
+```
+
+The validator compares assessments, structured questions, responses, calibration
+and suppression against Python, then evaluates the fixed-gain/raw-confidence
+baseline and the no-budget/no-cooldown/no-redundancy ablation. Questions remain
+local objects; this candidate does not send messages or execute actions.

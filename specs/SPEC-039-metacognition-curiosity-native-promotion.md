@@ -1,7 +1,7 @@
 ---
 id: SPEC-039
 title: Promoção nativa da metacognição e curiosidade
-status: future
+status: done
 phase: beta
 dependencies: [SPEC-011, SPEC-023, SPEC-026, SPEC-027, SPEC-029, SPEC-038]
 adrs: [ADR-0005, ADR-0008, ADR-0009, ADR-0010, ADR-0011]
@@ -36,11 +36,11 @@ Falsificação: não reduzir redundância ou piorar calibração.
 
 ## Critérios de aceite
 
-- [ ] Cada pergunta referencia assessment, evidência e ganho esperado.
-- [ ] Inconclusão não vira observação negativa.
-- [ ] Orçamento, cooldown e supressão são versionados e auditáveis.
-- [ ] Holdout, ablação, baseline, replay e benchmarks passam.
-- [ ] Nenhuma pergunta executa ação ou declara emoção real.
+- [x] Cada pergunta referencia assessment, evidência e ganho esperado.
+- [x] Inconclusão não vira observação negativa.
+- [x] Orçamento, cooldown e supressão são versionados e auditáveis.
+- [x] Holdout, ablação, baseline, replay e benchmarks passam.
+- [x] Nenhuma pergunta executa ação ou declara emoção real.
 
 ## Saída
 

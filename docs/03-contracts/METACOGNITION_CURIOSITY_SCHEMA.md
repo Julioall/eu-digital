@@ -19,3 +19,19 @@ favorável ou contrária.
 
 Confiança calibrada é uma estimativa operacional contra outcomes verificados,
 não certeza, intenção, crença humana ou validação científica suficiente.
+
+## Promoção nativa SPEC-039
+
+O candidato C++ `cognition.metacognition_curiosity.v1` expõe a mesma
+semântica por `promotion_fixture_runner --metacognition-curiosity`. Ele
+preserva provenance entre hipótese, assessment, pergunta e resposta,
+versiona a política de calibração/ganho e mantém budget, cooldown e supressão
+auditáveis. `inconclusive` não atualiza a calibração como outcome negativo.
+
+O manifesto e os fixtures bloqueados estão em
+`promotions/cognition.metacognition_curiosity.v1.json`,
+`validation/equivalence/metacognition_curiosity_v1.jsonl` e
+`validation/holdout/metacognition_curiosity_v1_holdout.jsonl`. A promoção
+comprova equivalência computacional, invariantes e desempenho operacional;
+não disponibiliza o componente no produto nem sustenta alegações de emoção,
+consciência, intenção ou curiosidade humana.

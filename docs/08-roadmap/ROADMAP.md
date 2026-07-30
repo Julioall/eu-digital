@@ -100,6 +100,11 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
   capabilities, remoção/reinstalação, baseline, ablação e holdout. O componente
   permanece `product_status: unavailable` até revisão humana; SPEC-039 é o
   próximo incremento nativo.
+- **SPEC-039 concluída nos gates automatizados:** metacognição e curiosidade
+  nativas com assessments calibráveis, ganho informacional, perguntas locais,
+  orçamento/cooldown/supressão versionados, feedback inconclusivo preservado,
+  baseline, ablação e holdout. O componente permanece
+  `product_status: unavailable` até revisão humana.
 - **V1 GA:** permanece condicionada a modelo local aprovado, shell/avatar,
   sugestões corrigíveis, MSIX assinado, atualização/rollback e gates de
   privacidade/operacionais.

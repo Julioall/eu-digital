@@ -50,6 +50,10 @@ add_executable(functional_self_model_test cpp/tests/functional_self_model_test.c
 target_include_directories(functional_self_model_test PRIVATE cpp)
 target_compile_features(functional_self_model_test PRIVATE cxx_std_23)
 
+add_executable(metacognition_curiosity_test cpp/tests/metacognition_curiosity_test.cpp)
+target_include_directories(metacognition_curiosity_test PRIVATE cpp)
+target_compile_features(metacognition_curiosity_test PRIVATE cxx_std_23)
+
 add_executable(system_activity_sensor_test cpp/tests/system_activity_sensor_test.cpp)
 target_include_directories(system_activity_sensor_test PRIVATE cpp)
 target_compile_features(system_activity_sensor_test PRIVATE cxx_std_23)
@@ -115,6 +119,7 @@ add_test(NAME pattern_learning COMMAND pattern_learning_test)
 add_test(NAME world_model COMMAND world_model_test)
 add_test(NAME global_workspace COMMAND global_workspace_test)
 add_test(NAME functional_self_model COMMAND functional_self_model_test)
+add_test(NAME metacognition_curiosity COMMAND metacognition_curiosity_test)
 add_test(NAME system_activity_sensor COMMAND system_activity_sensor_test)
 add_test(NAME input_interaction_sensor COMMAND input_interaction_sensor_test)
 add_test(NAME screen_ocr_sensor COMMAND screen_ocr_sensor_test)

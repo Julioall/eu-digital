@@ -39,6 +39,13 @@ class ComponentMaturityTests(unittest.TestCase):
         self.assertEqual(
             self_model["promotion_id"], "cognition.functional_self_model.v1"
         )
+        metacognition = registry.component("cognition.metacognition_curiosity")
+        self.assertEqual(metacognition["reference_status"], "frozen")
+        self.assertEqual(metacognition["native_status"], "equivalent")
+        self.assertEqual(metacognition["product_status"], "unavailable")
+        self.assertEqual(
+            metacognition["promotion_id"], "cognition.metacognition_curiosity.v1"
+        )
 
     def test_invalid_promotion_state_is_rejected(self) -> None:
         invalid = json.loads(
