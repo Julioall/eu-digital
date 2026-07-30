@@ -45,6 +45,10 @@ O perfil procedural sidecar da SPEC-042 está em
 `AvatarViewState`; a implementação nativa headless permanece separada do host
 desktop e da escolha de toolkit.
 
+O output observável do renderer headless está em `avatar_frame.schema.json`.
+O probe CLI só emite metadados locais e digest do framebuffer; não captura
+input, exige modelo ou abre uma janela.
+
 Os contratos locais da SPEC-015 estão em `audio_segment.schema.json` e
 `audio_transcription.schema.json`. A semântica está documentada em
 `docs/03-contracts/AUDIO_SENSOR_SCHEMA.md`.

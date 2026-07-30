@@ -344,7 +344,7 @@ public:
         descriptor_.implementation_id = "native.procedural_avatar";
         descriptor_.implementation_version = "1.0.0";
         descriptor_.kind = "presentation";
-        descriptor_.provides.push_back({"render.avatar_frame", "urn:eu-digital:avatar-frame:1"});
+        descriptor_.provides.push_back({"render.avatar_frame", "contracts/schemas/avatar_frame.schema.json"});
         descriptor_.supports_hot_plug = true;
         descriptor_.supports_checkpoint = false;
     }

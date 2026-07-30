@@ -38,6 +38,7 @@ contracts/schemas/agency_action_outcome.schema.json
 contracts/schemas/agency_attribution.schema.json
 contracts/schemas/audio_segment.schema.json
 contracts/schemas/audio_transcription.schema.json
+contracts/schemas/avatar_frame.schema.json
 contracts/schemas/avatar_presentation_profile.schema.json
 contracts/schemas/avatar_view_state.schema.json
 contracts/schemas/canonical_event.schema.json
@@ -90,6 +91,7 @@ contracts/schemas/world_model_prediction.schema.json
 cpp/app/.gitkeep
 cpp/app/desktop_interface_spike.cpp
 cpp/app/main.cpp
+cpp/app/procedural_avatar_probe.cpp
 cpp/app/promotion_fixture_runner.cpp
 cpp/benchmarks/.gitkeep
 cpp/core/.gitkeep
@@ -311,6 +313,7 @@ python/prototypes/.gitkeep
 python/README.md
 python/reference/.gitkeep
 python/tests/.gitkeep
+python/tests/test_avatar_frame_schema.py
 python/tests/test_avatar_presentation_profile.py
 python/tests/test_capabilities.py
 python/tests/test_capability_adaptation.py
@@ -500,6 +503,7 @@ validation/holdout/world_model_prediction_v1_holdout.jsonl
 validation/longitudinal/.gitkeep
 validation/README.md
 validation/reports/.gitkeep
+validation/reports/avatar_frame_probe.json
 validation/reports/desktop_interface_spike_windows.json
 validation/reports/episode_segmentation_v1.json
 validation/reports/episode_segmentation_v1_divergences.json

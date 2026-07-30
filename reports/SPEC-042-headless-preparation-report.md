@@ -19,6 +19,8 @@ Status: partial preparation only; SPEC-042 remains future.
 - Added the versioned `AvatarPresentationProfile` sidecar contract.
 - Added a dependency-free native CPU renderer for particles, filament, smoke
   and metaball profiles.
+- Added the `avatar_frame.schema.json` output contract and a CLI probe that
+  reports frame metadata plus a local framebuffer digest.
 - Added bounded profile validation, deterministic frame output, consent,
   global pause, health, quota, feedback controls and local feedback history.
 - Added an optional capability descriptor with absence, failure, removal,
@@ -41,9 +43,17 @@ cover this preparation increment. The full SPEC gate is intentionally pending.
 ## Verification executed
 
 - C++ build with the explicit MSVC environment: passed.
-- CTest: 23/23 passed, including `procedural_avatar`.
-- Python suite: 205/205 passed.
+- CTest: 24/24 passed, including `procedural_avatar` and
+  `procedural_avatar_probe`.
+- Python suite: 207/207 passed.
 - Targeted Ruff: passed.
 - Contract, promotion, maturity and configuration validators: passed.
 - Documentation validation and repository-tree freshness: passed.
 - `git diff --check`: passed.
+
+The CLI probe renders a 64x64 frame with `model_required: false`, zero focus,
+zero input capture and zero work blocking. Its output is validated by the
+Python shared-schema test; it remains an automated headless probe, not manual
+Windows shell evidence. The current local probe digest is
+`79ae8824f21a7a7402ec543cc512a573d43e4bef83007a8076948a6d28eb506a`, with
+1475 nonzero pixels out of 4096.

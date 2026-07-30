@@ -546,10 +546,18 @@ cmake --build build/dev --target procedural_avatar_test
 ctest --test-dir build/dev -R procedural_avatar --output-on-failure
 $env:PYTHONPATH = "python"
 python -m unittest python.tests.test_avatar_presentation_profile -v
+python -m unittest python.tests.test_avatar_frame_schema -v
 ```
 
 Do not enable a product host or add Qt until ADR-0032 has human review and the
 manual Windows matrix is captured.
+
+The headless probe can emit a local metadata report without opening a window:
+
+```powershell
+cmake --build build/dev --target procedural_avatar_probe
+build/dev/procedural_avatar_probe.exe validation/reports/avatar_frame_probe.json
+```
 
 The SPEC-033 native episode-segmentation promotion is validated with the local
 fixture runner:

@@ -26,6 +26,10 @@ without a model, downloaded asset, focus, input capture or action port. This is
 only the replaceable rendering core; a desktop host remains gated by
 ADR-0032.
 
+The `avatar_frame.schema.json` contract describes only render metadata and the
+local framebuffer digest. It is not a sensor record and carries no pixels to a
+remote service.
+
 ## SPEC-041 desktop boundary
 
 The desktop spike is an optional development target. It does not change the

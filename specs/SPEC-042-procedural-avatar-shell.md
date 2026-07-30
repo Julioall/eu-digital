@@ -54,3 +54,6 @@ host desktop. Essa camada expõe consentimento, pausa global, quota, health,
 feedback e histórico local, mas não abre janela nem declara a SPEC concluída.
 O shell Qt/QML e os critérios de acessibilidade continuam condicionados à
 revisão humana da ADR-0032 e à matriz manual Windows.
+
+O probe `procedural_avatar_probe` demonstra a saída de framebuffer local e
+valida `avatar_frame.schema.json`; ele não é um shell de produto.
