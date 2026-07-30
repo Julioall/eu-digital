@@ -199,13 +199,17 @@
     {
       "component_id": "inference.local_model_gateway",
       "spec_id": "SPEC-013",
-      "reference_status": "python",
-      "native_status": "none",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
       "product_status": "unavailable",
-      "promotion_id": null,
+      "promotion_id": "inference.local_model_gateway.v1",
       "evidence_refs": [
         "specs/SPEC-013-local-model-gateway.md",
-        "python/eu_digital_lab/local_model_gateway.py"
+        "specs/SPEC-040-local-model-dialogue.md",
+        "python/eu_digital_lab/local_model_gateway.py",
+        "cpp/core/local_model_gateway.hpp",
+        "promotions/inference.local_model_gateway.v1.json",
+        "validation/reports/local_model_dialogue_v1.json"
       ]
     },
     {

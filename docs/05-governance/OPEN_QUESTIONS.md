@@ -203,3 +203,15 @@ longitudinal:
    quantificar drift sem alegar continuidade fenomenal;
 5. o relatório é reconstruível por replay local; validade ecológica e promoção
    C++ permanecem fora desta SPEC.
+
+## Explicit boundary recorded by SPEC-040
+
+SPEC-040 implements and promotes the removable local gateway boundary with a
+fixture backend. ADR-0015 prohibits choosing an inference runtime or concrete
+model implicitly inside that port. The fixture therefore uses
+`detached_manifest_digest_v1` to verify integrity, size, hash, compatibility
+and separation of artifacts; this is not asymmetric release authentication.
+A future ADR/SPEC must decide the production GGUF, CPU runtime, final license,
+release key and signature mechanism before a production payload is enabled.
+The component remains unavailable in the product until that decision and human
+review.

@@ -3,6 +3,7 @@
 #include "core/functional_self_model.hpp"
 #include "core/global_workspace.hpp"
 #include "core/metacognition_curiosity.hpp"
+#include "core/local_model_gateway.hpp"
 #include "core/pattern_learner.hpp"
 #include "core/promotion_registry.hpp"
 #include "core/runtime_host.hpp"
@@ -17,6 +18,7 @@
 #include <iostream>
 #include <iterator>
 #include <optional>
+#include <memory>
 #include <sstream>
 #include <string>
 
@@ -1283,6 +1285,174 @@ int run_episode_segmentation() {
     return std::cout.good() ? 0 : 1;
 }
 
+class FixtureLocalModelBackend final : public eu_digital::LocalModelBackend {
+public:
+    FixtureLocalModelBackend(std::string id, eu_digital::LocalModelRawOutput output)
+        : id_(std::move(id)), output_(std::move(output)) {}
+
+    const std::string& backend_id() const override { return id_; }
+    void load(const eu_digital::LocalModelArtifact&) override {}
+    eu_digital::LocalModelRawOutput invoke(const eu_digital::LocalModelRequest&) override { return output_; }
+    void cancel(const std::string&) override {}
+    void unload(const std::string&) override {}
+
+private:
+    std::string id_;
+    eu_digital::LocalModelRawOutput output_;
+};
+
+std::map<std::string, std::string> parse_local_model_string_map(const JsonValue& value, const std::string& path) {
+    const auto& object = runtime_detail::object(value, path);
+    std::map<std::string, std::string> result;
+    for (const auto& [key, nested] : object) result.emplace(key, runtime_detail::string(nested, path + "." + key));
+    return result;
+}
+
+eu_digital::LocalModelArtifact parse_local_model_artifact(const JsonValue::Object& object, const std::string& path) {
+    eu_digital::LocalModelArtifact artifact;
+    artifact.model_id = required_string(object, "model_id", path);
+    artifact.format = optional_string(object, "format", path).value_or("GGUF");
+    artifact.quantization = required_string(object, "quantization", path);
+    artifact.size_bytes = runtime_detail::unsigned_number(runtime_detail::required(object, "size_bytes", path), path + ".size_bytes");
+    artifact.sha256 = required_string(object, "sha256", path);
+    artifact.language = required_string(object, "language", path);
+    artifact.license_id = required_string(object, "license_id", path);
+    artifact.license_compatible = runtime_detail::boolean(runtime_detail::required(object, "license_compatible", path), path + ".license_compatible");
+    artifact.backend_compatibility = required_string(object, "backend_compatibility", path);
+    artifact.signature_algorithm = optional_string(object, "signature_algorithm", path).value_or("detached_manifest_digest_v1");
+    artifact.signature = required_string(object, "signature", path);
+    artifact.signing_key_id = required_string(object, "signing_key_id", path);
+    artifact.runtime_artifact_id = required_string(object, "runtime_artifact_id", path);
+    artifact.payload_artifact_id = required_string(object, "payload_artifact_id", path);
+    if (const auto found = object.find("payload_separate"); found != object.end()) artifact.payload_separate = runtime_detail::boolean(found->second, path + ".payload_separate");
+    artifact.validate();
+    if (const auto* observed = optional_object(object, "observed_payload", path)) {
+        const auto observed_size = runtime_detail::unsigned_number(runtime_detail::required(*observed, "size_bytes", path + ".observed_payload"), path + ".observed_payload.size_bytes");
+        const auto observed_sha = required_string(*observed, "sha256", path + ".observed_payload");
+        artifact.verify_payload(observed_size, observed_sha);
+    }
+    return artifact;
+}
+
+eu_digital::LocalModelRequest parse_local_model_request(const JsonValue::Object& object,
+                                                         const std::string& path,
+                                                         const std::string& default_backend,
+                                                         const std::string& model_id) {
+    const auto& template_object = runtime_detail::object(runtime_detail::required(object, "template", path), path + ".template");
+    eu_digital::ModelPromptTemplate prompt_template;
+    prompt_template.template_id = required_string(template_object, "template_id", path + ".template");
+    prompt_template.version = required_string(template_object, "version", path + ".template");
+    prompt_template.body = required_string(template_object, "body", path + ".template");
+    prompt_template.variables = string_array(runtime_detail::required(template_object, "variables", path + ".template"), path + ".template.variables");
+    const auto values = parse_local_model_string_map(runtime_detail::required(object, "values", path), path + ".values");
+    eu_digital::LocalModelRequest request;
+    request.request_id = required_string(object, "request_id", path);
+    request.backend_id = optional_string(object, "backend_id", path).value_or(default_backend);
+    request.model_id = optional_string(object, "model_id", path).value_or(model_id);
+    if (const auto found = object.find("priority"); found != object.end()) request.priority = static_cast<int>(runtime_detail::unsigned_number(found->second, path + ".priority"));
+    if (const auto found = object.find("timeout_seconds"); found != object.end()) request.timeout_seconds = number_value(found->second, path + ".timeout_seconds");
+    prompt_template.validate();
+    request.template_value = std::move(prompt_template);
+    request.rendered_prompt = request.template_value.render(values);
+    request.validate();
+    return request;
+}
+
+std::string local_model_error_json(const std::string& code, const std::string& message) {
+    return "{\"code\":" + json_string(code) + ",\"message\":" + json_string(message) + "}";
+}
+
+int run_local_model_dialogue() {
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
+        const auto root = runtime_detail::JsonParser(line).parse();
+        const auto& object = runtime_detail::object(root, "fixture");
+        const auto case_id = required_string(object, "case_id", "fixture");
+        eu_digital::LocalModelAvailability availability;
+        std::string artifact_json = "null";
+        std::vector<std::string> errors;
+        std::vector<std::string> responses;
+        std::string snapshot_json = "null";
+        std::unique_ptr<FixtureLocalModelBackend> backend;
+        std::unique_ptr<eu_digital::LocalModelGateway> gateway;
+        std::string backend_id = "fixture";
+        eu_digital::LocalModelSchedulingPolicy policy = eu_digital::LocalModelSchedulingPolicy::priority_single_worker_v1;
+        bool unload_after_request = true;
+        try {
+            const auto* config = optional_object(object, "config", "fixture");
+            if (config) {
+                backend_id = optional_string(*config, "backend_id", "fixture.config").value_or("fixture");
+                const auto policy_id = optional_string(*config, "scheduling_policy", "fixture.config").value_or(eu_digital::LOCAL_MODEL_PRIORITY_SCHEDULER_ID);
+                if (policy_id == eu_digital::LOCAL_MODEL_BASELINE_SCHEDULER_ID) policy = eu_digital::LocalModelSchedulingPolicy::fifo_single_worker_v0;
+                else if (policy_id != eu_digital::LOCAL_MODEL_PRIORITY_SCHEDULER_ID) throw eu_digital::LocalModelGatewayError("unsupported scheduling policy");
+                if (const auto found = config->find("unload_after_request"); found != config->end()) unload_after_request = runtime_detail::boolean(found->second, "fixture.config.unload_after_request");
+            }
+            const auto* artifact_object = optional_object(object, "artifact", "fixture");
+            if (artifact_object) {
+                const auto artifact = parse_local_model_artifact(*artifact_object, "fixture.artifact");
+                artifact_json = artifact.to_json();
+                const auto* backend_object = optional_object(object, "backend", "fixture");
+                eu_digital::LocalModelRawOutput output{"summary", {{"text", "fixture response"}}};
+                if (backend_object) {
+                    output.kind = optional_string(*backend_object, "output_kind", "fixture.backend").value_or("summary");
+                    if (const auto found = backend_object->find("output_fields"); found != backend_object->end()) output.fields = parse_local_model_string_map(found->second, "fixture.backend.output_fields");
+                }
+                backend = std::make_unique<FixtureLocalModelBackend>(backend_id, std::move(output));
+                gateway = std::make_unique<eu_digital::LocalModelGateway>(
+                    std::map<std::string, eu_digital::LocalModelBackend*>{{backend_id, backend.get()}},
+                    eu_digital::LocalModelGatewayConfig{backend_id, policy, unload_after_request}, artifact);
+                availability.model_available = true;
+                availability.dialogue_enabled = true;
+                availability.reason_code = "model_available";
+            }
+        } catch (const std::exception& error) {
+            availability.reason_code = "artifact_invalid";
+            errors.push_back(local_model_error_json("artifact_invalid", error.what()));
+        }
+
+        if (const auto found = object.find("operations"); found != object.end()) {
+            const auto& operations = runtime_detail::array(found->second, "fixture.operations");
+            for (std::size_t index = 0; index < operations.size(); ++index) {
+                const auto operation_path = "fixture.operations[" + std::to_string(index) + "]";
+                const auto& operation = runtime_detail::object(operations[index], operation_path);
+                const auto type = required_string(operation, "type", operation_path);
+                if (type == "snapshot") {
+                    if (gateway) snapshot_json = gateway->snapshot_json();
+                    continue;
+                }
+                if (type != "request") {
+                    errors.push_back(local_model_error_json("unsupported_operation", type));
+                    continue;
+                }
+                if (!gateway) {
+                    errors.push_back(local_model_error_json("dialogue_unavailable", "model is unavailable; dialogue is disabled"));
+                    continue;
+                }
+                try {
+                    const auto& request_object = runtime_detail::object(runtime_detail::required(operation, "request", operation_path), operation_path + ".request");
+                    auto request = parse_local_model_request(request_object, operation_path + ".request", backend_id, gateway->artifact()->model_id);
+                    responses.push_back(gateway->invoke(std::move(request)).to_json());
+                } catch (const std::exception& error) {
+                    errors.push_back(local_model_error_json("request_failed", error.what()));
+                }
+            }
+        }
+        if (gateway && snapshot_json == "null") snapshot_json = gateway->snapshot_json();
+        std::ostringstream output;
+        output << "{\"artifact\":" << artifact_json
+               << ",\"availability\":" << availability.to_json()
+               << ",\"case_id\":" << json_string(case_id)
+               << ",\"errors\":[";
+        for (std::size_t index = 0; index < errors.size(); ++index) { if (index) output << ','; output << errors[index]; }
+        output << "],\"responses\":[";
+        for (std::size_t index = 0; index < responses.size(); ++index) { if (index) output << ','; output << responses[index]; }
+        output << "],\"snapshot\":" << snapshot_json << "}\n";
+        std::cout << output.str();
+    }
+    return std::cout.good() ? 0 : 1;
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -1294,6 +1464,7 @@ int main(int argc, char** argv) {
         if (argc > 1 && std::string(argv[1]) == "--global-workspace") return run_global_workspace();
         if (argc > 1 && std::string(argv[1]) == "--functional-self-model") return run_functional_self_model();
         if (argc > 1 && std::string(argv[1]) == "--metacognition-curiosity") return run_metacognition_curiosity();
+        if (argc > 1 && std::string(argv[1]) == "--local-model-dialogue") return run_local_model_dialogue();
         const std::string fixture_bytes{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
         std::cout << eu_digital::PromotionFixtureRunner::echo(fixture_bytes);
         return std::cout.good() ? 0 : 1;

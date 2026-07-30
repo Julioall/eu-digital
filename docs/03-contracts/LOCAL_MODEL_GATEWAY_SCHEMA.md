@@ -1,15 +1,40 @@
-# Contratos: Gateway de Modelo Local
+# Local Model Gateway Contract
 
-Os schemas executáveis da SPEC-013 são locais e não identificam um runtime ou
-modelo concreto:
+The executable schemas of SPEC-013 are local and do not identify a concrete
+runtime or model:
 
-- `model_prompt_template.schema.json`: template imutável por identificador e
-  versão;
-- `local_model_request.schema.json`: requisição enfileirada, backend/modelo
-  selecionados localmente, prioridade, timeout e prompt renderizado;
-- `local_model_response.schema.json`: resposta concluída com formato
-  `output.kind` e `output.fields` validado antes de devolução.
+- `model_prompt_template.schema.json`: immutable template by ID and version;
+- `local_model_request.schema.json`: queued request with local backend/model,
+  priority, timeout and rendered prompt;
+- `local_model_response.schema.json`: completed response with `output.kind`
+  and `output.fields` validated before return.
 
-O conteúdo do prompt permanece no processo local. O contrato não autoriza
-envio de dados à rede, ações, diálogo autônomo ou uso de uma API. Saída que não
-respeita o formato estruturado é rejeitada e não convertida em texto livre.
+Prompt content remains in the local process. This contract does not authorize
+network delivery, actions, autonomous dialogue or an API. Output that does not
+respect the structured format is rejected and is not converted to free text.
+
+## SPEC-040 native boundary
+
+The C++ implementation is an optional, backend-agnostic port. It owns one
+heavy worker, stable priority/FIFO selection, timeout and cancellation
+forwarding, unload-after-request, structured response validation and an
+availability record that keeps timeline, privacy and diagnostics independent
+from model availability.
+
+`LocalModelBackend` is intentionally injectable. The repository does not
+download, bundle or select a concrete model runtime. A fixture artifact is
+validated as GGUF, Portuguese-compatible, license-compatible, at most 4 GiB,
+hash-matching and compatible with a declared backend. Runtime and payload IDs
+must differ and are bound by the local detached-manifest-digest envelope.
+This envelope is an integrity/test contract, not a claim of asymmetric release
+authentication; release signing requires a future decision recorded by ADR.
+
+The native promotion command is:
+
+```text
+promotion_fixture_runner --local-model-dialogue
+```
+
+It accepts JSON Lines fixtures only and emits no prompt contents in gateway
+audit or metrics state. A missing or invalid artifact disables dialogue while
+leaving local operational capabilities available.

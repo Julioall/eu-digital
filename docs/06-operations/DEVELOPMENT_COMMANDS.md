@@ -504,3 +504,18 @@ The validator compares assessments, structured questions, responses, calibration
 and suppression against Python, then evaluates the fixed-gain/raw-confidence
 baseline and the no-budget/no-cooldown/no-redundancy ablation. Questions remain
 local objects; this candidate does not send messages or execute actions.
+
+The SPEC-040 local-model gateway candidate is exercised with:
+
+```powershell
+cmake --build build/dev-vcpkg --target local_model_gateway_test promotion_fixture_runner
+ctest --test-dir build/dev-vcpkg -R "local_model_gateway" --output-on-failure
+$env:PYTHONPATH = "python"
+python tools/validate_local_model_dialogue_promotion.py
+```
+
+The validator uses only an injected deterministic fixture backend. It checks
+the GGUF/hash/license/Portuguese artifact policy, structured response schema,
+single-heavy-model bound, model-absent degradation, unload ablation, replay and
+disjoint holdout. No model is downloaded or selected and no network endpoint is
+contacted.

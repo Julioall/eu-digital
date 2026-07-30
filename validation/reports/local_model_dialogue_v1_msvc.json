@@ -1,0 +1,144 @@
+{
+  "ablation": {
+    "baseline": "model absent keeps timeline/privacy/diagnostics available",
+    "fifo_scheduler": "fifo_single_worker_v0",
+    "interpretation": "operational resource-bound ablation only",
+    "unload_between_requests": true
+  },
+  "artifact_policy": {
+    "format": "GGUF",
+    "language": "Portuguese-compatible",
+    "max_declared_ram_gib": 7.0,
+    "max_model_size_gib": 4.0,
+    "signature": "detached_manifest_digest_v1 envelope; asymmetric release signing remains a future release concern"
+  },
+  "commits": {
+    "cpp": "working-tree",
+    "python": "frozen-2026-07-30"
+  },
+  "component_id": "inference.local_model_gateway",
+  "dataset": {
+    "case_count": 4,
+    "fixture_set": "validation/equivalence/local_model_dialogue_v1.jsonl",
+    "hash": "67d341adb4569e80b248458a0a0de50e13155f68f22155d7e043f84aa879ffaa"
+  },
+  "equivalence": {
+    "divergences": [],
+    "input_sha256": {
+      "cpp": "67d341adb4569e80b248458a0a0de50e13155f68f22155d7e043f84aa879ffaa",
+      "python": "67d341adb4569e80b248458a0a0de50e13155f68f22155d7e043f84aa879ffaa"
+    },
+    "output_sha256": {
+      "cpp": "05917aeaa96a9105588031638d4ddf57871e6ce0c7bd27f96706b09897cbb899",
+      "python": "05917aeaa96a9105588031638d4ddf57871e6ce0c7bd27f96706b09897cbb899"
+    },
+    "passed": true
+  },
+  "hardware": {
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 165 Stepping 3, GenuineIntel",
+    "release": "11",
+    "system": "Windows"
+  },
+  "holdout": {
+    "case_count": 3,
+    "divergences": [],
+    "equivalence_passed": true,
+    "fixture_set": "validation/holdout/local_model_dialogue_v1.jsonl",
+    "sha256": "19983ad8047fabe4b1756405c0f1601d3a1c56c5c1c8461d921c62a92b49d38d"
+  },
+  "hypothesis": {
+    "id": "H6-LOCAL-MODEL-GATEWAY",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "invariants": {
+    "failures": [],
+    "passed": true
+  },
+  "manifest": {
+    "candidate": {
+      "build_profile": "Debug",
+      "commit": "working-tree",
+      "compiler": "C++23 native",
+      "language": "cpp",
+      "target": "promotion_fixture_runner"
+    },
+    "component_id": "inference.local_model_gateway",
+    "component_version": "1.0.0",
+    "contract": {
+      "clock_semantics": "monotonic operational latency; normalized for semantic equivalence",
+      "error_schema": "docs/03-contracts/LOCAL_MODEL_GATEWAY_SCHEMA.md",
+      "input_schema": "validation/equivalence/local_model_dialogue_v1.jsonl",
+      "output_schema": "contracts/schemas/local_model_response.schema.json",
+      "random_seed_policy": "no randomness",
+      "state_schema": "docs/03-contracts/LOCAL_MODEL_GATEWAY_SCHEMA.md"
+    },
+    "dataset": {
+      "case_count": 4,
+      "fixture_set": "validation/equivalence/local_model_dialogue_v1.jsonl",
+      "hash": "67d341adb4569e80b248458a0a0de50e13155f68f22155d7e043f84aa879ffaa"
+    },
+    "equivalence": {
+      "absolute_tolerance": 0.0,
+      "acceptance_metrics": {
+        "invariant_pass_rate": 1.0,
+        "semantic_match": 1.0
+      },
+      "invariants": [
+        "single_heavy_model",
+        "structured_response",
+        "model_absence_preserves_local_services",
+        "artifact_integrity"
+      ],
+      "relative_tolerance": 0.0,
+      "type": "exact"
+    },
+    "hypothesis": {
+      "id": "H6-LOCAL-MODEL-GATEWAY",
+      "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+    },
+    "performance": {
+      "baseline_hardware": "captured by this validator",
+      "maximum_latency_ms": 500.0,
+      "maximum_memory_mb": 7168.0,
+      "minimum_throughput": 1.0
+    },
+    "promotion_id": "inference.local_model_gateway.v1",
+    "reference": {
+      "commit": "frozen-2026-07-30",
+      "entrypoint": "eu_digital_lab.local_model_gateway.LocalModelGateway",
+      "environment_lock_hash": "local-model-dialogue-reference",
+      "language": "python",
+      "package": "eu_digital_lab"
+    },
+    "status": "reference_frozen"
+  },
+  "operational_constants": {
+    "ablation": "select fifo_single_worker_v0 through the same gateway interface while retaining the single-worker resource bound",
+    "falsification": "two heavy inferences or loaded models coexist, a timeout retains a resource, or invalid structured output is returned to a caller",
+    "hypothesis": "a single-worker local gateway with stable priority ordering preserves the one-heavy-model resource bound while reducing priority wait versus FIFO"
+  },
+  "operational_metrics": {
+    "latency_max_ms": 17.97640000040701,
+    "latency_ms": 14.995634999922913,
+    "latency_p50_ms": 14.831749999757449,
+    "latency_p95_ms": 17.97640000040701,
+    "memory_mb": 0.0,
+    "throughput": 66686.07231405277
+  },
+  "performance": {
+    "failures": [],
+    "metrics": {
+      "latency_ms": 17.97640000040701,
+      "memory_mb": 0.0,
+      "throughput": 66686.07231405277
+    },
+    "passed": true
+  },
+  "promotion_id": "inference.local_model_gateway.v1",
+  "replay": {
+    "normalization": "response latency_ms set to 0 for semantic comparison",
+    "passed": true
+  },
+  "scientific_evidence_boundary": "equivalence, holdout, and operational limits are computational verification; they are not evidence of cognition or model quality"
+}

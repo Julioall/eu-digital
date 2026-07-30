@@ -46,6 +46,13 @@ class ComponentMaturityTests(unittest.TestCase):
         self.assertEqual(
             metacognition["promotion_id"], "cognition.metacognition_curiosity.v1"
         )
+        local_model = registry.component("inference.local_model_gateway")
+        self.assertEqual(local_model["reference_status"], "frozen")
+        self.assertEqual(local_model["native_status"], "equivalent")
+        self.assertEqual(local_model["product_status"], "unavailable")
+        self.assertEqual(
+            local_model["promotion_id"], "inference.local_model_gateway.v1"
+        )
 
     def test_invalid_promotion_state_is_rejected(self) -> None:
         invalid = json.loads(

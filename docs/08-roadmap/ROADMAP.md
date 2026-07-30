@@ -111,3 +111,10 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
 
 O status documental das SPECs não substitui `reference_status`,
 `native_status` e `product_status` do registro de maturidade.
+
+- **SPEC-040 concluida nos gates automatizados:** gateway local opcional com
+  porta C++ removivel, fila de um modelo pesado, timeout/cancelamento/descarga,
+  schema estruturado, politica de artefato GGUF e degradacao explicita sem
+  modelo. O componente permanece `product_status: unavailable`; modelo,
+  runtime de inferencia e assinatura assimetrica de release exigem decisao
+  posterior conforme ADR-0015.
