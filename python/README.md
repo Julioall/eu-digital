@@ -70,6 +70,10 @@ prediction error to the workspace surprise factor, and emits auditable drift
 signals that reduce confidence and start relearning. It is laboratory-only;
 it does not plan, execute actions or invoke an LLM.
 
+The SPEC-036 promotion harness uses this reference through
+`tools/validate_world_model_promotion.py`; the native candidate remains
+unavailable until a reviewed promotion enters the registry.
+
 The SPEC-022 longitudinal-evaluation reference is in
 `eu_digital_lab/longitudinal_evaluation.py`. It freezes a protocol and holdout
 hash, records 7/30/90-day snapshots, separates cognitive and operational

@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import uuid
 from collections import Counter, defaultdict, deque
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from datetime import datetime
 from enum import Enum
@@ -58,6 +58,23 @@ class PredictionConfig:
             raise WorldModelError("drift_threshold must be finite and non-negative")
         if self.top_k < 1:
             raise WorldModelError("top_k must be positive")
+
+
+@dataclass(frozen=True)
+class PromotedPatternInput:
+    """Symbolic vocabulary received from the separately promoted pattern learner."""
+
+    pattern_id: str
+    status: str = "promoted"
+    confidence: float = 1.0
+
+    def __post_init__(self) -> None:
+        if not self.pattern_id.strip():
+            raise WorldModelError("pattern_id cannot be empty")
+        if self.status != "promoted":
+            raise WorldModelError("world model accepts only promoted patterns")
+        if not math.isfinite(self.confidence) or not 0.0 <= self.confidence <= 1.0:
+            raise WorldModelError("pattern confidence must be between zero and one")
 
 
 @dataclass(frozen=True)
@@ -162,6 +179,7 @@ class WorldModel:
         stream_id: str,
         policy: ModelPolicy | str = ModelPolicy.incremental,
         config: PredictionConfig | None = None,
+        promoted_patterns: Sequence[Mapping[str, Any] | PromotedPatternInput] = (),
     ) -> None:
         if not stream_id.strip():
             raise WorldModelError("stream_id cannot be empty")
@@ -171,6 +189,7 @@ class WorldModel:
             raise WorldModelError(f"unsupported policy: {policy}") from error
         self.stream_id = stream_id
         self.config = config or PredictionConfig()
+        self._promoted_patterns = self._normalize_promoted_patterns(promoted_patterns)
         self._global_counts: Counter[str] = Counter()
         self._transition_counts: defaultdict[tuple[str, ...], Counter[str]] = defaultdict(Counter)
         self._states: set[str] = set()
@@ -288,16 +307,38 @@ class WorldModel:
             "confidence": self._confidence,
             "relearning_started": self._relearning_started,
             "relearning_observations": self._relearning_observations,
+            "promoted_pattern_count": len(self._promoted_patterns),
             "ablation": ABLATION,
             "falsification": FALSIFICATION,
         }
 
     def _known_states(self, candidate_states: Sequence[str]) -> list[str]:
-        states = set(self._states)
+        states = set(self._states) | set(self._promoted_patterns)
         for state in candidate_states:
             _required_state(state, "candidate state")
             states.add(state)
         return sorted(states)
+
+    @staticmethod
+    def _normalize_promoted_patterns(
+        patterns: Sequence[Mapping[str, Any] | PromotedPatternInput],
+    ) -> dict[str, PromotedPatternInput]:
+        normalized: dict[str, PromotedPatternInput] = {}
+        for value in patterns:
+            if isinstance(value, PromotedPatternInput):
+                pattern = value
+            elif isinstance(value, Mapping):
+                pattern = PromotedPatternInput(
+                    pattern_id=str(value.get("pattern_id", "")),
+                    status=str(value.get("status", "")),
+                    confidence=float(value.get("confidence", 0.0)),
+                )
+            else:
+                raise WorldModelError("promoted_patterns must contain mappings")
+            if pattern.pattern_id in normalized:
+                raise WorldModelError(f"duplicate promoted pattern: {pattern.pattern_id}")
+            normalized[pattern.pattern_id] = pattern
+        return normalized
 
     def _distribution(self, context: tuple[str, ...], states: list[str]) -> dict[str, float]:
         counts: Counter[str] | None = None

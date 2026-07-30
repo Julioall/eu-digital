@@ -1,0 +1,69 @@
+{
+  "candidate": {
+    "build_profile": "Debug",
+    "compiler": "C++23 native",
+    "commit": "working-tree",
+    "language": "cpp",
+    "target": "promotion_fixture_runner"
+  },
+  "component_id": "cognition.world_model",
+  "component_version": "1.0.0",
+  "contract": {
+    "clock_semantics": "ordered timezone-aware observation timestamps",
+    "error_schema": "contracts/schemas/prediction_error.schema.json",
+    "input_schema": "docs/03-contracts/WORLD_MODEL_PREDICTION_SCHEMA.md",
+    "output_schema": "contracts/schemas/world_model_prediction.schema.json",
+    "random_seed_policy": "no randomness",
+    "state_schema": "contracts/schemas/prediction_drift.schema.json"
+  },
+  "dataset": {
+    "case_count": 5,
+    "fixture_set": "validation/equivalence/world_model_prediction_v1.jsonl",
+    "hash": "7f5142932b2df972bae0fbc3c1fc14c9d9895f6cf55739066627889eb8071c5a"
+  },
+  "equivalence": {
+    "absolute_tolerance": 1e-12,
+    "acceptance_metrics": {
+      "holdout_numeric_semantic_match": 1.0,
+      "invariant_pass_rate": 1.0,
+      "semantic_match": 1.0
+    },
+    "invariants": [
+      "distribution_is_normalized",
+      "prediction_is_uncertain_until_observed",
+      "absence_is_not_negative_observation",
+      "prediction_error_provenance_is_explicit",
+      "drift_preserves_observations",
+      "world_model_does_not_create_facts_or_actions"
+    ],
+    "relative_tolerance": 1e-12,
+    "type": "numeric"
+  },
+  "hypothesis": {
+    "id": "H9-WORLD-MODEL",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "performance": {
+    "baseline_hardware": "captured by validation/reports/world_model_prediction_v1.json",
+    "maximum_latency_ms": 100.0,
+    "maximum_memory_mb": 512.0,
+    "minimum_throughput": 10.0
+  },
+  "promotion_id": "cognition.world_model.v1",
+  "reference": {
+    "commit": "frozen-2026-07-30",
+    "entrypoint": "eu_digital_lab.world_model.WorldModel",
+    "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+    "language": "python",
+    "package": "eu_digital_lab"
+  },
+  "status": "reference_frozen",
+  "validation": {
+    "ablation": "clear context while retaining the incremental predictor",
+    "baseline_id": "frequency_baseline_v0",
+    "ground_truth": "fixture ground_truth fields plus distribution, provenance and drift invariants",
+    "holdout_fixture_set": "validation/holdout/world_model_prediction_v1_holdout.jsonl",
+    "holdout_hash": "dfa5e0fa1e801c132768826687df5bea88805a38775e1878b37e4624ae2239fd",
+    "holdout_status": "locked-before-evaluation"
+  }
+}

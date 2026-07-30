@@ -235,13 +235,17 @@
     {
       "component_id": "cognition.world_model",
       "spec_id": "SPEC-021",
-      "reference_status": "python",
-      "native_status": "none",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
       "product_status": "unavailable",
-      "promotion_id": null,
+      "promotion_id": "cognition.world_model.v1",
       "evidence_refs": [
+        "specs/SPEC-036-world-model-prediction-native-promotion.md",
         "specs/SPEC-021-world-model-prediction-error.md",
-        "python/eu_digital_lab/world_model.py"
+        "python/eu_digital_lab/world_model.py",
+        "cpp/core/world_model.hpp",
+        "promotions/cognition.world_model.v1.json",
+        "validation/reports/world_model_prediction_v1.json"
       ]
     },
     {

@@ -3,6 +3,7 @@
 #include "core/pattern_learner.hpp"
 #include "core/promotion_registry.hpp"
 #include "core/runtime_host.hpp"
+#include "core/world_model.hpp"
 
 #include <cctype>
 #include <cmath>
@@ -164,6 +165,15 @@ std::string json_number(double value) {
 
 std::string json_optional_string(const std::optional<std::string>& value) {
     return value ? json_string(*value) : "null";
+}
+
+std::string json_optional_number(const std::optional<double>& value) {
+    return value ? json_number(*value) : "null";
+}
+
+std::string json_optional_boolean(const std::optional<bool>& value) {
+    if (!value) return "null";
+    return *value ? "true" : "false";
 }
 
 eu_digital::MemoryEpisode parse_memory_episode(const JsonValue& value, const std::string& path) {
@@ -370,6 +380,196 @@ int run_pattern_learning() {
     return std::cout.good() ? 0 : 1;
 }
 
+std::string serialize_world_distribution(const std::map<std::string, double>& distribution) {
+    std::ostringstream output;
+    output << '{';
+    std::size_t index = 0;
+    for (const auto& [state, probability] : distribution) {
+        if (index++) output << ',';
+        output << json_string(state) << ':' << json_number(probability);
+    }
+    output << '}';
+    return output.str();
+}
+
+std::string serialize_world_prediction(const eu_digital::WorldPrediction& prediction) {
+    std::ostringstream output;
+    output << "{\"confidence\":" << json_number(prediction.confidence)
+           << ",\"context\":" << json_array(prediction.context)
+           << ",\"created_by\":" << json_string(prediction.created_by)
+           << ",\"drift_id\":" << json_optional_string(prediction.drift_id)
+           << ",\"log_loss\":" << json_optional_number(prediction.log_loss)
+           << ",\"model_id\":" << json_string(prediction.model_id)
+           << ",\"observed_state\":" << json_optional_string(prediction.observed_state)
+           << ",\"predicted_at\":" << json_string(prediction.predicted_at)
+           << ",\"predicted_distribution\":" << serialize_world_distribution(prediction.predicted_distribution)
+           << ",\"prediction_id\":" << json_string(prediction.prediction_id)
+           << ",\"salience_contribution\":" << json_number(prediction.salience_contribution)
+           << ",\"schema_version\":" << json_string(prediction.schema_version)
+           << ",\"stream_id\":" << json_string(prediction.stream_id)
+           << ",\"top_k\":" << prediction.top_k
+           << ",\"top_k_hit\":" << json_optional_boolean(prediction.top_k_hit) << '}';
+    return output.str();
+}
+
+std::string serialize_world_error(const eu_digital::WorldPrediction& prediction, const std::string& observed_at) {
+    if (!prediction.observed_state || !prediction.log_loss || !prediction.top_k_hit) {
+        throw std::runtime_error("cannot serialize an unscored prediction error");
+    }
+    std::ostringstream output;
+    output << "{\"confidence\":" << json_number(prediction.confidence)
+           << ",\"drift_id\":" << json_optional_string(prediction.drift_id)
+           << ",\"log_loss\":" << json_number(*prediction.log_loss)
+           << ",\"model_id\":" << json_string(prediction.model_id)
+           << ",\"observed_at\":" << json_string(observed_at)
+           << ",\"observed_state\":" << json_string(*prediction.observed_state)
+           << ",\"prediction_id\":" << json_string(prediction.prediction_id)
+           << ",\"salience_contribution\":" << json_number(prediction.salience_contribution)
+           << ",\"schema_version\":" << json_string(prediction.schema_version)
+           << ",\"top_k_hit\":" << (*prediction.top_k_hit ? "true" : "false") << '}';
+    return output.str();
+}
+
+std::string serialize_world_drift(const eu_digital::WorldDriftSignal& drift) {
+    std::ostringstream output;
+    output << "{\"confidence_after\":" << json_number(drift.confidence_after)
+           << ",\"confidence_before\":" << json_number(drift.confidence_before)
+           << ",\"detected_at\":" << json_string(drift.detected_at)
+           << ",\"drift_id\":" << json_string(drift.drift_id)
+           << ",\"model_id\":" << json_string(drift.model_id)
+           << ",\"reason\":" << json_string(drift.reason)
+           << ",\"relearning_started\":" << (drift.relearning_started ? "true" : "false")
+           << ",\"rolling_log_loss\":" << json_number(drift.rolling_log_loss)
+           << ",\"schema_version\":" << json_string(drift.schema_version)
+           << ",\"stream_id\":" << json_string(drift.stream_id)
+           << ",\"threshold\":" << json_number(drift.threshold)
+           << ",\"trigger_prediction_id\":" << json_string(drift.trigger_prediction_id) << '}';
+    return output.str();
+}
+
+std::string serialize_world_metrics(const eu_digital::WorldModel& model) {
+    std::ostringstream output;
+    output << "{\"ablation\":\"replace incremental context with frequency_baseline_v0\",\"confidence\":"
+           << json_number(model.confidence())
+           << ",\"drift_count\":" << model.drifts().size()
+           << ",\"falsification\":\"prediction does not beat frequency on the frozen holdout\""
+           << ",\"mean_log_loss\":" << json_optional_number(model.mean_log_loss())
+           << ",\"model_id\":" << json_string(eu_digital::world_model_policy_id(model.policy()))
+           << ",\"prediction_count\":" << model.prediction_count()
+           << ",\"promoted_pattern_count\":" << model.promoted_pattern_count()
+           << ",\"relearning_observations\":" << model.relearning_observations()
+           << ",\"relearning_started\":" << (model.relearning_started() ? "true" : "false")
+           << ",\"scored_count\":" << model.scored_count()
+           << ",\"stream_id\":" << json_string(model.stream_id())
+           << ",\"top_k_accuracy\":" << json_optional_number(model.top_k_accuracy()) << '}';
+    return output.str();
+}
+
+int run_world_model() {
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
+        const auto root = runtime_detail::JsonParser(line).parse();
+        const auto& object = runtime_detail::object(root, "fixture");
+        eu_digital::WorldModelConfig config;
+        if (const auto* config_object = optional_object(object, "config", "fixture")) {
+            if (const auto found = config_object->find("max_order"); found != config_object->end()) {
+                config.max_order = static_cast<int>(runtime_detail::unsigned_number(found->second, "fixture.config.max_order"));
+            }
+            if (const auto found = config_object->find("smoothing"); found != config_object->end()) {
+                config.smoothing = number_value(found->second, "fixture.config.smoothing");
+            }
+            if (const auto found = config_object->find("drift_window"); found != config_object->end()) {
+                config.drift_window = static_cast<int>(runtime_detail::unsigned_number(found->second, "fixture.config.drift_window"));
+            }
+            if (const auto found = config_object->find("drift_threshold"); found != config_object->end()) {
+                config.drift_threshold = number_value(found->second, "fixture.config.drift_threshold");
+            }
+            if (const auto found = config_object->find("top_k"); found != config_object->end()) {
+                config.top_k = static_cast<int>(runtime_detail::unsigned_number(found->second, "fixture.config.top_k"));
+            }
+        }
+        const auto stream_id = required_string(object, "stream_id", "fixture");
+        const auto policy = eu_digital::world_model_policy_from_id(
+            optional_string(object, "policy", "fixture").value_or(eu_digital::PREDICTOR_POLICY_ID));
+        std::vector<eu_digital::PromotedPatternInput> promoted_patterns;
+        if (const auto found = object.find("patterns"); found != object.end()) {
+            const auto& pattern_values = runtime_detail::array(found->second, "fixture.patterns");
+            promoted_patterns.reserve(pattern_values.size());
+            for (std::size_t index = 0; index < pattern_values.size(); ++index) {
+                const auto path = "fixture.patterns[" + std::to_string(index) + "]";
+                const auto& pattern = runtime_detail::object(pattern_values[index], path);
+                eu_digital::PromotedPatternInput input;
+                input.pattern_id = required_string(pattern, "pattern_id", path);
+                input.status = required_string(pattern, "status", path);
+                if (const auto confidence = pattern.find("confidence"); confidence != pattern.end()) {
+                    input.confidence = number_value(confidence->second, path + ".confidence");
+                }
+                promoted_patterns.push_back(std::move(input));
+            }
+        }
+        eu_digital::WorldModel model(config, stream_id, policy, std::move(promoted_patterns));
+        std::vector<eu_digital::WorldPrediction> predictions;
+        std::vector<std::string> errors;
+        std::string last_prediction_id;
+        const auto& operations = runtime_detail::array(runtime_detail::required(object, "operations", "fixture"), "fixture.operations");
+        for (std::size_t index = 0; index < operations.size(); ++index) {
+            const auto path = "fixture.operations[" + std::to_string(index) + "]";
+            const auto& operation = runtime_detail::object(operations[index], path);
+            const auto type = required_string(operation, "type", path);
+            if (type == "observe") {
+                const auto& observation = runtime_detail::object(runtime_detail::required(operation, "observation", path), path + ".observation");
+                model.observe(
+                    required_string(observation, "state", path + ".observation"),
+                    required_string(observation, "event_ref", path + ".observation"),
+                    parse_timestamp(required_string(observation, "occurred_at", path + ".observation")));
+            } else if (type == "predict") {
+                std::vector<std::string> context;
+                if (const auto found = operation.find("context"); found != operation.end()) context = string_array(found->second, path + ".context");
+                std::vector<std::string> candidate_states;
+                if (const auto found = operation.find("candidate_states"); found != operation.end()) candidate_states = string_array(found->second, path + ".candidate_states");
+                const auto prediction = model.predict(
+                    context,
+                    required_string(operation, "predicted_at", path),
+                    candidate_states);
+                predictions.push_back(prediction);
+                last_prediction_id = prediction.prediction_id;
+            } else if (type == "score") {
+                const auto target = required_string(operation, "target", path);
+                const auto target_id = target == "last_prediction" ? last_prediction_id : target;
+                auto found = std::find_if(predictions.begin(), predictions.end(), [&](const auto& prediction) {
+                    return prediction.prediction_id == target_id;
+                });
+                if (found == predictions.end()) throw std::runtime_error("unknown prediction target: " + target_id);
+                const auto observed_at = required_string(operation, "observed_at", path);
+                *found = model.score(*found, required_string(operation, "observed_state", path), observed_at);
+                errors.push_back(serialize_world_error(*found, observed_at));
+            } else {
+                throw std::runtime_error("unsupported world model operation: " + type);
+            }
+        }
+        std::ostringstream output;
+        output << "{\"drifts\":[";
+        for (std::size_t index = 0; index < model.drifts().size(); ++index) {
+            if (index) output << ',';
+            output << serialize_world_drift(model.drifts()[index]);
+        }
+        output << "],\"errors\":[";
+        for (std::size_t index = 0; index < errors.size(); ++index) {
+            if (index) output << ',';
+            output << errors[index];
+        }
+        output << "],\"metrics\":" << serialize_world_metrics(model) << ",\"predictions\":[";
+        for (std::size_t index = 0; index < predictions.size(); ++index) {
+            if (index) output << ',';
+            output << serialize_world_prediction(predictions[index]);
+        }
+        output << "],\"schema_version\":\"1.0\"}\n";
+        std::cout << output.str();
+    }
+    return std::cout.good() ? 0 : 1;
+}
+
 int run_episodic_memory() {
     std::string line;
     while (std::getline(std::cin, line)) {
@@ -471,6 +671,7 @@ int main(int argc, char** argv) {
         if (argc > 1 && std::string(argv[1]) == "--episode-segmentation") return run_episode_segmentation();
         if (argc > 1 && std::string(argv[1]) == "--episodic-memory") return run_episodic_memory();
         if (argc > 1 && std::string(argv[1]) == "--pattern-learning") return run_pattern_learning();
+        if (argc > 1 && std::string(argv[1]) == "--world-model") return run_world_model();
         const std::string fixture_bytes{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
         std::cout << eu_digital::PromotionFixtureRunner::echo(fixture_bytes);
         return std::cout.good() ? 0 : 1;

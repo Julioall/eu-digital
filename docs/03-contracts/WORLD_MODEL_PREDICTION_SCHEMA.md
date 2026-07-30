@@ -24,3 +24,24 @@ decisão de seleção por si só.
 
 Drift não apaga observações. Ele limpa apenas contagens derivadas do modelo,
 reduz a confiança e marca que as observações seguintes iniciam reaprendizagem.
+
+## Promoção nativa SPEC-036
+
+O candidato C++ recebe os mesmos JSON-lines da referência Python pelo runner
+`promotion_fixture_runner --world-model`. Cada caso pode intercalar
+`observe`, `predict` e `score`; uma previsão sem resultado observado mantém
+`observed_state`, `log_loss` e `top_k_hit` nulos. O conjunto de desenvolvimento
+e o holdout são congelados em
+`validation/equivalence/world_model_prediction_v1.jsonl` e
+`validation/holdout/world_model_prediction_v1_holdout.jsonl`, com hashes no
+manifesto `promotions/cognition.world_model.v1.json`.
+
+O campo opcional `patterns` recebe referências de padrões com
+`pattern_id`, `status: promoted` e confiança validada. Esses IDs formam apenas
+um vocabulário simbólico de estados possíveis; a confiança não é convertida em
+fato, nome, intenção ou ação. Padrões candidatos, duplicados ou inválidos são
+rejeitados, e a ausência de padrões não é interpretada como evidência negativa.
+
+Equivalência computacional, calibração, baseline, ablação e benchmark são
+evidência operacional da promoção, não ground truth nem evidência cognitiva.
+O componente permanece indisponível no produto sem revisão humana registrada.

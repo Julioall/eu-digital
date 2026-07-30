@@ -1,0 +1,168 @@
+{
+  "ablation": {
+    "context": "cleared",
+    "error_count": 6.0,
+    "interpretation": "operational ablation only",
+    "mean_log_loss": 1.0357680164036986,
+    "policy": "incremental_markov_v1",
+    "top_k_accuracy": 0.8333333333333334
+  },
+  "baseline": {
+    "error_count": 6.0,
+    "interpretation": "operational baseline only",
+    "mean_log_loss": 1.0357680164036986,
+    "policy": "frequency_baseline_v0",
+    "top_k_accuracy": 0.8333333333333334
+  },
+  "calibration": {
+    "brier_score": 0.545888888888889,
+    "expected_calibration_error": 0.12333333333333335
+  },
+  "commits": {
+    "cpp": "working-tree",
+    "python": "frozen-2026-07-30"
+  },
+  "component_id": "cognition.world_model",
+  "dataset": {
+    "case_count": 5,
+    "fixture_set": "validation/equivalence/world_model_prediction_v1.jsonl",
+    "hash": "7f5142932b2df972bae0fbc3c1fc14c9d9895f6cf55739066627889eb8071c5a"
+  },
+  "equivalence": {
+    "divergences": [],
+    "input_sha256": {
+      "cpp": "7f5142932b2df972bae0fbc3c1fc14c9d9895f6cf55739066627889eb8071c5a",
+      "python": "7f5142932b2df972bae0fbc3c1fc14c9d9895f6cf55739066627889eb8071c5a"
+    },
+    "output_sha256": {
+      "cpp": "00dfefc41bba2de23cb131cd1a3dbf52294e686d4481cec0686ddb1372ebc698",
+      "python": "901b22ec3ee3e1c577ebcec9d052a0ea7b0436464003e5d58d7d3e4a069f25e0"
+    },
+    "passed": true
+  },
+  "hardware": {
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 165 Stepping 3, GenuineIntel",
+    "release": "11",
+    "system": "Windows"
+  },
+  "holdout": {
+    "case_count": 3,
+    "equivalence_passed": true,
+    "fixture_set": "validation/holdout/world_model_prediction_v1_holdout.jsonl",
+    "metrics": {
+      "error_count": 4.0,
+      "mean_log_loss": 0.5787519032481507,
+      "top_k_accuracy": 0.75
+    },
+    "sha256": "dfa5e0fa1e801c132768826687df5bea88805a38775e1878b37e4624ae2239fd"
+  },
+  "hypothesis": {
+    "id": "H9-WORLD-MODEL",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "invariants": {
+    "failures": {},
+    "passed": true
+  },
+  "manifest": {
+    "candidate": {
+      "build_profile": "Debug",
+      "commit": "working-tree",
+      "compiler": "C++23 native",
+      "language": "cpp",
+      "target": "promotion_fixture_runner"
+    },
+    "component_id": "cognition.world_model",
+    "component_version": "1.0.0",
+    "contract": {
+      "clock_semantics": "ordered timezone-aware observation timestamps",
+      "error_schema": "contracts/schemas/prediction_error.schema.json",
+      "input_schema": "docs/03-contracts/WORLD_MODEL_PREDICTION_SCHEMA.md",
+      "output_schema": "contracts/schemas/world_model_prediction.schema.json",
+      "random_seed_policy": "no randomness",
+      "state_schema": "contracts/schemas/prediction_drift.schema.json"
+    },
+    "dataset": {
+      "case_count": 5,
+      "fixture_set": "validation/equivalence/world_model_prediction_v1.jsonl",
+      "hash": "7f5142932b2df972bae0fbc3c1fc14c9d9895f6cf55739066627889eb8071c5a"
+    },
+    "equivalence": {
+      "absolute_tolerance": 1e-12,
+      "acceptance_metrics": {
+        "holdout_numeric_semantic_match": 1.0,
+        "invariant_pass_rate": 1.0,
+        "semantic_match": 1.0
+      },
+      "invariants": [
+        "distribution_is_normalized",
+        "prediction_is_uncertain_until_observed",
+        "absence_is_not_negative_observation",
+        "prediction_error_provenance_is_explicit",
+        "drift_preserves_observations",
+        "world_model_does_not_create_facts_or_actions"
+      ],
+      "relative_tolerance": 1e-12,
+      "type": "numeric"
+    },
+    "hypothesis": {
+      "id": "H9-WORLD-MODEL",
+      "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+    },
+    "performance": {
+      "baseline_hardware": "captured by validation/reports/world_model_prediction_v1.json",
+      "maximum_latency_ms": 100.0,
+      "maximum_memory_mb": 512.0,
+      "minimum_throughput": 10.0
+    },
+    "promotion_id": "cognition.world_model.v1",
+    "reference": {
+      "commit": "frozen-2026-07-30",
+      "entrypoint": "eu_digital_lab.world_model.WorldModel",
+      "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+      "language": "python",
+      "package": "eu_digital_lab"
+    },
+    "status": "reference_frozen",
+    "validation": {
+      "ablation": "clear context while retaining the incremental predictor",
+      "baseline_id": "frequency_baseline_v0",
+      "ground_truth": "fixture ground_truth fields plus distribution, provenance and drift invariants",
+      "holdout_fixture_set": "validation/holdout/world_model_prediction_v1_holdout.jsonl",
+      "holdout_hash": "dfa5e0fa1e801c132768826687df5bea88805a38775e1878b37e4624ae2239fd",
+      "holdout_status": "locked-before-evaluation"
+    }
+  },
+  "operational_measurement": {
+    "interpretation": "operational only; no cognitive claim",
+    "metrics": {
+      "latency_max_ms": 67.6674,
+      "latency_ms": 38.1871,
+      "latency_p50_ms": 18.5355,
+      "latency_p95_ms": 38.1871,
+      "memory_mb": 0.1953125,
+      "throughput": 231.80325874584426
+    }
+  },
+  "performance": {
+    "failures": [],
+    "metrics": {
+      "latency_max_ms": 67.6674,
+      "latency_ms": 38.1871,
+      "latency_p50_ms": 18.5355,
+      "latency_p95_ms": 38.1871,
+      "memory_mb": 0.1953125,
+      "throughput": 231.80325874584426
+    },
+    "passed": true
+  },
+  "promotion_id": "cognition.world_model.v1",
+  "scientific_evidence_boundary": "cross-language equivalence and holdout are computational verification, not ground truth",
+  "treatment_metrics": {
+    "error_count": 6.0,
+    "mean_log_loss": 0.8654928084817017,
+    "policy": "incremental_markov_v1",
+    "top_k_accuracy": 0.8333333333333334
+  }
+}

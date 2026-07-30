@@ -86,6 +86,10 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
 - **SPEC-035 em validação:** padrões nativos com suporte, feedback, drift,
   baseline de chave exata e holdout bloqueado. O status `promoted` do cluster
   não significa verdade, nomeação ou ação.
+- **SPEC-036 concluída nos gates automatizados:** world model nativo com
+  previsão explícita, incerteza, erro, calibração, drift, baseline, ablação e
+  holdout. O componente permanece `product_status: unavailable` até revisão
+  humana; SPEC-037 é o próximo incremento nativo.
 - **V1 GA:** permanece condicionada a modelo local aprovado, shell/avatar,
   sugestões corrigíveis, MSIX assinado, atualização/rollback e gates de
   privacidade/operacionais.

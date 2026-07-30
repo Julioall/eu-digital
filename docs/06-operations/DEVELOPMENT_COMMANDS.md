@@ -289,6 +289,19 @@ The test compares the incremental n-gram predictor with the frequency
 baseline on a holdout, validates log loss and top-k, and verifies that drift
 reduces confidence while preserving the source observations.
 
+The SPEC-036 native promotion gate is exercised with:
+
+```powershell
+$env:PYTHONPATH = "python"
+python tools/validate_world_model_promotion.py --candidate build/dev/promotion_fixture_runner
+ctest --test-dir build/dev -R world_model --output-on-failure
+```
+
+The gate compares the C++ runner with the frozen Python reference, checks the
+locked holdout, calibration, baseline, context ablation, uncertainty without
+observation and operational p50/p95/max latency. Agreement does not make the
+component available in the product.
+
 The SPEC-022 longitudinal-evaluation tests are exercised with:
 
 ```powershell

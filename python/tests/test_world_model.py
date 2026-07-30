@@ -116,6 +116,23 @@ class WorldModelTests(unittest.TestCase):
         with self.assertRaises(WorldModelError):
             prediction_error_to_salience(-1.0)
 
+    def test_promoted_patterns_seed_only_symbolic_vocabulary(self) -> None:
+        model = WorldModel(
+            stream_id="pattern-stream",
+            promoted_patterns=[
+                {"pattern_id": "pattern-a", "status": "promoted", "confidence": 0.9},
+                {"pattern_id": "pattern-b", "status": "promoted", "confidence": 0.8},
+            ],
+        )
+        prediction = model.predict(predicted_at="2026-01-01T00:00:00Z")
+        self.assertEqual(set(prediction.predicted_distribution), {"pattern-a", "pattern-b"})
+        self.assertEqual(model.metrics()["promoted_pattern_count"], 2)
+        with self.assertRaises(WorldModelError):
+            WorldModel(
+                stream_id="invalid-pattern-stream",
+                promoted_patterns=[{"pattern_id": "candidate", "status": "candidate"}],
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

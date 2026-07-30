@@ -1,7 +1,7 @@
 ---
 id: SPEC-036
 title: Promoção nativa do world model e erro preditivo
-status: future
+status: done
 phase: beta
 dependencies: [SPEC-021, SPEC-023, SPEC-026, SPEC-027, SPEC-029, SPEC-035]
 adrs: [ADR-0005, ADR-0008, ADR-0009, ADR-0010, ADR-0011]
@@ -36,13 +36,13 @@ Falsificação: o tratamento não supera o baseline ou apresenta calibração pi
 
 ## Critérios de aceite
 
-- [ ] Referência congelada, fixtures, ground truth, invariantes e holdout têm
+- [x] Referência congelada, fixtures, ground truth, invariantes e holdout têm
       hashes registrados.
-- [ ] Candidato C++ reproduz os schemas de previsão, erro e drift.
-- [ ] Ausência de observação não gera estado negativo nem previsão certa.
-- [ ] Baseline, ablação, calibração e benchmarks p50/p95/máximo passam.
-- [ ] Plugin é removível e a maturidade permanece indisponível sem promoção.
-- [ ] Não há integração com workspace, self-model, diálogo ou ações.
+- [x] Candidato C++ reproduz os schemas de previsão, erro e drift.
+- [x] Ausência de observação não gera estado negativo nem previsão certa.
+- [x] Baseline, ablação, calibração e benchmarks p50/p95/máximo passam.
+- [x] Plugin é removível e a maturidade permanece indisponível sem promoção.
+- [x] Não há integração com workspace, self-model, diálogo ou ações.
 
 ## Saída
 
