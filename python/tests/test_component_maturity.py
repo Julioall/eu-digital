@@ -28,9 +28,10 @@ class ComponentMaturityTests(unittest.TestCase):
         self.assertEqual(runtime["product_status"], "experimental")
         self.assertIsNone(runtime["promotion_id"])
         cognitive = registry.component("cognition.global_workspace")
-        self.assertEqual(cognitive["reference_status"], "python")
-        self.assertEqual(cognitive["native_status"], "none")
+        self.assertEqual(cognitive["reference_status"], "frozen")
+        self.assertEqual(cognitive["native_status"], "equivalent")
         self.assertEqual(cognitive["product_status"], "unavailable")
+        self.assertEqual(cognitive["promotion_id"], "cognition.global_workspace.v1")
 
     def test_invalid_promotion_state_is_rejected(self) -> None:
         invalid = json.loads(

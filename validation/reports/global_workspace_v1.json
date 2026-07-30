@@ -1,0 +1,176 @@
+{
+  "ablation": {
+    "case_count": 5.0,
+    "churn_mean": 0.2,
+    "f1_mean": 0.2,
+    "interpretation": "operational ablation only",
+    "occupancy_mean": 0.8,
+    "policy": "capacity_minus_one_fifo",
+    "precision_mean": 0.2,
+    "recall_mean": 0.2
+  },
+  "baseline": {
+    "case_count": 5.0,
+    "churn_mean": 0.2,
+    "f1_mean": 0.3,
+    "interpretation": "operational baseline only",
+    "occupancy_mean": 0.8,
+    "policy": "fifo_capacity_v0",
+    "precision_mean": 0.3,
+    "recall_mean": 0.3
+  },
+  "commits": {
+    "cpp": "working-tree",
+    "python": "frozen-2026-07-30"
+  },
+  "component_id": "cognition.global_workspace",
+  "dataset": {
+    "case_count": 5,
+    "fixture_set": "validation/equivalence/global_workspace_v1.jsonl",
+    "hash": "4c40933cbebce86c7dd7c12f62189a5fd72f371e1531f37cad1a8ca8da53a60a"
+  },
+  "equivalence": {
+    "divergences": [],
+    "input_sha256": {
+      "cpp": "4c40933cbebce86c7dd7c12f62189a5fd72f371e1531f37cad1a8ca8da53a60a",
+      "python": "4c40933cbebce86c7dd7c12f62189a5fd72f371e1531f37cad1a8ca8da53a60a"
+    },
+    "output_sha256": {
+      "cpp": "07ad88d6c6b7962a9a40040b452851d0ca1b2d13bc5fe52c4f4ead8663b0c7b2",
+      "python": "07ad88d6c6b7962a9a40040b452851d0ca1b2d13bc5fe52c4f4ead8663b0c7b2"
+    },
+    "passed": true
+  },
+  "hardware": {
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 165 Stepping 3, GenuineIntel",
+    "release": "11",
+    "system": "Windows"
+  },
+  "holdout": {
+    "case_count": 3,
+    "equivalence_passed": true,
+    "fixture_set": "validation/holdout/global_workspace_v1_holdout.jsonl",
+    "metrics": {
+      "case_count": 3.0,
+      "churn_mean": 0.3333333333333333,
+      "f1_mean": 1.0,
+      "occupancy_mean": 0.6666666666666666,
+      "precision_mean": 1.0,
+      "recall_mean": 1.0
+    },
+    "sha256": "8535590e6cc25da3ab43971beb157a9a8c8f7e9f652d1a436d09ccffc5706495"
+  },
+  "hypothesis": {
+    "id": "H3-GLOBAL-WORKSPACE",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "invariants": {
+    "failures": {},
+    "passed": true
+  },
+  "manifest": {
+    "candidate": {
+      "build_profile": "Debug",
+      "commit": "working-tree",
+      "compiler": "C++23 native",
+      "language": "cpp",
+      "target": "promotion_fixture_runner"
+    },
+    "component_id": "cognition.global_workspace",
+    "component_version": "1.0.0",
+    "contract": {
+      "broadcast_schema": "contracts/schemas/workspace_broadcast.schema.json",
+      "clock_semantics": "ordered timezone-aware workspace operation timestamps",
+      "error_schema": "contracts/schemas/workspace_snapshot.schema.json",
+      "input_schema": "docs/03-contracts/GLOBAL_WORKSPACE_SCHEMA.md",
+      "output_schema": "contracts/schemas/workspace_snapshot.schema.json",
+      "random_seed_policy": "no randomness",
+      "state_schema": "contracts/schemas/workspace_snapshot.schema.json"
+    },
+    "dataset": {
+      "case_count": 5,
+      "fixture_set": "validation/equivalence/global_workspace_v1.jsonl",
+      "hash": "4c40933cbebce86c7dd7c12f62189a5fd72f371e1531f37cad1a8ca8da53a60a"
+    },
+    "equivalence": {
+      "absolute_tolerance": 1e-12,
+      "acceptance_metrics": {
+        "holdout_numeric_semantic_match": 1.0,
+        "invariant_pass_rate": 1.0,
+        "semantic_match": 1.0
+      },
+      "invariants": [
+        "capacity_bounded",
+        "provenance_preserved",
+        "selection_churn_bounded",
+        "expiration_is_explicit",
+        "broadcast_local",
+        "workspace_does_not_create_facts_or_plans"
+      ],
+      "relative_tolerance": 1e-12,
+      "type": "numeric"
+    },
+    "hypothesis": {
+      "id": "H3-GLOBAL-WORKSPACE",
+      "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+    },
+    "performance": {
+      "baseline_hardware": "captured by validation/reports/global_workspace_v1.json",
+      "maximum_latency_ms": 100.0,
+      "maximum_memory_mb": 512.0,
+      "minimum_throughput": 10.0
+    },
+    "promotion_id": "cognition.global_workspace.v1",
+    "reference": {
+      "commit": "frozen-2026-07-30",
+      "entrypoint": "eu_digital_lab.global_workspace.GlobalWorkspace",
+      "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+      "language": "python",
+      "package": "eu_digital_lab"
+    },
+    "status": "reference_frozen",
+    "validation": {
+      "ablation": "capacity minus one with FIFO prioritization",
+      "baseline_id": "fifo_capacity_v0",
+      "ground_truth": "fixture relevance annotations plus boundedness, provenance, expiration and local broadcast invariants",
+      "holdout_fixture_set": "validation/holdout/global_workspace_v1_holdout.jsonl",
+      "holdout_hash": "8535590e6cc25da3ab43971beb157a9a8c8f7e9f652d1a436d09ccffc5706495",
+      "holdout_status": "locked-before-evaluation"
+    }
+  },
+  "operational_measurement": {
+    "interpretation": "operational only; no cognitive claim",
+    "metrics": {
+      "latency_max_ms": 17.7543,
+      "latency_ms": 15.7255,
+      "latency_p50_ms": 14.5802,
+      "latency_p95_ms": 15.7255,
+      "memory_mb": 0.0,
+      "throughput": 339.1135463382384
+    }
+  },
+  "performance": {
+    "failures": [],
+    "metrics": {
+      "latency_max_ms": 17.7543,
+      "latency_ms": 15.7255,
+      "latency_p50_ms": 14.5802,
+      "latency_p95_ms": 15.7255,
+      "memory_mb": 0.0,
+      "throughput": 339.1135463382384
+    },
+    "passed": true
+  },
+  "promotion_id": "cognition.global_workspace.v1",
+  "scientific_evidence_boundary": "equivalence and holdout are computational verification, not ground truth",
+  "treatment_metrics": {
+    "case_count": 5.0,
+    "churn_mean": 0.7333333333333333,
+    "f1_mean": 0.8,
+    "occupancy_mean": 0.8,
+    "policy": "observed_weighted_mean_v1",
+    "precision_mean": 0.8,
+    "recall_mean": 0.8
+  }
+}

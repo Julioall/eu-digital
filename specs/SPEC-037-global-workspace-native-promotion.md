@@ -1,7 +1,7 @@
 ---
 id: SPEC-037
 title: Promoção nativa do workspace global
-status: future
+status: done
 phase: beta
 dependencies: [SPEC-010, SPEC-023, SPEC-026, SPEC-027, SPEC-029, SPEC-036]
 adrs: [ADR-0005, ADR-0008, ADR-0009, ADR-0010, ADR-0011]
@@ -35,12 +35,12 @@ Falsificação: não superar FIFO ou aumentar churn acima do limite.
 
 ## Critérios de aceite
 
-- [ ] Referência, invariantes, holdout e hashes são congelados.
-- [ ] Snapshot e broadcast C++ validam os contratos compartilhados.
-- [ ] Empates, expiração, ausência e remoção de capacidade são determinísticos.
-- [ ] Baseline, ablação, métricas científicas e operacionais passam.
-- [ ] O workspace não cria fatos nem planos e permanece removível.
-- [ ] Nenhuma integração com diálogo, avatar ou ação é antecipada.
+- [x] Referência, invariantes, holdout e hashes são congelados.
+- [x] Snapshot e broadcast C++ validam os contratos compartilhados.
+- [x] Empates, expiração, ausência e remoção de capacidade são determinísticos.
+- [x] Baseline, ablação, métricas científicas e operacionais passam.
+- [x] O workspace não cria fatos nem planos e permanece removível.
+- [x] Nenhuma integração com diálogo, avatar ou ação é antecipada.
 
 ## Saída
 

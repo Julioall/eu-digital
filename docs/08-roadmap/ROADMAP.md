@@ -89,7 +89,12 @@ Escopo detalhado: `specs/SPEC-028-native-runtime-shell.md`.
 - **SPEC-036 concluída nos gates automatizados:** world model nativo com
   previsão explícita, incerteza, erro, calibração, drift, baseline, ablação e
   holdout. O componente permanece `product_status: unavailable` até revisão
-  humana; SPEC-037 é o próximo incremento nativo.
+  humana.
+- **SPEC-037 concluída nos gates automatizados:** workspace global nativo com
+  capacidade limitada, prioridade observada, expiração, proveniência, baseline
+  FIFO, ablação, broadcast local e holdout. O componente permanece
+  `product_status: unavailable` até revisão humana; SPEC-038 é o próximo
+  incremento nativo.
 - **V1 GA:** permanece condicionada a modelo local aprovado, shell/avatar,
   sugestões corrigíveis, MSIX assinado, atualização/rollback e gates de
   privacidade/operacionais.

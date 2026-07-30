@@ -97,6 +97,7 @@ cpp/core/digest.hpp
 cpp/core/episode_segmenter.hpp
 cpp/core/episodic_memory.hpp
 cpp/core/event_bus.hpp
+cpp/core/global_workspace.hpp
 cpp/core/input_interaction_sensor.hpp
 cpp/core/observation_privacy.hpp
 cpp/core/pattern_learner.hpp
@@ -121,6 +122,7 @@ cpp/tests/capability_runtime_test.cpp
 cpp/tests/episode_segmentation_test.cpp
 cpp/tests/episodic_memory_test.cpp
 cpp/tests/event_bus_test.cpp
+cpp/tests/global_workspace_test.cpp
 cpp/tests/input_interaction_sensor_test.cpp
 cpp/tests/pattern_learning_test.cpp
 cpp/tests/privacy_storage_test.cpp
@@ -250,6 +252,7 @@ plans/PLAN-001-foundation.md
 plans/PLAN-002-runtime-shell.md
 promotions/cognition.episode_segmentation.v1.json
 promotions/cognition.episodic_memory.v1.json
+promotions/cognition.global_workspace.v1.json
 promotions/cognition.pattern_learning.v1.json
 promotions/cognition.world_model.v1.json
 promotions/registry.json
@@ -307,6 +310,7 @@ python/tests/test_event_bus.py
 python/tests/test_foundation.py
 python/tests/test_functional_self_model.py
 python/tests/test_global_workspace.py
+python/tests/test_global_workspace_promotion.py
 python/tests/test_local_model_gateway.py
 python/tests/test_longitudinal_evaluation.py
 python/tests/test_memory_consolidation.py
@@ -360,6 +364,7 @@ reports/SPEC-033-execution-report.md
 reports/SPEC-034-execution-report.md
 reports/SPEC-035-execution-report.md
 reports/SPEC-036-execution-report.md
+reports/SPEC-037-execution-report.md
 REPOSITORY_TREE.txt
 schemas/agreement.schema.json
 schemas/annotation.schema.json
@@ -438,17 +443,20 @@ tools/validate_privacy_storage.py
 tools/validate_sandbox.py
 tools/validate_screen_ocr_policy.py
 tools/validate_specs.ps1
+tools/validate_workspace_promotion.py
 tools/validate_world_model_promotion.py
 uv.lock
 validation/ablations/.gitkeep
 validation/equivalence/.gitkeep
 validation/equivalence/episode_segmentation_v1.jsonl
 validation/equivalence/episodic_memory_v1.jsonl
+validation/equivalence/global_workspace_v1.jsonl
 validation/equivalence/pattern_learning_v1.jsonl
 validation/equivalence/world_model_prediction_v1.jsonl
 validation/holdout/episode_segmentation_v1_holdout.jsonl
 validation/holdout/episodic_memory_manifest.json
 validation/holdout/episodic_memory_v1_holdout.jsonl
+validation/holdout/global_workspace_v1_holdout.jsonl
 validation/holdout/manifest.json
 validation/holdout/pattern_learning_v1_holdout.jsonl
 validation/holdout/world_model_prediction_v1_holdout.jsonl
@@ -459,6 +467,8 @@ validation/reports/episode_segmentation_v1.json
 validation/reports/episode_segmentation_v1_divergences.json
 validation/reports/episodic_memory_v1.json
 validation/reports/episodic_memory_v1_divergences.json
+validation/reports/global_workspace_v1.json
+validation/reports/global_workspace_v1_divergences.json
 validation/reports/pattern_learning_v1.json
 validation/reports/pattern_learning_v1_divergences.json
 validation/reports/world_model_prediction_v1.json

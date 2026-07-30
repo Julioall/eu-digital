@@ -27,3 +27,17 @@ leve para que não haja cópia manual da definição de item em cada linguagem.
 
 Os scores são decisão operacional de priorização, não fatos, objetivos,
 intenções ou evidência de consciência. O contrato não autoriza ações.
+
+## Promoção nativa SPEC-037
+
+O candidato C++ recebe os mesmos JSON-lines da referência Python pelo runner
+promotion_fixture_runner --global-workspace. Cada operação produz um snapshot
+determinístico; broadcast transporta o último snapshot como evento local
+workspace.selection.v1. A referência, o conjunto de desenvolvimento e o
+holdout bloqueado estão registrados em
+promotions/cognition.global_workspace.v1.json.
+
+O componente é removível e permanece product_status: unavailable sem revisão
+humana. Equivalência entre linguagens, holdout, baseline FIFO, ablação,
+capacidade, expiração e latência são verificações operacionais; não
+constituem ground truth, evidência cognitiva ou autorização de ação.

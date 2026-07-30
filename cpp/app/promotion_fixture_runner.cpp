@@ -1,5 +1,6 @@
 #include "core/episode_segmenter.hpp"
 #include "core/episodic_memory.hpp"
+#include "core/global_workspace.hpp"
 #include "core/pattern_learner.hpp"
 #include "core/promotion_registry.hpp"
 #include "core/runtime_host.hpp"
@@ -174,6 +175,175 @@ std::string json_optional_number(const std::optional<double>& value) {
 std::string json_optional_boolean(const std::optional<bool>& value) {
     if (!value) return "null";
     return *value ? "true" : "false";
+}
+
+std::string json_value_raw(const JsonValue& value) {
+    if (runtime_detail::is_null(value)) return "null";
+    if (const auto found = std::get_if<bool>(&value.value)) return *found ? "true" : "false";
+    if (const auto found = std::get_if<runtime_detail::JsonNumber>(&value.value)) return found->text;
+    if (const auto found = std::get_if<std::string>(&value.value)) return json_string(*found);
+    if (const auto found = std::get_if<JsonValue::Array>(&value.value)) {
+        std::ostringstream output;
+        output << '[';
+        for (std::size_t index = 0; index < found->size(); ++index) {
+            if (index) output << ',';
+            output << json_value_raw((*found)[index]);
+        }
+        output << ']';
+        return output.str();
+    }
+    const auto& object = std::get<JsonValue::Object>(value.value);
+    std::ostringstream output;
+    output << '{';
+    std::size_t index = 0;
+    for (const auto& [key, nested] : object) {
+        if (index++) output << ',';
+        output << json_string(key) << ':' << json_value_raw(nested);
+    }
+    output << '}';
+    return output.str();
+}
+
+std::map<std::string, std::string> json_object_raw(const JsonValue& value, const std::string& path) {
+    const auto& object = runtime_detail::object(value, path);
+    std::map<std::string, std::string> result;
+    for (const auto& [key, nested] : object) result.emplace(key, json_value_raw(nested));
+    return result;
+}
+
+std::string json_raw_object(const std::map<std::string, std::string>& values) {
+    std::ostringstream output;
+    output << '{';
+    std::size_t index = 0;
+    for (const auto& [key, raw] : values) {
+        if (index++) output << ',';
+        output << json_string(key) << ':' << raw;
+    }
+    output << '}';
+    return output.str();
+}
+
+std::string json_number_canonical(double value) {
+    return eu_digital::workspace_python_float(value);
+}
+
+eu_digital::WorkspaceConfig parse_workspace_config(const JsonValue::Object& object, const std::string& path) {
+    eu_digital::WorkspaceConfig config;
+    if (const auto* value = optional_object(object, "config", path)) {
+        if (const auto found = value->find("capacity"); found != value->end()) config.capacity = static_cast<int>(runtime_detail::unsigned_number(found->second, path + ".config.capacity"));
+        if (const auto found = value->find("ttl_seconds"); found != value->end()) config.ttl_seconds = number_value(found->second, path + ".config.ttl_seconds");
+        if (const auto found = value->find("max_candidates"); found != value->end()) config.max_candidates = static_cast<int>(runtime_detail::unsigned_number(found->second, path + ".config.max_candidates"));
+        if (const auto found = value->find("selection_policy"); found != value->end()) config.selection_policy = runtime_detail::string(found->second, path + ".config.selection_policy");
+        if (const auto found = value->find("weights"); found != value->end()) {
+            const auto& weights = runtime_detail::object(found->second, path + ".config.weights");
+            for (const auto& [name, weight] : weights) config.weights[name] = number_value(weight, path + ".config.weights." + name);
+        }
+        if (const auto found = value->find("enabled_factors"); found != value->end()) {
+            config.enabled_factors.clear();
+            for (const auto& name : string_array(found->second, path + ".config.enabled_factors")) config.enabled_factors.insert(name);
+        }
+    }
+    config.validate();
+    return config;
+}
+
+eu_digital::WorkspaceCandidate parse_workspace_candidate(const JsonValue& value, const std::string& path) {
+    const auto& object = runtime_detail::object(value, path);
+    eu_digital::WorkspaceCandidate candidate;
+    candidate.candidate_id = required_string(object, "candidate_id", path);
+    candidate.schema_version = optional_string(object, "schema_version", path).value_or(eu_digital::WORKSPACE_SCHEMA_VERSION);
+    candidate.session_id = required_string(object, "session_id", path);
+    candidate.source_kind = required_string(object, "source_kind", path);
+    candidate.source_refs = string_array(runtime_detail::required(object, "source_refs", path), path + ".source_refs");
+    candidate.observed_at = required_string(object, "observed_at", path);
+    candidate.content = json_object_raw(runtime_detail::required(object, "content", path), path + ".content");
+    const auto& signals = runtime_detail::object(runtime_detail::required(object, "salience_signals", path), path + ".salience_signals");
+    for (const auto& [name, signal] : signals) candidate.salience_signals[name] = number_value(signal, path + ".salience_signals." + name);
+    candidate.validate();
+    return candidate;
+}
+
+std::string serialize_workspace_salience(const eu_digital::WorkspaceSalience& salience) {
+    std::ostringstream output;
+    output << "{\"missing_factors\":" << json_array(salience.missing_factors)
+           << ",\"observed_factors\":{";
+    std::size_t index = 0;
+    for (const auto& [name, value] : salience.observed_factors) {
+        if (index++) output << ',';
+        output << json_string(name) << ':' << json_number_canonical(value);
+    }
+    output << "},\"policy_id\":" << json_string(salience.policy_id)
+           << ",\"score\":" << json_number_canonical(salience.score) << '}';
+    return output.str();
+}
+
+std::string serialize_workspace_decision(const eu_digital::WorkspaceDecision& decision) {
+    std::ostringstream output;
+    output << "{\"candidate_id\":" << json_string(decision.candidate_id)
+           << ",\"rank\":" << (decision.rank ? std::to_string(*decision.rank) : "null")
+           << ",\"reason_codes\":" << json_array(decision.reason_codes)
+           << ",\"score\":" << (decision.score ? json_number_canonical(*decision.score) : "null")
+           << ",\"selected\":" << (decision.selected ? "true" : "false") << '}';
+    return output.str();
+}
+
+std::string serialize_workspace_item(const eu_digital::WorkspaceItem& item) {
+    std::ostringstream output;
+    output << "{\"admitted_at\":" << json_string(item.admitted_at)
+           << ",\"candidate_id\":" << json_string(item.candidate_id)
+           << ",\"content\":" << json_raw_object(item.content)
+           << ",\"expires_at\":" << json_string(item.expires_at)
+           << ",\"observed_at\":" << json_string(item.observed_at)
+           << ",\"salience\":" << serialize_workspace_salience(item.salience)
+           << ",\"schema_version\":" << json_string(item.schema_version)
+           << ",\"selection\":{\"rank\":" << item.rank
+           << ",\"reasons\":" << json_array(item.selection_reasons)
+           << ",\"selected_at\":" << json_string(item.selected_at)
+           << ",\"snapshot_id\":" << json_string(item.snapshot_id) << "}"
+           << ",\"session_id\":" << json_string(item.session_id)
+           << ",\"source_kind\":" << json_string(item.source_kind)
+           << ",\"source_refs\":" << json_array(item.source_refs)
+           << ",\"workspace_id\":" << json_string(item.workspace_id)
+           << ",\"workspace_item_id\":" << json_string(item.workspace_item_id)
+           << '}';
+    return output.str();
+}
+
+std::string serialize_workspace_snapshot(const eu_digital::WorkspaceSnapshot& snapshot) {
+    std::ostringstream output;
+    output << "{\"active_items\":[";
+    for (std::size_t index = 0; index < snapshot.active_items.size(); ++index) {
+        if (index) output << ',';
+        output << serialize_workspace_item(snapshot.active_items[index]);
+    }
+    output << "],\"capacity\":" << snapshot.capacity
+           << ",\"config_fingerprint\":" << json_string(snapshot.config_fingerprint)
+           << ",\"created_at\":" << json_string(snapshot.created_at)
+           << ",\"decisions\":[";
+    for (std::size_t index = 0; index < snapshot.decisions.size(); ++index) {
+        if (index) output << ',';
+        output << serialize_workspace_decision(snapshot.decisions[index]);
+    }
+    output << "],\"discarded_candidate_ids\":" << json_array(snapshot.discarded_candidate_ids)
+           << ",\"expired_candidate_ids\":" << json_array(snapshot.expired_candidate_ids)
+           << ",\"policy_id\":" << json_string(snapshot.policy_id)
+           << ",\"schema_version\":" << json_string(snapshot.schema_version)
+           << ",\"selection_churn\":" << json_number_canonical(snapshot.selection_churn)
+           << ",\"session_id\":" << json_string(snapshot.session_id)
+           << ",\"snapshot_id\":" << json_string(snapshot.snapshot_id)
+           << ",\"workspace_id\":" << json_string(snapshot.workspace_id) << '}';
+    return output.str();
+}
+
+std::string serialize_workspace_broadcast(const eu_digital::WorkspaceBroadcast& broadcast) {
+    std::ostringstream output;
+    output << "{\"broadcast_id\":" << json_string(broadcast.broadcast_id)
+           << ",\"emitted_at\":" << json_string(broadcast.emitted_at)
+           << ",\"schema_version\":" << json_string(broadcast.schema_version)
+           << ",\"session_id\":" << json_string(broadcast.session_id)
+           << ",\"snapshot\":" << serialize_workspace_snapshot(broadcast.snapshot)
+           << ",\"workspace_id\":" << json_string(broadcast.workspace_id) << '}';
+    return output.str();
 }
 
 eu_digital::MemoryEpisode parse_memory_episode(const JsonValue& value, const std::string& path) {
@@ -570,6 +740,78 @@ int run_world_model() {
     return std::cout.good() ? 0 : 1;
 }
 
+std::string serialize_workspace_event(const eu_digital::WorkspaceBroadcast& broadcast, double emitted_epoch) {
+    const auto payload = serialize_workspace_broadcast(broadcast);
+    std::ostringstream output;
+    output << "{\"actor_id\":null,\"context\":{\"workspace_id\":" << json_string(broadcast.workspace_id)
+           << "},\"event_id\":" << json_string(broadcast.broadcast_id)
+           << ",\"event_type\":\"workspace.selection.v1\",\"monotonic_ns\":"
+           << std::max<std::int64_t>(0, static_cast<std::int64_t>(emitted_epoch * 1000000000.0))
+           << ",\"occurred_at\":" << json_string(broadcast.emitted_at)
+           << ",\"payload\":" << payload
+           << ",\"privacy_class\":\"local\",\"provenance\":{\"module\":"
+           << json_string(eu_digital::WORKSPACE_CREATED_BY) << ",\"snapshot_id\":"
+           << json_string(broadcast.snapshot.snapshot_id)
+           << "},\"quality\":{\"completeness\":1.0,\"latency_ms\":0},\"received_at\":"
+           << json_string(broadcast.emitted_at)
+           << ",\"schema_version\":\"1.0\",\"session_id\":" << json_string(broadcast.session_id)
+           << ",\"source\":\"global_workspace\",\"tags\":[\"workspace\",\"selection\"]}";
+    return output.str();
+}
+
+int run_global_workspace() {
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        if (line.empty()) continue;
+        const auto root = runtime_detail::JsonParser(line).parse();
+        const auto& object = runtime_detail::object(root, "fixture");
+        const auto workspace_id = required_string(object, "workspace_id", "fixture");
+        const auto session_id = required_string(object, "session_id", "fixture");
+        auto workspace = eu_digital::GlobalWorkspace(workspace_id, session_id, parse_workspace_config(object, "fixture"));
+        const auto& operations = runtime_detail::array(runtime_detail::required(object, "operations", "fixture"), "fixture.operations");
+        std::vector<eu_digital::WorkspaceSnapshot> snapshots;
+        std::vector<std::string> broadcasts;
+        for (std::size_t index = 0; index < operations.size(); ++index) {
+            const auto path = "fixture.operations[" + std::to_string(index) + "]";
+            const auto& operation = runtime_detail::object(operations[index], path);
+            const auto type = required_string(operation, "type", path);
+            const auto now_value = optional_string(operation, "now", path);
+            const auto now_epoch = parse_timestamp(now_value.value_or("1970-01-01T00:00:00+00:00"));
+            const auto now = eu_digital::workspace_format_utc(now_epoch);
+            if (type == "admit") {
+                snapshots.push_back(workspace.admit(parse_workspace_candidate(runtime_detail::required(operation, "candidate", path), path + ".candidate"), now, now_epoch));
+            } else if (type == "snapshot") {
+                snapshots.push_back(workspace.snapshot(now, now_epoch));
+            } else if (type == "update_priority") {
+                snapshots.push_back(workspace.update_priority(required_string(operation, "candidate_id", path), number_value(runtime_detail::required(operation, "priority", path), path + ".priority"), now, now_epoch));
+            } else if (type == "broadcast") {
+                if (snapshots.empty()) throw std::runtime_error("workspace broadcast requires a prior snapshot");
+                const auto emitted_value = optional_string(operation, "emitted_at", path).value_or(now);
+                const auto emitted_epoch = parse_timestamp(emitted_value);
+                const auto emitted_at = eu_digital::workspace_format_utc(emitted_epoch);
+                const auto broadcast = workspace.broadcast(snapshots.back(), emitted_at, emitted_epoch);
+                broadcasts.push_back(serialize_workspace_event(broadcast, emitted_epoch));
+            } else {
+                throw std::runtime_error("unsupported global workspace operation: " + type);
+            }
+        }
+        std::ostringstream output;
+        output << "{\"broadcasts\":[";
+        for (std::size_t index = 0; index < broadcasts.size(); ++index) {
+            if (index) output << ',';
+            output << broadcasts[index];
+        }
+        output << "],\"schema_version\":\"1.0\",\"snapshots\":[";
+        for (std::size_t index = 0; index < snapshots.size(); ++index) {
+            if (index) output << ',';
+            output << serialize_workspace_snapshot(snapshots[index]);
+        }
+        output << "]}\n";
+        std::cout << output.str();
+    }
+    return std::cout.good() ? 0 : 1;
+}
+
 int run_episodic_memory() {
     std::string line;
     while (std::getline(std::cin, line)) {
@@ -672,6 +914,7 @@ int main(int argc, char** argv) {
         if (argc > 1 && std::string(argv[1]) == "--episodic-memory") return run_episodic_memory();
         if (argc > 1 && std::string(argv[1]) == "--pattern-learning") return run_pattern_learning();
         if (argc > 1 && std::string(argv[1]) == "--world-model") return run_world_model();
+        if (argc > 1 && std::string(argv[1]) == "--global-workspace") return run_global_workspace();
         const std::string fixture_bytes{std::istreambuf_iterator<char>(std::cin), std::istreambuf_iterator<char>()};
         std::cout << eu_digital::PromotionFixtureRunner::echo(fixture_bytes);
         return std::cout.good() ? 0 : 1;

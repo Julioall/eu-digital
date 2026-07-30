@@ -373,6 +373,18 @@ The reference is local and accepts generic candidates with source references.
 the module interface. Snapshots are broadcast only as local canonical events
 of type `workspace.selection.v1`.
 
+The SPEC-037 native candidate is validated with the frozen development and
+holdout fixtures:
+
+    cmake --build build/dev --target global_workspace_test promotion_fixture_runner
+    ctest --test-dir build/dev -R global_workspace --output-on-failure
+    python tools/validate_workspace_promotion.py
+
+The validator compares the C++ runner with the Python reference, checks
+capacity/provenance/expiration/local-broadcast invariants, and records FIFO
+baseline, capacity ablation and operational latency separately from scientific
+claims.
+
 The SPEC-011 metacognition-and-curiosity reference is exercised with:
 
 ```powershell

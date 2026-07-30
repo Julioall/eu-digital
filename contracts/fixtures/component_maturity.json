@@ -151,13 +151,17 @@
     {
       "component_id": "cognition.global_workspace",
       "spec_id": "SPEC-010",
-      "reference_status": "python",
-      "native_status": "none",
+      "reference_status": "frozen",
+      "native_status": "equivalent",
       "product_status": "unavailable",
-      "promotion_id": null,
+      "promotion_id": "cognition.global_workspace.v1",
       "evidence_refs": [
         "specs/SPEC-010-global-workspace.md",
-        "python/eu_digital_lab/global_workspace.py"
+        "specs/SPEC-037-global-workspace-native-promotion.md",
+        "python/eu_digital_lab/global_workspace.py",
+        "cpp/core/global_workspace.hpp",
+        "promotions/cognition.global_workspace.v1.json",
+        "validation/reports/global_workspace_v1.json"
       ]
     },
     {

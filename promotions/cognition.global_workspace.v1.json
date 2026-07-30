@@ -1,0 +1,70 @@
+{
+  "candidate": {
+    "build_profile": "Debug",
+    "compiler": "C++23 native",
+    "commit": "working-tree",
+    "language": "cpp",
+    "target": "promotion_fixture_runner"
+  },
+  "component_id": "cognition.global_workspace",
+  "component_version": "1.0.0",
+  "contract": {
+    "clock_semantics": "ordered timezone-aware workspace operation timestamps",
+    "error_schema": "contracts/schemas/workspace_snapshot.schema.json",
+    "input_schema": "docs/03-contracts/GLOBAL_WORKSPACE_SCHEMA.md",
+    "output_schema": "contracts/schemas/workspace_snapshot.schema.json",
+    "broadcast_schema": "contracts/schemas/workspace_broadcast.schema.json",
+    "random_seed_policy": "no randomness",
+    "state_schema": "contracts/schemas/workspace_snapshot.schema.json"
+  },
+  "dataset": {
+    "case_count": 5,
+    "fixture_set": "validation/equivalence/global_workspace_v1.jsonl",
+    "hash": "4c40933cbebce86c7dd7c12f62189a5fd72f371e1531f37cad1a8ca8da53a60a"
+  },
+  "equivalence": {
+    "absolute_tolerance": 1e-12,
+    "relative_tolerance": 1e-12,
+    "acceptance_metrics": {
+      "holdout_numeric_semantic_match": 1.0,
+      "invariant_pass_rate": 1.0,
+      "semantic_match": 1.0
+    },
+    "invariants": [
+      "capacity_bounded",
+      "provenance_preserved",
+      "selection_churn_bounded",
+      "expiration_is_explicit",
+      "broadcast_local",
+      "workspace_does_not_create_facts_or_plans"
+    ],
+    "type": "numeric"
+  },
+  "hypothesis": {
+    "id": "H3-GLOBAL-WORKSPACE",
+    "report_uri": "docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md"
+  },
+  "performance": {
+    "baseline_hardware": "captured by validation/reports/global_workspace_v1.json",
+    "maximum_latency_ms": 100.0,
+    "maximum_memory_mb": 512.0,
+    "minimum_throughput": 10.0
+  },
+  "promotion_id": "cognition.global_workspace.v1",
+  "reference": {
+    "commit": "frozen-2026-07-30",
+    "entrypoint": "eu_digital_lab.global_workspace.GlobalWorkspace",
+    "environment_lock_hash": "4e3ccab2bced7e6c33dc7cc032a2ec9466b7f114414095145626d3503b77fe89",
+    "language": "python",
+    "package": "eu_digital_lab"
+  },
+  "status": "reference_frozen",
+  "validation": {
+    "ablation": "capacity minus one with FIFO prioritization",
+    "baseline_id": "fifo_capacity_v0",
+    "ground_truth": "fixture relevance annotations plus boundedness, provenance, expiration and local broadcast invariants",
+    "holdout_fixture_set": "validation/holdout/global_workspace_v1_holdout.jsonl",
+    "holdout_hash": "8535590e6cc25da3ab43971beb157a9a8c8f7e9f652d1a436d09ccffc5706495",
+    "holdout_status": "locked-before-evaluation"
+  }
+}
