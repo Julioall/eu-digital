@@ -17,6 +17,10 @@
 13. Quais operações formam a ontologia inicial de capacidades?
 14. Como versionar modalidades novas sem alterar `CanonicalEvent`?
 15. Quais sensores serão considerados obrigatórios? Recomendação atual: nenhum sensor de domínio; somente relógio, event bus e estado interno.
+16. Conflito documental: SPEC-052 foi marcada como `implemented` mas os critérios estavam desmarcados (corrigido na SPEC-053 ao rebaixar para `spike`).
+17. Conflito documental: SPECs 045 a 050 estão como `draft` apesar de existirem commits pesados de implementação. Elas devem ser promovidas para `active`/`implemented`?
+18. Conflito documental: `docs/03-contracts` possui markdown vazio enquanto `contracts/schemas` possui os schemas reais. Qual é a pasta canônica?
+19. Conflito documental: A estrutura de governança indica que cabeçalhos devem referenciar contratos reais (ex: `contracts: []`), mas há schemas órfãos.
 
 
 ## Resoluções registradas pela SPEC-023

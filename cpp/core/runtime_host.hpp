@@ -461,6 +461,11 @@ public:
         return *event_bus_;
     }
 
+    std::shared_ptr<CognitiveCoordinator> coordinator() const {
+        std::lock_guard lock(mutex_);
+        return coordinator_;
+    }
+
     StorageHealth storage_health() const {
         std::lock_guard lock(mutex_);
         return storage_quota_.health();

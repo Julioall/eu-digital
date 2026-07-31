@@ -22,6 +22,16 @@
       "displayName": "Windows Development",
       "inherits": "dev",
       "binaryDir": "${sourceDir}/build/windows-dev"
+    },
+    {
+      "name": "windows-qt",
+      "displayName": "Windows Qt Headless CI",
+      "inherits": "windows-dev",
+      "binaryDir": "${sourceDir}/build/windows-qt",
+      "cacheVariables": {
+        "QT_QPA_PLATFORM": "offscreen",
+        "EU_DIGITAL_BUILD_QT_SHELL": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -32,6 +42,10 @@
     {
       "name": "windows-dev",
       "configurePreset": "windows-dev"
+    },
+    {
+      "name": "windows-qt",
+      "configurePreset": "windows-qt"
     }
   ],
   "testPresets": [
@@ -45,6 +59,13 @@
     {
       "name": "windows-dev",
       "configurePreset": "windows-dev",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "windows-qt",
+      "configurePreset": "windows-qt",
       "output": {
         "outputOnFailure": true
       }

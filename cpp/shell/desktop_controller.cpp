@@ -19,12 +19,8 @@ DesktopController::DesktopController(QObject* parent)
     connect(tray_adapter_.get(), &QtTrayAdapter::userInputReceived, this, &DesktopController::onUserInputReceived);
     connect(tray_adapter_.get(), &QtTrayAdapter::shutdownRequested, this, &DesktopController::onShutdownRequested);
     connect(tray_adapter_.get(), &QtTrayAdapter::openSettingsRequested, this, &DesktopController::onOpenSettingsRequested);
-    connect(tray_adapter_.get(), &QtTrayAdapter::openQuickPanelRequested, this, &DesktopController::onOpenQuickPanelRequested);
 
     // Initialize UI Panels
-    quick_panel_ = std::make_unique<QuickPanelWidget>();
-    connect(quick_panel_.get(), &QuickPanelWidget::pauseRequested, this, &DesktopController::onTrayPauseRequested);
-
     settings_window_ = std::make_unique<SettingsWindow>();
     connect(settings_window_.get(), &SettingsWindow::settingsChanged, this, [this]() {
         // Handle settings changes, like privacy level, auto start, etc.
@@ -48,9 +44,8 @@ DesktopController::~DesktopController() {
 
 bool DesktopController::checkConsent() {
     QSettings settings("EU-Digital", "DesktopRuntime");
-    settings.setValue("consent_granted", true);
-    consent_granted_ = true;
-    return true;
+    consent_granted_ = settings.value("consent_granted", false).toBool();
+    return consent_granted_;
 }
 
 void DesktopController::setConsent(bool granted) {
@@ -76,8 +71,27 @@ void DesktopController::setPaused(bool paused) {
 
 void DesktopController::start() {
     if (!checkConsent()) {
-        QCoreApplication::quit();
-        return;
+        // SPEC-030: consent is deny-by-default. Show onboarding dialog.
+        auto answer = QMessageBox::question(
+            nullptr,
+            "Eu Digital — Consentimento de Observação",
+            "O Eu Digital precisa do seu consentimento para observar atividades "
+            "do sistema (janelas ativas, padrões de digitação) de forma local e privada.\n\n"
+            "Nenhum dado será enviado para a nuvem.\n\n"
+            "Você autoriza a observação local?",
+            QMessageBox::Yes | QMessageBox::No,
+            QMessageBox::No
+        );
+        if (answer == QMessageBox::Yes) {
+            setConsent(true);
+        } else {
+            setConsent(false);
+            // Show tray in passive mode without sensors
+            tray_adapter_->show();
+            tray_adapter_->setPresence(PresenceState::paused, "Aguardando consentimento");
+            health_timer_->start(1000);
+            return;
+        }
     }
 
     tray_adapter_->show();
@@ -145,6 +159,36 @@ void DesktopController::start() {
             host->capability_registry().register_instance("system.activity", system_sensor_);
             host->capability_registry().register_instance("interaction.input", input_sensor_);
             
+            // Instantiate cognitive components and register ports (SPEC-053 Fase 2)
+            episodic_memory_ = std::make_shared<EpisodicMemoryStore>();
+            
+            WorldModelConfig wm_config;
+            world_model_ = std::make_shared<WorldModel>(wm_config, "desktop");
+            
+            global_workspace_ = std::make_shared<GlobalWorkspace>(
+                "gw-desktop", config.session_id, WorkspaceConfig{});
+            
+            self_model_ = std::make_shared<VersionedFunctionalSelfModel>(
+                "eu-digital-desktop", config.observed_at);
+            
+            metacognition_engine_ = std::make_shared<MetacognitionCuriosityEngine>();
+            suggestion_orchestrator_ = std::make_shared<SuggestionOrchestrator>();
+            
+            host->capability_registry().register_instance("episode_boundary",
+                CognitivePortFactory::create_episode_boundary_port());
+            host->capability_registry().register_instance("memory_write",
+                CognitivePortFactory::create_memory_write_port(episodic_memory_));
+            host->capability_registry().register_instance("prediction",
+                CognitivePortFactory::create_prediction_port(world_model_));
+            host->capability_registry().register_instance("workspace",
+                CognitivePortFactory::create_workspace_selection_port(global_workspace_));
+            host->capability_registry().register_instance("self_model",
+                CognitivePortFactory::create_self_model_query_port(self_model_));
+            host->capability_registry().register_instance("metacognition",
+                CognitivePortFactory::create_metacognition_port(metacognition_engine_));
+            host->capability_registry().register_instance("decision",
+                CognitivePortFactory::create_cognitive_decision_port(suggestion_orchestrator_));
+            
             runtime_ = std::move(host);
         }
 
@@ -207,28 +251,16 @@ void DesktopController::onShutdownRequested() {
 
 void DesktopController::onOpenSettingsRequested() {
     if (settings_window_) {
+        std::lock_guard lock(runtime_mutex_);
+        if (runtime_) {
+            settings_window_->setCapabilityRegistry(&runtime_->capability_registry());
+        }
         settings_window_->show();
         settings_window_->activateWindow();
     }
 }
 
-void DesktopController::onOpenQuickPanelRequested() {
-    if (quick_panel_) {
-        // Calculate position near tray
-        QPoint pos = QCursor::pos();
-        quick_panel_->move(pos.x() - quick_panel_->width() / 2, pos.y() - quick_panel_->height() - 10);
-        
-        int sensors = 0;
-        if (system_sensor_) sensors++;
-        if (input_sensor_) sensors++;
-        
-        int memories = 0; // TODO: Fetch from actual storage when implemented
 
-        quick_panel_->updateHealthStats(sensors, memories, paused_);
-        quick_panel_->show();
-        quick_panel_->activateWindow();
-    }
-}
 
 void DesktopController::onTrayConsentRevoked(bool revoked) {
     setConsent(!revoked);
@@ -253,19 +285,71 @@ void DesktopController::onUserInputReceived(const QString& text) {
             event.source        = "user.utterance";
             event.event_type    = "dialogue.message";
             event.schema_version = "1.0";
-            event.payload       = "{\"text\":\"" + text.toStdString() + "\"}";
+            QJsonObject payload_obj;
+            payload_obj["text"] = text;
+            QJsonDocument payload_doc(payload_obj);
+            event.payload = payload_doc.toJson(QJsonDocument::Compact).toStdString();
             try { runtime_->event_bus().publish(event); } catch (...) {}
         }
     }
 
-    // Show a "thinking" indicator while Ollama processes
+    // Show a "thinking" indicator while the cognitive cycle processes
     appendMessageToTray("agent", "\xF0\x9F\xA4\x94 Pensando...");
+    tray_adapter_->setPresence(PresenceState::processing, "Processando ciclo cognitivo");
 
-    // Send to Ollama asynchronously
-    if (ollama_service_) {
+    // Wait briefly for the cognitive cycle to process, then send enriched prompt to Ollama.
+    // The cycle runs on a background thread; we use a short delay to let it complete.
+    QTimer::singleShot(200, this, [this, text]() {
+        if (!ollama_service_) return;
+
+        // Build enriched prompt from cognitive context
+        QString enriched_prompt = text;
+        {
+            std::lock_guard lock(runtime_mutex_);
+            if (runtime_) {
+                auto coordinator = runtime_->coordinator();
+                if (coordinator) {
+                    auto ctx = coordinator->last_cycle_context();
+
+                    // Enrich the prompt with cognitive context
+                    QStringList context_parts;
+
+                    if (ctx.episode && ctx.episode->valid()) {
+                        context_parts << QString("Episódio atual: %1 (%2)")
+                            .arg(QString::fromStdString(ctx.episode->episode_id))
+                            .arg(QString::fromStdString(ctx.episode->current_state));
+                    }
+
+                    if (ctx.self_model && ctx.self_model->valid()) {
+                        context_parts << QString("Modelo: %1, alinhamento: %2")
+                            .arg(QString::fromStdString(ctx.self_model->model_id))
+                            .arg(ctx.self_model->alignment_score);
+                    }
+
+                    if (ctx.decision) {
+                        context_parts << QString("Decisão cognitiva: intent=%1, razão=%2")
+                            .arg(QString::fromStdString(ctx.decision->intent))
+                            .arg(QString::fromStdString(ctx.decision->reason));
+                    }
+
+                    if (ctx.metacognition && ctx.metacognition->valid()) {
+                        context_parts << QString("Curiosidade: %1, explorar: %2")
+                            .arg(ctx.metacognition->curiosity_score)
+                            .arg(ctx.metacognition->requires_exploration ? "sim" : "não");
+                    }
+
+                    if (!context_parts.isEmpty()) {
+                        enriched_prompt = QString("[Contexto cognitivo: %1]\n\nUsuário: %2")
+                            .arg(context_parts.join("; "))
+                            .arg(text);
+                    }
+                }
+            }
+        }
+
         tray_adapter_->setPresence(PresenceState::processing, "Aguardando Ollama");
-        ollama_service_->sendAsync(text);
-    }
+        ollama_service_->sendAsync(enriched_prompt);
+    });
 }
 
 void DesktopController::onOllamaResponse(const QString& text) {

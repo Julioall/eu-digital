@@ -23,6 +23,12 @@ public:
     void toggleVisibility(const QPoint& trayIconPos);
     void setPresenceState(PresenceState state);
 
+    // SPEC-053: Activity companion display
+    void setCurrentActivity(const QString& description, const QString& duration);
+    void setAssistanceCard(const QString& title, const QString& body,
+                           const QString& action_label, const QString& card_type);
+    void clearAssistanceCard();
+
 signals:
     void userInputReceived(const QString& text);
     void expandRequested();
@@ -53,6 +59,14 @@ private:
     QPushButton* cancel_btn_;
     QPushButton* settings_btn_;
     QVBoxLayout* main_layout_;
+
+    // SPEC-053: Activity companion widgets
+    QLabel* activity_label_{nullptr};
+    QLabel* activity_duration_label_{nullptr};
+    QWidget* assistance_card_widget_{nullptr};
+    QLabel* card_title_label_{nullptr};
+    QLabel* card_body_label_{nullptr};
+    QPushButton* card_action_btn_{nullptr};
 };
 
 } // namespace eu_digital

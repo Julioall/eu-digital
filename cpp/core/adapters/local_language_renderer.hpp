@@ -4,6 +4,7 @@
 #include <future>
 #include <chrono>
 #include <string>
+#include <functional>
 
 namespace eu_digital {
 

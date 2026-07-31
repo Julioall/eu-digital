@@ -1,0 +1,62 @@
+name: Qt Desktop Integration Validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  qt-integration:
+    name: Desktop UI and Integration
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.5.3'
+          arch: 'win64_msvc2019_64'
+
+      - name: Install SQLite runtime
+        shell: pwsh
+        run: |
+          vcpkg install sqlite3:x64-windows
+          $vcpkgPrefix = Join-Path $env:VCPKG_INSTALLATION_ROOT "installed\x64-windows"
+          "$vcpkgPrefix\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          "CMAKE_PREFIX_PATH=$vcpkgPrefix" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Configure CMake (windows-qt)
+        run: cmake --preset windows-qt
+
+      - name: Build Desktop integration test
+        run: cmake --build --preset windows-qt --target desktop_integration_test
+
+      - name: Run Desktop integration test
+        run: ctest --preset windows-qt -R desktop_integration_test
+
+      - name: Build Desktop Application
+        run: cmake --build --preset windows-qt --target eu_digital_desktop
+
+      - name: Run windeployqt
+        run: |
+          $qtBinDir = (Get-ChildItem -Directory $env:RUNNER_WORKSPACE\..\Qt\*\*\msvc*\bin | Select-Object -First 1).FullName
+          & "$qtBinDir\windeployqt.exe" --compiler-runtime build/windows-qt/eu_digital_desktop.exe
+        shell: pwsh
+        continue-on-error: true
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eu-digital-desktop-windows
+          path: |
+            build/windows-qt/eu_digital_desktop.exe
+            build/windows-qt/*.dll

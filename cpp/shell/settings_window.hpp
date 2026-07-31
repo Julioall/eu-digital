@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include "sensor_control_widget.hpp"
 
 class QTextBrowser;
 
@@ -21,6 +22,8 @@ public:
 
     void loadSettings();
     void saveSettings();
+
+    void setCapabilityRegistry(const CapabilityRegistry* registry);
 
 signals:
     void settingsChanged();
@@ -52,6 +55,7 @@ private:
     
     QSlider* privacy_slider_;
     QTextBrowser* log_viewer_;
+    SensorControlWidget* sensor_control_{nullptr};
 };
 
 } // namespace eu_digital

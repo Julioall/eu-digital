@@ -210,14 +210,8 @@ QWidget* SettingsWindow::createPrivacidadeTab() {
 }
 
 QWidget* SettingsWindow::createSensoresTab() {
-    QWidget* tab = new QWidget();
-    QVBoxLayout* l = new QVBoxLayout(tab);
-    l->setContentsMargins(0,0,0,0);
-    QLabel* lbl = new QLabel("Configurações de Sensores (WIP)", tab);
-    lbl->setStyleSheet("color: #A0A0A0;");
-    l->addWidget(lbl);
-    l->addStretch();
-    return tab;
+    sensor_control_ = new SensorControlWidget();
+    return sensor_control_;
 }
 
 QWidget* SettingsWindow::createPerguntasTab() {
@@ -331,6 +325,12 @@ void SettingsWindow::saveSettings() {
 void SettingsWindow::closeEvent(QCloseEvent* event) {
     hide();
     event->ignore();
+}
+
+void SettingsWindow::setCapabilityRegistry(const CapabilityRegistry* registry) {
+    if (sensor_control_) {
+        sensor_control_->updateFromRegistry(registry);
+    }
 }
 
 } // namespace eu_digital

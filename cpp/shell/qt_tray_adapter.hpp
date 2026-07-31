@@ -196,8 +196,7 @@ private:
         auto* open_act = menu->addAction(createMenuIcon(QString::fromUtf8("\xE2\x8C\x82")), "Abrir Eu Digital");
         connect(open_act, &QAction::triggered, this, &QtTrayAdapter::onOpenWidget);
 
-        action_quick_panel_ = menu->addAction(createMenuIcon(QString::fromUtf8("\xE2\x8A\x9E")), "Painel Rápido");
-        connect(action_quick_panel_, &QAction::triggered, this, &QtTrayAdapter::onQuickPanel);
+
 
         menu->addSeparator();
 
@@ -228,7 +227,7 @@ private:
     TrayStateMachine* state_machine_;
     QAction*          action_pause_{nullptr};
     QAction*          action_mute_{nullptr};
-    QAction*          action_quick_panel_{nullptr};
+
     bool              muted_{false};
 };
 

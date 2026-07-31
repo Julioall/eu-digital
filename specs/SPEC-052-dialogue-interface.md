@@ -1,7 +1,9 @@
 ---
 id: SPEC-052
 title: Interface de Bandeja, Widgets e Diálogo (Tray UI)
-status: implemented
+status: spike
+version: 1.0.0
+note: "Reclassificada como spike experimental da interface conversacional. Ver SPEC-053 para a evolução de produto."
 phase: product_beta
 dependencies: [SPEC-050, SPEC-040]
 adrs: []

@@ -271,8 +271,8 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         cpp/shell/tray_widget.hpp
         cpp/shell/tray_state_machine.hpp
         cpp/shell/tray_state_machine.cpp
-        cpp/shell/quick_panel_widget.hpp
-        cpp/shell/quick_panel_widget.cpp
+        cpp/shell/sensor_control_widget.hpp
+        cpp/shell/sensor_control_widget.cpp
         cpp/shell/settings_window.hpp
         cpp/shell/settings_window.cpp
         cpp/shell/toast_notification.hpp
@@ -301,8 +301,8 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         cpp/shell/tray_widget.hpp
         cpp/shell/tray_state_machine.hpp
         cpp/shell/tray_state_machine.cpp
-        cpp/shell/quick_panel_widget.hpp
-        cpp/shell/quick_panel_widget.cpp
+        cpp/shell/sensor_control_widget.hpp
+        cpp/shell/sensor_control_widget.cpp
         cpp/shell/settings_window.hpp
         cpp/shell/settings_window.cpp
         cpp/shell/toast_notification.hpp

@@ -3,10 +3,16 @@
 #include "core/runtime_host.hpp"
 #include "core/system_activity_sensor.hpp"
 #include "core/input_interaction_sensor.hpp"
+#include "core/adapters/cognitive_port_factory.hpp"
+#include "core/episodic_memory.hpp"
+#include "core/world_model.hpp"
+#include "core/global_workspace.hpp"
+#include "core/functional_self_model.hpp"
+#include "core/metacognition_curiosity.hpp"
+#include "core/suggestion_orchestrator.hpp"
 #include "shell/qt_tray_adapter.hpp"
 #include "shell/qt_avatar_window.hpp"
 #include "shell/ollama_dialogue_service.hpp"
-#include "shell/quick_panel_widget.hpp"
 #include "shell/settings_window.hpp"
 
 #include <QObject>
@@ -78,6 +84,14 @@ private:
 
     // Ollama Dialogue
     std::unique_ptr<OllamaDialogueService> ollama_service_;
+
+    // Cognitive Components (Fase 2 — SPEC-053)
+    std::shared_ptr<EpisodicMemoryStore> episodic_memory_;
+    std::shared_ptr<WorldModel> world_model_;
+    std::shared_ptr<GlobalWorkspace> global_workspace_;
+    std::shared_ptr<VersionedFunctionalSelfModel> self_model_;
+    std::shared_ptr<MetacognitionCuriosityEngine> metacognition_engine_;
+    std::shared_ptr<SuggestionOrchestrator> suggestion_orchestrator_;
 };
 
 } // namespace eu_digital

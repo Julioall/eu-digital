@@ -1,5 +1,5 @@
 #include "shell/desktop_controller.hpp"
-#include <QCoreApplication>
+#include <QApplication>
 #include <QTimer>
 #include <QSettings>
 #include <QElapsedTimer>
@@ -8,7 +8,7 @@
 using namespace eu_digital;
 
 int main(int argc, char** argv) {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     app.setApplicationName("EU-Digital Test");
     app.setOrganizationName("EU-Digital");
 
