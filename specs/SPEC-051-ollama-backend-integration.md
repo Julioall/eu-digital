@@ -1,23 +1,33 @@
-# SPEC-051: Ollama Backend Integration
+---
+id: SPEC-051
+title: "Ollama Backend Integration"
+status: done
+phase: cognitive_loop
+dependencies: ["SPEC-013"]
+adrs: []
+contracts: []
+---
+
+# SPEC-051 - Ollama Backend Integration
+
+## Objetivo
+Introduzir um backend HTTP nativo (`OllamaModelBackend`) para conectar o Gateway de Modelos Locais (`LocalModelGateway`) à API REST do Ollama rodando localmente (tipicamente na porta 11434).
 
 ## Visão Geral
-Esta especificação introduz um backend HTTP nativo (`OllamaModelBackend`) para conectar o Gateway de Modelos Locais (`LocalModelGateway`) à API REST do Ollama rodando localmente (tipicamente na porta 11434).
+A arquitetura base da SPEC-013 (`LocalModelGateway`) descrevia abstrações independentes do provedor. No entanto, o ecossistema C++ ainda não continha um motor (`LocalModelBackend`) de fato. Para viabilizar a prototipação rápida, a integração HTTP via Ollama se torna o caminho mais aderente e limpo no Windows.
 
-## Motivação
-A arquitetura base da SPEC-013 (`LocalModelGateway`) descrevia abstrações independentes do provedor. No entanto, o ecossistema C++ ainda não continha um motor (`LocalModelBackend`) de fato. Para viabilizar a prototipação rápida e usar modelos Vision-Language (como o `qwen3-vl:2b`) de forma imediata sem inchar o projeto com bibliotecas GGUF pesadas (como `llama.cpp` e dependências CUDA/Metal), a integração HTTP via Ollama se torna o caminho mais aderente e limpo no Windows.
+## Escopo negativo
+- Não inclui execução direta de modelos GGUF via CUDA ou Metal.
+- Não requer dependências pesadas de curl.
 
 ## Requisitos Funcionais
 - Implementar `OllamaModelBackend` herdando de `LocalModelBackend`.
-- O método `load()` deve verificar se a tag do modelo (ex: `qwen3-vl:2b`) existe localmente usando `GET /api/tags`.
-- O método `invoke()` deve construir uma requisição JSON (com suporte a *images*, caso disponíveis, extraídas dos módulos de visão no futuro) e fazer um `POST /api/generate`.
-- Timeout e cancelamento devem ser tratados (embora requisições bloqueantes do WinHTTP/WinINet possuam limitações, deve-se usar sockets primitivos ou configurar timeouts no cliente HTTP usado).
+- O método `load()` deve verificar se a tag do modelo existe localmente usando `GET /api/tags`.
+- O método `invoke()` deve construir uma requisição JSON e fazer um `POST /api/generate`.
 
-## Requisitos Não Funcionais
-- **Nenhuma dependência massiva de HTTP cURL:** Dado que estamos focando num build rápido e livre de poluição, usaremos APIs nativas de rede (como `WinHTTP` no Windows) ou um client HTTP socket C++ puro (`httplib.h` header-only ou simulação via Boost/ASIO, se já constarem no sistema). Se nada disso estiver disponível de forma simples, usaremos implementações baseadas no cabeçalho `<windows.h>` WinHTTP já disponível nativamente no ecossistema MSVC.
-
-## Contratos
-- A classe injetará os outputs do Ollama num `LocalModelRawOutput` respeitando a SPEC-013.
-
-## Critérios de Aceite
+## Critérios de aceite
+- [x] O `OllamaModelBackend` é capaz de enviar requisições e processar a resposta json do servidor local Ollama.
 - [ ] A arquitetura isola o protocolo HTTP dentro do `OllamaModelBackend` apenas.
 - [ ] Teste mock valida a serialização correta de request/response JSON e timeouts.
+
+

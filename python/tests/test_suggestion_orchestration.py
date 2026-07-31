@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import pathlib
 
-import pytest
+import unittest
 
 from reference.suggestion_orchestrator import (
     SUGGESTION_ABLATION,
@@ -37,17 +37,17 @@ def _evidence(
     )
 
 
-class TestSuggestionDecisionSchema:
+class TestSuggestionDecisionSchema(unittest.TestCase):
     """Validate suggestion_decision.schema.json contract."""
 
     def test_schema_exists(self):
         schema_path = CONTRACTS / "suggestion_decision.schema.json"
-        assert schema_path.exists(), "suggestion_decision.schema.json must exist"
+        self.assertTrue(schema_path.exists(), "suggestion_decision.schema.json must exist")
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
-        assert schema["title"] == "SuggestionDecision"
-        assert "action_proposed" in schema["properties"]
+        self.assertEqual(schema["title"], "SuggestionDecision")
+        self.assertIn("action_proposed", schema["properties"])
         # action_proposed must be false
-        assert schema["properties"]["action_proposed"]["const"] is False
+        self.assertIs(schema["properties"]["action_proposed"]["const"], False)
 
     def test_required_fields(self):
         schema_path = CONTRACTS / "suggestion_decision.schema.json"
@@ -60,53 +60,53 @@ class TestSuggestionDecisionSchema:
             "budget_after", "cooldown_remaining_seconds", "override_active",
             "action_proposed", "created_at",
         }
-        assert required == expected
+        self.assertEqual(required, expected)
 
 
-class TestSuggestionPolicy:
+class TestSuggestionPolicy(unittest.TestCase):
     """Test policy validation and defaults."""
 
     def test_default_policy(self):
         p = SuggestionPolicy()
         p.validate()
-        assert p.max_per_window == 3
-        assert p.window_seconds == 900.0
-        assert p.cooldown_seconds == 300.0
-        assert p.correction_cooldown_seconds == 1800.0
-        assert p.max_per_day == 8
+        self.assertEqual(p.max_per_window, 3)
+        self.assertEqual(p.window_seconds, 900.0)
+        self.assertEqual(p.cooldown_seconds, 300.0)
+        self.assertEqual(p.correction_cooldown_seconds, 1800.0)
+        self.assertEqual(p.max_per_day, 8)
 
     def test_invalid_max_per_window(self):
         p = SuggestionPolicy(max_per_window=0)
-        with pytest.raises(ValueError, match="max_per_window"):
+        with self.assertRaisesRegex(ValueError, "max_per_window"):
             p.validate()
 
     def test_invalid_min_confidence(self):
         p = SuggestionPolicy(min_confidence=1.5)
-        with pytest.raises(ValueError, match="min_confidence"):
+        with self.assertRaisesRegex(ValueError, "min_confidence"):
             p.validate()
 
     def test_fingerprint_deterministic(self):
         p = SuggestionPolicy()
-        assert p.fingerprint() == p.fingerprint()
-        assert len(p.fingerprint()) == 16
+        self.assertEqual(p.fingerprint(), p.fingerprint())
+        self.assertEqual(len(p.fingerprint()), 16)
 
 
-class TestBasicSuggestion:
+class TestBasicSuggestion(unittest.TestCase):
     """Test basic suggestion delivery."""
 
     def test_deliver_suggestion(self):
         orch = SuggestionOrchestrator()
         d = orch.evaluate(_evidence(), "2026-07-31T12:00:00+00:00")
-        assert d.decision_id
-        assert d.schema_version == SUGGESTION_SCHEMA_VERSION
-        assert d.hypothesis_id == "h-001"
-        assert abs(d.confidence - 0.6) < 1e-9
-        assert abs(d.information_gain - 0.3) < 1e-9
-        assert not d.suppressed
-        assert d.suppression_reason is None
-        assert not d.action_proposed
-        assert d.budget_before == 3
-        assert d.budget_after == 2
+        self.assertTrue(d.decision_id)
+        self.assertEqual(d.schema_version, SUGGESTION_SCHEMA_VERSION)
+        self.assertEqual(d.hypothesis_id, "h-001")
+        self.assertTrue(abs(d.confidence - 0.6) < 1e-9)
+        self.assertTrue(abs(d.information_gain - 0.3) < 1e-9)
+        self.assertFalse(d.suppressed)
+        self.assertIs(d.suppression_reason, None)
+        self.assertFalse(d.action_proposed)
+        self.assertEqual(d.budget_before, 3)
+        self.assertEqual(d.budget_after, 2)
 
     def test_action_proposed_always_false(self):
         d = SuggestionDecision(
@@ -119,29 +119,29 @@ class TestBasicSuggestion:
             created_at="2026-07-31T12:00:00+00:00",
             action_proposed=True,
         )
-        with pytest.raises(ValueError, match="SPEC-043 prohibits"):
+        with self.assertRaisesRegex(ValueError, "SPEC-043 prohibits"):
             d.validate()
 
     def test_evidence_required(self):
         orch = SuggestionOrchestrator()
         evidence = SuggestionEvidence("h-001", 0.6, 0.3, [], "reason")
-        with pytest.raises(ValueError, match="evidence"):
+        with self.assertRaisesRegex(ValueError, "evidence"):
             orch.evaluate(evidence, "2026-07-31T12:00:00+00:00")
 
 
-class TestBudget:
+class TestBudget(unittest.TestCase):
     """Test budget exhaustion."""
 
     def test_window_budget(self):
         policy = SuggestionPolicy(max_per_window=2, redundancy_suppression=False)
         orch = SuggestionOrchestrator(policy)
         d1 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:00:00+00:00")
-        assert not d1.suppressed
+        self.assertFalse(d1.suppressed)
         d2 = orch.evaluate(_evidence("h-002"), "2026-07-31T12:01:00+00:00")
-        assert not d2.suppressed
+        self.assertFalse(d2.suppressed)
         d3 = orch.evaluate(_evidence("h-003"), "2026-07-31T12:02:00+00:00")
-        assert d3.suppressed
-        assert d3.suppression_reason == "budget_exhausted"
+        self.assertTrue(d3.suppressed)
+        self.assertEqual(d3.suppression_reason, "budget_exhausted")
 
     def test_daily_budget(self):
         policy = SuggestionPolicy(
@@ -150,26 +150,26 @@ class TestBudget:
         )
         orch = SuggestionOrchestrator(policy)
         d1 = orch.evaluate(_evidence("h-001"), "2026-07-31T08:00:00+00:00")
-        assert not d1.suppressed
+        self.assertFalse(d1.suppressed)
         d2 = orch.evaluate(_evidence("h-002"), "2026-07-31T09:00:00+00:00")
-        assert not d2.suppressed
+        self.assertFalse(d2.suppressed)
         d3 = orch.evaluate(_evidence("h-003"), "2026-07-31T10:00:00+00:00")
-        assert d3.suppressed
-        assert d3.suppression_reason == "budget_exhausted"
+        self.assertTrue(d3.suppressed)
+        self.assertEqual(d3.suppression_reason, "budget_exhausted")
 
 
-class TestCooldown:
+class TestCooldown(unittest.TestCase):
     """Test cooldown and correction cooldown."""
 
     def test_cooldown_active(self):
         policy = SuggestionPolicy(cooldown_seconds=300.0)
         orch = SuggestionOrchestrator(policy)
         d1 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:00:00+00:00")
-        assert not d1.suppressed
+        self.assertFalse(d1.suppressed)
         d2 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:03:00+00:00")
-        assert d2.suppressed
-        assert d2.suppression_reason == "cooldown_active"
-        assert d2.cooldown_remaining_seconds > 0
+        self.assertTrue(d2.suppressed)
+        self.assertEqual(d2.suppression_reason, "cooldown_active")
+        self.assertTrue(d2.cooldown_remaining_seconds > 0)
 
     def test_correction_extends_cooldown(self):
         policy = SuggestionPolicy(
@@ -180,34 +180,34 @@ class TestCooldown:
         d1 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:00:00+00:00")
         orch.record_feedback(d1.decision_id, "correct", "fix", "2026-07-31T12:00:10+00:00")
         d2 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:05:00+00:00")
-        assert d2.suppressed
-        assert d2.suppression_reason == "cooldown_active"
+        self.assertTrue(d2.suppressed)
+        self.assertEqual(d2.suppression_reason, "cooldown_active")
 
 
-class TestSuppression:
+class TestSuppression(unittest.TestCase):
     """Test various suppression reasons."""
 
     def test_confidence_below_minimum(self):
         orch = SuggestionOrchestrator()
         d = orch.evaluate(_evidence(confidence=0.05), "2026-07-31T12:00:00+00:00")
-        assert d.suppressed
-        assert d.suppression_reason == "confidence_below_minimum"
+        self.assertTrue(d.suppressed)
+        self.assertEqual(d.suppression_reason, "confidence_below_minimum")
 
     def test_gain_below_minimum(self):
         orch = SuggestionOrchestrator()
         d = orch.evaluate(_evidence(gain=0.01), "2026-07-31T12:00:00+00:00")
-        assert d.suppressed
-        assert d.suppression_reason == "information_gain_below_minimum"
+        self.assertTrue(d.suppressed)
+        self.assertEqual(d.suppression_reason, "information_gain_below_minimum")
 
     def test_redundancy(self):
         policy = SuggestionPolicy(cooldown_seconds=60.0)
         orch = SuggestionOrchestrator(policy)
         d1 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:00:00+00:00")
-        assert not d1.suppressed
+        self.assertFalse(d1.suppressed)
         # After cooldown but redundant
         d2 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:06:00+00:00")
-        assert d2.suppressed
-        assert d2.suppression_reason == "redundant_hypothesis"
+        self.assertTrue(d2.suppressed)
+        self.assertEqual(d2.suppression_reason, "redundant_hypothesis")
 
     def test_correction_resets_redundancy(self):
         policy = SuggestionPolicy(cooldown_seconds=60.0, correction_cooldown_seconds=120.0)
@@ -215,27 +215,27 @@ class TestSuppression:
         d1 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:00:00+00:00")
         orch.record_feedback(d1.decision_id, "correct", "wrong context", "2026-07-31T12:00:30+00:00")
         d2 = orch.evaluate(_evidence("h-001"), "2026-07-31T12:03:00+00:00")
-        assert not d2.suppressed
+        self.assertFalse(d2.suppressed)
 
 
-class TestModelAbsent:
+class TestModelAbsent(unittest.TestCase):
     """Test explicit degradation without model."""
 
     def test_model_absent_suppresses(self):
         orch = SuggestionOrchestrator(model_available=False)
         d = orch.evaluate_without_model(_evidence(), "2026-07-31T12:00:00+00:00")
-        assert d.suppressed
-        assert d.suppression_reason == "model_absent"
-        assert "model absent" in d.reason
-        assert not d.action_proposed
+        self.assertTrue(d.suppressed)
+        self.assertEqual(d.suppression_reason, "model_absent")
+        self.assertIn("model absent", d.reason)
+        self.assertFalse(d.action_proposed)
 
     def test_model_available_rejects_without_model(self):
         orch = SuggestionOrchestrator(model_available=True)
-        with pytest.raises(ValueError, match="model is available"):
+        with self.assertRaisesRegex(ValueError, "model is available"):
             orch.evaluate_without_model(_evidence(), "2026-07-31T12:00:00+00:00")
 
 
-class TestFeedback:
+class TestFeedback(unittest.TestCase):
     """Test feedback recording."""
 
     def test_feedback_on_suppressed_rejected(self):
@@ -243,24 +243,24 @@ class TestFeedback:
         orch = SuggestionOrchestrator(policy)
         orch.evaluate(_evidence("h-000"), "2026-07-31T12:00:00+00:00")
         d = orch.evaluate(_evidence("h-001"), "2026-07-31T12:00:30+00:00")
-        assert d.suppressed
-        with pytest.raises(ValueError, match="suppressed"):
+        self.assertTrue(d.suppressed)
+        with self.assertRaisesRegex(ValueError, "suppressed"):
             orch.record_feedback(d.decision_id, "defer", None, "2026-07-31T12:01:00+00:00")
 
     def test_correct_requires_correction(self):
         orch = SuggestionOrchestrator()
         d = orch.evaluate(_evidence(), "2026-07-31T12:00:00+00:00")
-        with pytest.raises(ValueError, match="correction"):
+        with self.assertRaisesRegex(ValueError, "correction"):
             orch.record_feedback(d.decision_id, "correct", None, "2026-07-31T12:01:00+00:00")
 
     def test_defer_rejects_correction(self):
         orch = SuggestionOrchestrator()
         d = orch.evaluate(_evidence(), "2026-07-31T12:00:00+00:00")
-        with pytest.raises(ValueError, match="only correct"):
+        with self.assertRaisesRegex(ValueError, "only correct"):
             orch.record_feedback(d.decision_id, "defer", "wrong", "2026-07-31T12:01:00+00:00")
 
 
-class TestMetrics:
+class TestMetrics(unittest.TestCase):
     """Test metrics snapshot."""
 
     def test_metrics_content(self):
@@ -268,15 +268,15 @@ class TestMetrics:
         d = orch.evaluate(_evidence(), "2026-07-31T12:00:00+00:00")
         orch.record_feedback(d.decision_id, "defer", None, "2026-07-31T12:01:00+00:00")
         m = orch.metrics()
-        assert m["delivered"] == 1
-        assert m["total_decisions"] == 1
-        assert m["total_feedback"] == 1
-        assert m["hypothesis"] == SUGGESTION_HYPOTHESIS
-        assert m["falsification"] == SUGGESTION_FALSIFICATION
-        assert m["ablation"] == SUGGESTION_ABLATION
+        self.assertEqual(m["delivered"], 1)
+        self.assertEqual(m["total_decisions"], 1)
+        self.assertEqual(m["total_feedback"], 1)
+        self.assertEqual(m["hypothesis"], SUGGESTION_HYPOTHESIS)
+        self.assertEqual(m["falsification"], SUGGESTION_FALSIFICATION)
+        self.assertEqual(m["ablation"], SUGGESTION_ABLATION)
 
 
-class TestAblation:
+class TestAblation(unittest.TestCase):
     """Test ablation: no budget, no cooldown, no redundancy."""
 
     def test_unlimited_without_budget(self):
@@ -290,30 +290,30 @@ class TestAblation:
                 _evidence(f"h-{i:03d}"),
                 f"2026-07-31T12:0{i}:00+00:00",
             )
-            assert not d.suppressed
+            self.assertFalse(d.suppressed)
 
 
-class TestSerialization:
+class TestSerialization(unittest.TestCase):
     """Test JSON serialization."""
 
     def test_decision_dict(self):
         orch = SuggestionOrchestrator()
         d = orch.evaluate(_evidence(), "2026-07-31T12:00:00+00:00")
         data = d.to_dict()
-        assert data["action_proposed"] is False
-        assert data["hypothesis_id"] == "h-001"
-        assert data["schema_version"] == "1.0"
-        assert data["suppressed"] is False
+        self.assertIs(data["action_proposed"], False)
+        self.assertEqual(data["hypothesis_id"], "h-001")
+        self.assertEqual(data["schema_version"], "1.0")
+        self.assertIs(data["suppressed"], False)
 
 
-class TestPlugin:
+class TestPlugin(unittest.TestCase):
     """Test the plugin descriptor pattern."""
 
     def test_orchestrator_as_capability(self):
         # The orchestrator follows the same removable pattern
         orch = SuggestionOrchestrator()
         # Verify it doesn't import concrete plugins
-        assert hasattr(orch, "evaluate")
-        assert hasattr(orch, "evaluate_without_model")
-        assert hasattr(orch, "record_feedback")
-        assert hasattr(orch, "metrics")
+        self.assertTrue(hasattr(orch, "evaluate"))
+        self.assertTrue(hasattr(orch, "evaluate_without_model"))
+        self.assertTrue(hasattr(orch, "record_feedback"))
+        self.assertTrue(hasattr(orch, "metrics"))

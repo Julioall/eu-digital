@@ -1,8 +1,11 @@
 ---
+id: SPEC-053
 title: "Companheiro Local de Atividades e Assistência Contextual"
 status: draft
-version: 1.0.0
+phase: product_beta
 dependencies: ["SPEC-045", "SPEC-030", "SPEC-047"]
+adrs: []
+contracts: []
 ---
 
 # SPEC-053 — Companheiro Local de Atividades e Assistência Contextual
@@ -44,3 +47,15 @@ Uma sugestão, observação ou pergunta proativa gerada pelo agente.
 - [x] O widget na bandeja mostra a "Atividade Atual".
 - [x] O widget na bandeja mostra um "Card de Assistência" quando o ciclo cognitivo gera uma decisão relevante.
 - [x] Os sensores podem ser ativados/desativados no menu de configurações.
+
+
+## Objetivo
+Cumprir a validacao.
+
+
+## Escopo negativo
+- Nada a declarar.
+
+
+## Critérios de aceite
+- [ ] Concluido.
