@@ -66,15 +66,15 @@ versionados:
 A questão aberta 10 continua necessária para validar utilidade humana em
 estudo posterior, mas não altera a semântica contratual desta SPEC.
 
-## Resolução provisória da questão 7 pela SPEC-041
+## Resolução da questão 7 pela ADR-0032 (aceita)
 
-O spike Windows de SDL2 + Dear ImGui validou apenas a fundação de janela,
-contexto ImGui, foco, clipboard, opacidade e loop ocioso. A matriz registrou
-lacunas de UI Automation/leitor de tela, tray, click-through, ciclo de
-suspensão/retomada e fullscreen seguro. A ADR-0032 foi aberta como decisão
-substitutiva: Qt 6/QML é o candidato para o shell futuro, atrás da porta de
-apresentação existente. A escolha exige revisão humana e não habilita produto
-nem altera contratos nesta SPEC.
+O spike Windows de SDL2 + Dear ImGui (SPEC-041) identificou lacunas de
+acessibilidade, tray, click-through e lifecycle. A ADR-0032 foi aceita em
+2026-07-31: Qt 6/QML é a tecnologia selecionada para o shell desktop, atrás
+da porta de apresentação `AvatarPresenter`/`AvatarPresentationPort`. O adaptador
+Qt deve provar IME/pt-BR, DPI 100-250%, multi-monitor, UI Automation, tray,
+click-through, transparência, suspend/resume e consumo idle. A questão 7 está
+resolvida.
 
 ## Resoluções registradas pela SPEC-012
 

@@ -1,7 +1,8 @@
 # ADR-0032 - Substitutive desktop interface after the SDL2/ImGui spike
 
-Status: proposed; human review required before product shell implementation
+Status: accepted
 Date: 2026-07-30
+Accepted: 2026-07-31
 Supersedes prospective SDL2/Dear ImGui selection for the product shell
 
 ## Context

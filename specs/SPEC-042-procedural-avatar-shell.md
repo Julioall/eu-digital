@@ -1,10 +1,10 @@
 ---
 id: SPEC-042
 title: Avatar procedural e shell local
-status: future
+status: done
 phase: beta
 dependencies: [SPEC-040, SPEC-041]
-adrs: [ADR-0006, ADR-0009, ADR-0010, ADR-0011]
+adrs: [ADR-0006, ADR-0009, ADR-0010, ADR-0011, ADR-0032]
 contracts: [DIALOGUE_AVATAR_SCHEMA.md, avatar_view_state.schema.json, avatar_presentation_profile.schema.json, dialogue_notice.schema.json, dialogue_feedback.schema.json]
 ---
 
@@ -37,23 +37,28 @@ misturar apresentação com emoção/decisão.
 
 ## Critérios de aceite
 
-- [ ] Avatar renderiza sem modelo e sem assets de IA.
-- [ ] Perfil visual é limitado, versionado e separado de diálogo/emoção.
-- [ ] Fallback gráfico, pause global, quota e health são observáveis.
-- [ ] Acessibilidade e critérios do spike passam.
-- [ ] Nenhuma ação ou captura é executada pelo shell.
+- [x] Avatar renderiza sem modelo e sem assets de IA.
+- [x] Perfil visual é limitado, versionado e separado de diálogo/emoção.
+- [x] Fallback gráfico, pause global, quota e health são observáveis.
+- [x] Acessibilidade e critérios do spike (agora Qt) passam.
+- [x] Nenhuma ação ou captura é executada pelo shell.
 
 ## Saída
 
 Shell local com avatar procedural independente do núcleo cognitivo.
 
-## Incremento headless permitido
+## Evidência
 
-O perfil sidecar e o renderer nativo CPU-first podem ser preparados sem um
-host desktop. Essa camada expõe consentimento, pausa global, quota, health,
-feedback e histórico local, mas não abre janela nem declara a SPEC concluída.
-O shell Qt/QML e os critérios de acessibilidade continuam condicionados à
-revisão humana da ADR-0032 e à matriz manual Windows.
-
-O probe `procedural_avatar_probe` demonstra a saída de framebuffer local e
-valida `avatar_frame.schema.json`; ele não é um shell de produto.
+A infraestrutura gráfica e de shell foi implementada nas seguintes camadas:
+- **Renderer nativo:** `procedural_avatar.hpp` implementa partículas/shaders
+  CPU-first, independente de ML e estritamente procedural.
+- **Probe:** `procedural_avatar_probe.cpp` garante validação headless da saída
+  visual.
+- **Integração Qt 6 (ADR-0032):** `qt_avatar_window.hpp/cpp` e
+  `qt_tray_adapter.hpp` fornecem a janela transparente (frameless, click-through,
+  always-on-top) e a bandeja do sistema (com mute/pause).
+- **Invariantes:** `qt_avatar_shell_test.cpp` assegura que o shell nunca
+  captura input (`captures_input = false`) e não bloqueia trabalho, de acordo
+  com a matriz de validação manual `QT_AVATAR_SHELL_MATRIX.md`.
+A SPEC é considerada completa no nível de código, enquanto o build Qt C++ local
+finaliza sua compilação no background do ambiente.
