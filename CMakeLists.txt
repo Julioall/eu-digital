@@ -195,6 +195,14 @@ add_executable(cognitive_decision_adapter_test cpp/tests/cognitive_decision_adap
 target_include_directories(cognitive_decision_adapter_test PRIVATE cpp)
 target_compile_features(cognitive_decision_adapter_test PRIVATE cxx_std_23)
 
+add_executable(local_language_renderer_test cpp/tests/local_language_renderer_test.cpp)
+target_include_directories(local_language_renderer_test PRIVATE cpp)
+target_compile_features(local_language_renderer_test PRIVATE cxx_std_23)
+
+add_executable(cognitive_decision_policy_test cpp/tests/cognitive_decision_policy_test.cpp)
+target_include_directories(cognitive_decision_policy_test PRIVATE cpp)
+target_compile_features(cognitive_decision_policy_test PRIVATE cxx_std_23)
+
 add_executable(cognitive_port_factory_test cpp/tests/cognitive_port_factory_test.cpp)
 target_include_directories(cognitive_port_factory_test PRIVATE cpp)
 target_compile_features(cognitive_port_factory_test PRIVATE cxx_std_23)
@@ -249,6 +257,8 @@ add_test(NAME global_workspace_adapter COMMAND global_workspace_adapter_test)
 add_test(NAME functional_self_model_adapter COMMAND functional_self_model_adapter_test)
 add_test(NAME metacognition_curiosity_adapter COMMAND metacognition_curiosity_adapter_test)
 add_test(NAME cognitive_decision_adapter COMMAND cognitive_decision_adapter_test)
+add_test(NAME local_language_renderer COMMAND local_language_renderer_test)
+add_test(NAME cognitive_decision_policy COMMAND cognitive_decision_policy_test)
 add_test(NAME cognitive_port_factory COMMAND cognitive_port_factory_test)
 add_test(
     NAME runtime_cli_required_dependency_failure
