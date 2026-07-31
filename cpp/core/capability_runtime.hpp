@@ -12,6 +12,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace eu_digital {
 
@@ -69,6 +70,7 @@ struct CapabilityRecord {
     CapabilityStateRecord state;
     int priority{0};
     std::map<std::string, std::string> checkpoint;
+    std::shared_ptr<void> instance;
 };
 
 struct SelfModelState {
@@ -324,6 +326,37 @@ public:
                            fallback ? "fallback_provider" : (preferred ? "preferred_provider" : "highest_priority")};
         if (event_sink_) event_sink_("capability.resolved", result.implementation_id);
         return result;
+    }
+
+    template <typename T>
+    void register_instance(const std::string& operation, std::shared_ptr<T> instance) {
+        // Quick setup for registering test/mock instances directly
+        CapabilityDescriptor desc;
+        desc.capability_id = operation;
+        desc.implementation_id = operation + "_impl";
+        desc.implementation_version = "1.0.0";
+        desc.kind = "mock";
+        desc.provides.push_back({operation, "{}"});
+        
+        discover(desc, 100);
+        
+        auto& record = records_[desc.implementation_id];
+        record.instance = instance;
+        record.state.state = CapabilityState::available;
+    }
+
+    template <typename T>
+    std::shared_ptr<T> resolve(const std::string& operation) const {
+        try {
+            auto resolution = resolve(operation, std::nullopt); // explicitly call non-template
+            auto found = records_.find(resolution.implementation_id);
+            if (found != records_.end() && found->second.instance) {
+                return std::static_pointer_cast<T>(found->second.instance);
+            }
+        } catch (const NoCapabilityProvider&) {
+            // Not found
+        }
+        return nullptr;
     }
 
 private:

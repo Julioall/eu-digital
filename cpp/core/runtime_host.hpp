@@ -1,6 +1,7 @@
 #pragma once
 
 #include "capability_runtime.hpp"
+#include "cognitive_coordinator.hpp"
 #include "cognitive_snapshot.hpp"
 #include "event_bus.hpp"
 #include "privacy_storage.hpp"
@@ -371,8 +372,14 @@ public:
             recover_cognitive_state();
             capability_registry_.define_profile("runtime-host-minimal", {});
             capability_registry_.activate_profile("runtime-host-minimal");
+            coordinator_ = std::make_shared<CognitiveCoordinator>(capability_registry_);
             event_bus_ = std::make_shared<EventBus>();
-            event_bus_->subscribe({}, {}, [this](const CanonicalEvent& event) { persist(event); });
+            event_bus_->subscribe({}, {}, [this](const CanonicalEvent& event) {
+                persist(event);
+                if (coordinator_) {
+                    coordinator_->enqueue(event);
+                }
+            });
 
             if (storage_quota_.health().status == StorageStatus::degraded) {
                 state_ = RuntimeState::degraded;
@@ -388,6 +395,7 @@ public:
             return true;
         } catch (const std::exception& error) {
             event_bus_.reset();
+            coordinator_.reset();
             timeline_.reset();
             add_error_locked("runtime_start_failed", error.what(), true);
             state_ = RuntimeState::failed;
@@ -397,16 +405,20 @@ public:
 
     void stop() {
         std::shared_ptr<EventBus> event_bus;
+        std::shared_ptr<CognitiveCoordinator> coordinator;
         {
             std::lock_guard lock(mutex_);
             if (state_ == RuntimeState::stopped) return;
             event_bus = event_bus_;
+            coordinator = coordinator_;
             if (event_bus) state_ = RuntimeState::stopping;
         }
         if (event_bus) event_bus->wait_idle();
+        if (coordinator) coordinator->stop();
         {
             std::lock_guard lock(mutex_);
             event_bus_.reset();
+            coordinator_.reset();
             timeline_.reset();
             if (state_ != RuntimeState::failed) state_ = RuntimeState::stopped;
         }
@@ -441,8 +453,13 @@ public:
         std::lock_guard lock(mutex_);
         return state_;
     }
-
+    CapabilityRegistry& capability_registry() { return capability_registry_; }
     const CapabilityRegistry& capability_registry() const { return capability_registry_; }
+
+    EventBus& event_bus() {
+        if (!event_bus_) throw RuntimeHostError("event bus is unavailable");
+        return *event_bus_;
+    }
 
     StorageHealth storage_health() const {
         std::lock_guard lock(mutex_);
@@ -755,6 +772,7 @@ private:
     RuntimeState state_{RuntimeState::stopped};
     std::optional<RuntimeManifest> manifest_;
     CapabilityRegistry capability_registry_;
+    std::shared_ptr<CognitiveCoordinator> coordinator_;
     std::shared_ptr<EventBus> event_bus_;
     std::shared_ptr<TimelineStore> timeline_;
     StorageQuotaController storage_quota_;

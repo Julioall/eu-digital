@@ -9,3 +9,7 @@ __pycache__/
 .vs/
 build/
 out/
+
+error_log.txt
+manifest.json
+timeline.sqlite

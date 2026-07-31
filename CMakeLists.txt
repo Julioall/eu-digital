@@ -167,6 +167,10 @@ if(WIN32)
     target_link_libraries(runtime_host_test PRIVATE Crypt32)
 endif()
 
+add_executable(cognitive_coordinator_test cpp/tests/cognitive_coordinator_test.cpp)
+target_include_directories(cognitive_coordinator_test PRIVATE cpp)
+target_compile_features(cognitive_coordinator_test PRIVATE cxx_std_23)
+
 add_executable(ports_mock_test cpp/tests/ports_mock_test.cpp)
 target_include_directories(ports_mock_test PRIVATE cpp)
 target_compile_features(ports_mock_test PRIVATE cxx_std_23)
@@ -226,6 +230,7 @@ endif()
 add_test(NAME ollama_model_backend COMMAND ollama_model_backend_test)
 
 add_test(NAME event_bus COMMAND event_bus_test)
+add_test(NAME cognitive_coordinator COMMAND cognitive_coordinator_test)
 add_test(NAME capability_runtime COMMAND capability_runtime_test)
 add_test(NAME promotion_registry COMMAND promotion_registry_test)
 add_test(NAME episode_segmentation COMMAND episode_segmentation_test)
@@ -246,7 +251,7 @@ endif()
 
 option(EU_DIGITAL_BUILD_QT_SHELL "Build the Qt 6 QML desktop shell adapter" OFF)
 if(EU_DIGITAL_BUILD_QT_SHELL)
-    find_package(Qt6 COMPONENTS Core Gui Quick Widgets REQUIRED)
+    find_package(Qt6 COMPONENTS Core Gui Quick Widgets Concurrent REQUIRED)
     set(CMAKE_AUTOMOC ON)
     set(CMAKE_AUTORCC ON)
     set(CMAKE_AUTOUIC ON)
@@ -257,10 +262,29 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
     target_link_libraries(qt_avatar_shell_test PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets)
     add_test(NAME qt_avatar_shell COMMAND qt_avatar_shell_test)
 
-    add_executable(eu_digital_desktop cpp/app/eu_digital_desktop.cpp cpp/shell/desktop_controller.cpp cpp/shell/desktop_controller.hpp cpp/shell/qt_tray_adapter.hpp)
+    add_executable(eu_digital_desktop WIN32
+        cpp/app/eu_digital_desktop.cpp
+        cpp/shell/desktop_controller.cpp
+        cpp/shell/desktop_controller.hpp
+        cpp/shell/qt_tray_adapter.hpp
+        cpp/shell/tray_widget.cpp
+        cpp/shell/tray_widget.hpp
+        cpp/shell/tray_state_machine.hpp
+        cpp/shell/tray_state_machine.cpp
+        cpp/shell/quick_panel_widget.hpp
+        cpp/shell/quick_panel_widget.cpp
+        cpp/shell/settings_window.hpp
+        cpp/shell/settings_window.cpp
+        cpp/shell/toast_notification.hpp
+        cpp/shell/toast_notification.cpp
+        cpp/shell/log_manager.hpp
+        cpp/shell/log_manager.cpp
+        cpp/shell/ollama_dialogue_service.hpp
+        cpp/core/adapters/ollama_model_backend.cpp
+    )
     target_include_directories(eu_digital_desktop PRIVATE cpp)
     target_compile_features(eu_digital_desktop PRIVATE cxx_std_23)
-    target_link_libraries(eu_digital_desktop PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets)
+    target_link_libraries(eu_digital_desktop PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets Qt6::Concurrent)
     if(NOT WIN32)
         target_link_libraries(eu_digital_desktop PRIVATE "${EU_DIGITAL_SQLITE3_LIBRARY}")
     endif()
@@ -268,10 +292,29 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         target_link_libraries(eu_digital_desktop PRIVATE Crypt32)
     endif()
 
-    add_executable(desktop_integration_test cpp/tests/desktop_integration_test.cpp cpp/shell/desktop_controller.cpp cpp/shell/desktop_controller.hpp cpp/shell/qt_tray_adapter.hpp)
+    add_executable(desktop_integration_test
+        cpp/tests/desktop_integration_test.cpp
+        cpp/shell/desktop_controller.cpp
+        cpp/shell/desktop_controller.hpp
+        cpp/shell/qt_tray_adapter.hpp
+        cpp/shell/tray_widget.cpp
+        cpp/shell/tray_widget.hpp
+        cpp/shell/tray_state_machine.hpp
+        cpp/shell/tray_state_machine.cpp
+        cpp/shell/quick_panel_widget.hpp
+        cpp/shell/quick_panel_widget.cpp
+        cpp/shell/settings_window.hpp
+        cpp/shell/settings_window.cpp
+        cpp/shell/toast_notification.hpp
+        cpp/shell/toast_notification.cpp
+        cpp/shell/log_manager.hpp
+        cpp/shell/log_manager.cpp
+        cpp/shell/ollama_dialogue_service.hpp
+        cpp/core/adapters/ollama_model_backend.cpp
+    )
     target_include_directories(desktop_integration_test PRIVATE cpp)
     target_compile_features(desktop_integration_test PRIVATE cxx_std_23)
-    target_link_libraries(desktop_integration_test PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets)
+    target_link_libraries(desktop_integration_test PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets Qt6::Concurrent)
     if(NOT WIN32)
         target_link_libraries(desktop_integration_test PRIVATE "${EU_DIGITAL_SQLITE3_LIBRARY}")
     endif()

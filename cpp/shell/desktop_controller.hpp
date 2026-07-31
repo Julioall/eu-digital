@@ -5,6 +5,9 @@
 #include "core/input_interaction_sensor.hpp"
 #include "shell/qt_tray_adapter.hpp"
 #include "shell/qt_avatar_window.hpp"
+#include "shell/ollama_dialogue_service.hpp"
+#include "shell/quick_panel_widget.hpp"
+#include "shell/settings_window.hpp"
 
 #include <QObject>
 #include <QSettings>
@@ -36,8 +39,18 @@ signals:
 
 private slots:
     void onTrayPauseRequested(bool paused);
+    void onTrayMuteRequested(bool muted);
     void onTrayConsentRevoked(bool revoked);
+    void onShutdownRequested();
+    void onOpenSettingsRequested();
+    void onOpenQuickPanelRequested();
     void checkHealth();
+    void onUserInputReceived(const QString& text);
+    void onOllamaResponse(const QString& text);
+    void onOllamaError(const QString& message);
+
+public slots:
+    void appendMessageToTray(const QString& role, const QString& text);
 
 private:
     void cognitiveThreadMain();
@@ -46,18 +59,25 @@ private:
     bool paused_{false};
     std::atomic<bool> running_{false};
     std::jthread cognitive_thread_;
-    std::mutex runtime_mutex_;
+    std::recursive_mutex runtime_mutex_;
 
     // Runtime Core
     std::unique_ptr<RuntimeHost> runtime_;
     
     // Sensors
-    std::unique_ptr<SystemActivitySensor> system_sensor_;
-    std::unique_ptr<InputInteractionSensor> input_sensor_;
+    std::unique_ptr<SystemActivityAdapter> activity_adapter_;
+    std::shared_ptr<SystemActivitySensor> system_sensor_;
+    std::unique_ptr<WindowsInputCaptureAdapter> input_adapter_;
+    std::shared_ptr<InputInteractionSensor> input_sensor_;
 
     // UI Adapters
     std::unique_ptr<QtTrayAdapter> tray_adapter_;
+    std::unique_ptr<QuickPanelWidget> quick_panel_;
+    std::unique_ptr<SettingsWindow> settings_window_;
     QTimer* health_timer_{nullptr};
+
+    // Ollama Dialogue
+    std::unique_ptr<OllamaDialogueService> ollama_service_;
 };
 
 } // namespace eu_digital

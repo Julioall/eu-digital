@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eu-digital.local/schemas/ui_preferences.schema.json",
+  "title": "UI Preferences",
+  "description": "Contrato de preferências de interface do usuário, base para o QSettings",
+  "type": "object",
+  "properties": {
+    "auto_start": {
+      "type": "boolean",
+      "description": "Se a interface deve iniciar junto com o S.O.",
+      "default": true
+    },
+    "notifications_enabled": {
+      "type": "boolean",
+      "description": "Se notificações proativas devem ser mostradas em balões nativos",
+      "default": true
+    },
+    "privacy_level": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3,
+      "description": "1 = Máxima, 2 = Moderada, 3 = Flexível",
+      "default": 2
+    },
+    "theme": {
+      "type": "string",
+      "enum": ["dark", "light", "system"],
+      "default": "dark"
+    }
+  }
+}

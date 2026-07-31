@@ -95,6 +95,8 @@ public:
         return health_.available && !health_.cpu_budget_exceeded && health_.consecutive_failures == 0;
     }
 
+    void set_global_pause(bool pause) { config_.privacy_policy.global_pause = pause; }
+
     bool poll() {
         if (config_.privacy_policy.global_pause) {
             health_.available = true;

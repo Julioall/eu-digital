@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eu-digital.local/schemas/user_interaction_request.schema.json",
+  "title": "User Interaction Request",
+  "description": "Contrato de evento solicitando interação do usuário na interface expandida",
+  "type": "object",
+  "properties": {
+    "request_id": { "type": "string", "format": "uuid" },
+    "source_component": { "type": "string" },
+    "prompt_text": { "type": "string" },
+    "expected_response_type": {
+      "type": "string",
+      "enum": ["text", "boolean", "choice"]
+    },
+    "choices": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "timeout_ms": { "type": "integer", "minimum": 0 }
+  },
+  "required": ["request_id", "source_component", "prompt_text", "expected_response_type"]
+}

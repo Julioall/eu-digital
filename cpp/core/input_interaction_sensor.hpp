@@ -103,6 +103,8 @@ public:
     const InputInteractionHealth& health() const { return health_; }
     bool health_check() const { return true; }
 
+    void set_global_pause(bool pause) { config_.privacy_policy.global_pause = pause; }
+
     void ingest(const RawInputEvent& input, const WindowContext& context) {
         if (config_.privacy_policy.global_pause) {
             health_.paused = true;

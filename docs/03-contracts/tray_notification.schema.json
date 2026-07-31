@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eu-digital.local/schemas/tray_notification.schema.json",
+  "title": "Tray Notification",
+  "description": "Contrato de notificação de bandeja enviada ao usuário (RF-05)",
+  "type": "object",
+  "properties": {
+    "notification_id": { "type": "string", "format": "uuid" },
+    "title": { "type": "string", "maxLength": 100 },
+    "body": { "type": "string", "maxLength": 255 },
+    "type": {
+      "type": "string",
+      "enum": ["info", "question", "suggestion", "action_required", "error"]
+    },
+    "timeout_ms": { "type": "integer", "minimum": 0, "default": 5000 },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action_id": { "type": "string" },
+          "label": { "type": "string" }
+        },
+        "required": ["action_id", "label"]
+      }
+    }
+  },
+  "required": ["notification_id", "title", "body", "type"]
+}

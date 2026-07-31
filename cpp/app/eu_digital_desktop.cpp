@@ -1,7 +1,16 @@
 #include "shell/desktop_controller.hpp"
-#include <QApplication>
+#include "shell/log_manager.hpp"
 
-int main(int argc, char** argv) {
+#include <QApplication>
+#include <QSurfaceFormat>
+#include <QDir>
+#include <iostream>
+
+using namespace eu_digital;
+
+int main(int argc, char* argv[]) {
+    LogManager::instance().install();
+
     QApplication app(argc, argv);
     app.setApplicationName("EU-Digital Desktop");
     app.setOrganizationName("EU-Digital");

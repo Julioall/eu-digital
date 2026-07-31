@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://eu-digital.local/schemas/tray_ui_state.schema.json",
+  "title": "Tray UI State",
+  "description": "Contrato de estado da interface de bandeja",
+  "type": "object",
+  "properties": {
+    "presence": {
+      "type": "string",
+      "enum": ["active", "processing", "asking", "paused", "offline", "degraded"],
+      "description": "Estado de presença atual (RF-01)"
+    },
+    "surface": {
+      "type": "string",
+      "enum": ["tray_only", "compact", "expanded", "quick_panel", "settings"],
+      "description": "Superfície visível na UI"
+    },
+    "health_summary": {
+      "type": "object",
+      "properties": {
+        "sensors_active": { "type": "integer", "minimum": 0 },
+        "total_memories": { "type": "integer", "minimum": 0 },
+        "is_paused": { "type": "boolean" }
+      },
+      "required": ["sensors_active", "total_memories", "is_paused"]
+    }
+  },
+  "required": ["presence", "surface"]
+}
