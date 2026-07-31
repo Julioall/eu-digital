@@ -1,76 +1,104 @@
 ---
 id: SPEC-045
-title: Integrated Cognitive Cycle Runtime
+title: Integrated Headless Cognitive Cycle
 status: draft
-created: 2026-07-31
-authors: [Julio]
+phase: design
+dependencies: [SPEC-047, SPEC-023]
+adrs: []
+contracts: []
 ---
 
-# SPEC-045: Integrated Cognitive Cycle Runtime
+# SPEC-045 — Integrated Headless Cognitive Cycle
 
-## 1. Motivação
-Apesar de o projeto "Eu Digital" possuir uma vasta biblioteca de módulos cognitivos altamente testados (segmentador de episódios, modelo de mundo, memória episódica, metacognição, etc.), atualmente não existe um "coração" que impulsione o fluxo de dados sequencialmente por esses módulos no runtime C++ (`RuntimeHost`). A ausência deste fluxo central impede que o sistema funcione como um produto utilizável, relegando-o a um laboratório de testes isolados.
+Status: draft  
+Owner: humano  
+Fase: design  
+Dependências: SPEC-047 (Component Wiring), SPEC-023 (Pluggable Capability Runtime)  
+ADRs aplicáveis: Nenhuma  
+Contratos afetados: Novo DTO `CognitiveCycleResult`.
 
-## 2. Objetivo
-Implementar um **CognitiveCoordinator** dentro do `RuntimeHost` responsável por capturar eventos do `EventBus` e conduzi-los ordenadamente através do ciclo cognitivo completo, alimentando cada órgão com o contexto do anterior, de forma estritamente serial ou estruturadamente assíncrona, respeitando os contratos firmados de cada módulo.
+## Problema
+Os módulos cognitivos do projeto ("órgãos") operam de maneira isolada em testes sintéticos. O `RuntimeHost` captura eventos no `EventBus` mas termina no SQLite, sem uma orquestração de fluxo ("sistema circulatório"). A ausência desse motor coordenador impede que percepções gerem reações. A implementação anterior proposta sugeria classes estritas, o que quebra o desacoplamento de plugins.
 
-## 3. Escopo
+## Objetivo
+Criar o `CognitiveCoordinator` acoplado apenas às portas de serviço (`IPredictionPort`, `IMemoryWritePort`, etc) definidas na SPEC-047. O coordenador roteará os eventos recebidos no `EventBus` através destas portas, mantendo gestão rigorosa de estado (`queued`, `processing`, `degraded`, `completed`, `failed`), timeout cooperativo, backpressure, idempotência e tratamento estruturado de erros.
 
-### 3.1 Escopo Positivo
-- Criar a classe `CognitiveCoordinator` no C++ (e sua referência em Python).
-- Assinar o `EventBus` e reagir a novos `CanonicalEvent`s.
-- Executar, em ordem estrita: `EpisodeSegmenter` → `EpisodicMemory` → `PatternLearner` → `WorldModel` → `GlobalWorkspace` → `MetacognitionCuriosity` → `FunctionalSelfModel` → `SuggestionOrchestrator`.
-- Gerenciar o repasse do `Context` de um módulo para outro (ex: `MemoryRetrieval` repassada ao `WorldModel`).
-- Gerenciar a política de timeout de cada etapa da cadeia.
-- Tratar e engolir erros de órgãos individuais sem causar crash no ciclo inteiro.
+## Resultado observável
+A emissão de um `CanonicalEvent` pelo sistema operacional resultará em um registro de log unificado do `CognitiveCoordinator` detalhando por quais portas o evento passou, em qual estado finalizou e se houve falha pontual tratada.
 
-### 3.2 Escopo Negativo
-- Não implementar lógicas internas cognitivas novas (apenas amarrar as existentes).
-- Não persistir o estado cognitivo em disco neste componente (tratado na SPEC-046).
-- Não lidar com interface gráfica ou empacotamento.
-- Não executar chamadas em nuvem (preservar 100% execução local).
+## Requisitos funcionais
+- Assinar o `EventBus`.
+- Resolver portas via `CapabilityRegistry`.
+- Conduzir o pipeline: Segmentação -> Memória -> Predição -> Workspace -> Metacognição -> Self Model -> Decisão.
+- Capturar erros de adaptadores sem derrubar o processo; se uma porta falha, o erro é englobado em um pacote de `DegradedState` e o pipeline prossegue se possível, ou encerra se crítico.
+- Implementar política de *backpressure* (descartar/enfileirar eventos se o loop principal estiver sobrecarregado).
+- Implementar idempotência para evitar *loops* internos (re-entrada de eventos gerados por ações).
 
-## 4. Dependências e Contratos
-- Depende de: `EventBus`, `TimelineStore`, e todos os módulos promovidos (SPEC-033 a SPEC-039).
-- Modifica: `RuntimeHost` (para instanciar o Coordinator).
-- Contratos Envolvidos: `canonical_event.schema.json`. Novo contrato: `cognitive_cycle_state.schema.json` (apenas para logging).
+## Requisitos não funcionais
+- **Concorrência:** Não deve bloquear a thread principal da UI. 
+- **Resiliência:** Timeouts de portas devem usar primitivas cooperativas seguras (ex: cancellation tokens ou timeouts na promessa de futuro), nunca abortar violentamente uma thread alheia.
 
-## 5. Fluxo de Dados e Arquitetura
+## Entradas
+- `CanonicalEvent` capturado do `EventBus`.
 
-O ciclo cognitivo deve operar preferencialmente através de um pipeline orientado a Eventos Internos (Internal Bus) ou chamadas síncronas bloqueantes dentro de uma Task Background para garantir determinismo.
+## Saídas
+- `CognitiveDecision` DTO ao final do pipeline.
+- Telemetria local estruturada (estado do ciclo).
 
-```text
-EventBus (CanonicalEvent)
-  │
-  ├─> 1. EpisodeSegmenter (Avalia quebra de episódio)
-  │     └─> Se novo: EpisodicMemory (Armazena)
-  │
-  ├─> 2. WorldModel (Calcula erro de previsão/surpresa sobre o evento)
-  │
-  ├─> 3. PatternLearner (Registra repetições em background)
-  │
-  ├─> 4. GlobalWorkspace (Funde Evento, Memórias passadas e Surpresa)
-  │
-  ├─> 5. Metacognition (Calcula a relevância/confiança do Workspace)
-  │
-  ├─> 6. FunctionalSelfModel (Consulta capacidades/limitações)
-  │
-  └─> 7. SuggestionOrchestrator (Gera silêncio, pergunta ou sugestão)
-```
+## Fluxo
+1. Evento chega e entra no estado `queued`.
+2. O Loop de orquestração apanha o evento, muda para `processing`.
+3. Chama `IEpisodeBoundaryPort`. Passa para `IMemoryWritePort`.
+4. Se alguma porta não resolve, muda para estado `degraded`, omitindo a etapa.
+5. Se falha fatal, entra em `failed`.
+6. Termina gerando a `CognitiveDecision`, estado `completed`.
 
-## 6. Tratamento de Falhas e Degradação
-Se um módulo (ex: `PatternLearner`) disparar uma exceção de OOM ou Timeout (demorar mais de 50ms), o `CognitiveCoordinator` deve abortar a etapa desse módulo, injetar um erro "Graceful Degradation" no `GlobalWorkspace`, e prosseguir para as próximas etapas para não interromper a percepção do usuário.
+## Estados e transições
+- `queued` -> `processing`
+- `processing` -> `completed` (Sucesso pleno)
+- `processing` -> `degraded` (Falha parcial em uma porta não-crítica) -> `completed` (ou `failed`)
+- `processing` -> `failed` (Erro crasso, ex: OOM, exception não tratada no núcleo)
+- `queued` -> `discarded` (Backpressure / Fila cheia / Duplicata)
 
-## 7. Critérios de Aceite Mensuráveis
-1. Um evento publicado no `EventBus` deve atravessar a cadeia dos 7 módulos base sem causar memory leaks (testado via `valgrind`/ASan).
-2. O tempo máximo para processamento de um ciclo síncrono (excluindo I/O do modelo local) não deve exceder `200ms`.
-3. Erros induzidos (Fault Injection) em 3 módulos simultaneamente não podem causar travamento do loop principal.
-4. Deve haver equivalência Python-C++ na sequência de logs gerada por um evento atravessando a cadeia.
+## Erros esperados
+- `CoordinatorTimeoutError`: Uma porta extrapolou a quota de tempo e a operação foi cancelada.
+- `CycleDegradedError`: Adicionado à payload do evento quando falta resolução de capacidade.
 
-## 8. Testes Exigidos
-- **Testes Unitários:** O Coordinator reage ao evento e chama as interfaces.
-- **Teste de Integração:** O Coordinator instanciado com instâncias mockadas (via GMock) de todos os módulos cognitivos, verificando a ordem estrita de chamada.
-- **Teste Metamórfico:** Atrasar um módulo em X ms não deve afetar o output final, apenas a latência (salvo timeouts).
+## Escopo negativo
+- Não invocar a UI ou modelos visuais (tratado em SPECs futuras).
+- Não gerenciar Snapshotting aqui (SPEC-046 cuida disso).
+- Não embutir lógica matemática de surpresa (pertence ao WorldModel).
 
-## 9. Impacto no Produto
-Esta é a SPEC que transforma o "Laboratório" em "Produto", pois faz a máquina finalmente pulsar a cada clique de mouse capturado.
+## Critérios de aceite
+- [ ] O coordenador resolve dependências via CapabilityRegistry e não possui inclusões (`#include`) dos headers concretos de memória/modelo de mundo.
+- [ ] Eventos injetados sequencialmente acima do limite configurado de *backpressure* resultam em estado `discarded` e não derrubam o processo via OOM.
+- [ ] Falha forçada simulada no adaptador de predição gera estado final `degraded`, mantendo o fluxo até a decisão.
+- [ ] O design documentado inclui *baseline*, *ablação* (funcionar sem Módulo X) e *critério de falsificação*.
+
+## Plano de testes
+
+### Unitários
+- Mockar TODAS as portas. Comprovar a sequência de chamadas.
+- Simular timeout em MockPort e verificar cancelamento.
+
+### Integração
+- Levantar o coordenador com 2 adaptadores reais e os demais mockados. Injetar evento e conferir log de estado.
+
+### Contrato
+- O objeto de estado do coordenador reflete os enumeradores exatos do diagrama.
+
+### Desempenho
+- O overhead de agendamento na fila não ultrapassa 1ms.
+
+### Recuperação
+- Se um componente não está registrado, o ciclo segue graciosamente (baseline de ablação provada).
+
+## Migração
+Nenhuma migração externa.
+
+## Rollback
+Desligar a instanciação do `CognitiveCoordinator` no `RuntimeHost` através de uma flag de feature (`enable_cognitive_coordinator=false`).
+
+## Evidências de conclusão
+- Log de execução de CTest com a suíte de coordenação 100% aprovada.
+- Relatório de Validação Científica da arquitetura (conforme AGENTS.md).
