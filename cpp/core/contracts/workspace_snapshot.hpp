@@ -5,6 +5,7 @@
 #include <vector>
 
 namespace eu_digital {
+namespace contracts {
 
 struct WorkspaceSnapshot {
     std::string workspace_id;
@@ -16,4 +17,5 @@ struct WorkspaceSnapshot {
     }
 };
 
+} // namespace contracts
 } // namespace eu_digital

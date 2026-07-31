@@ -157,7 +157,7 @@ public:
     TimelinePage query(const TimelineQuery& query = {}, std::size_t page_size = 100,
                        std::size_t offset = 0) const {
         if (page_size == 0) throw std::invalid_argument("timeline page_size must be positive");
-        if (page_size == std::numeric_limits<std::size_t>::max()) {
+        if (page_size == (std::numeric_limits<std::size_t>::max)()) {
             throw std::invalid_argument("timeline page_size is too large");
         }
 

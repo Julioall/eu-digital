@@ -9,7 +9,7 @@ class IWorkspaceSelectionPort {
 public:
     virtual ~IWorkspaceSelectionPort() = default;
 
-    virtual WorkspaceSnapshot select(const CanonicalEvent& event) = 0;
+    virtual contracts::WorkspaceSnapshot select(const CanonicalEvent& event) = 0;
 };
 
 } // namespace eu_digital

@@ -9,7 +9,7 @@ class IMetacognitionPort {
 public:
     virtual ~IMetacognitionPort() = default;
 
-    virtual MetacognitiveAssessment evaluate(const WorkspaceSnapshot& workspace) = 0;
+    virtual contracts::MetacognitiveAssessment evaluate(const contracts::WorkspaceSnapshot& workspace) = 0;
 };
 
 } // namespace eu_digital

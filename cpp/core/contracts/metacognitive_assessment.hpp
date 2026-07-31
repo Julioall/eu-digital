@@ -3,6 +3,7 @@
 #include <string>
 
 namespace eu_digital {
+namespace contracts {
 
 struct MetacognitiveAssessment {
     std::string assessment_id;
@@ -15,4 +16,5 @@ struct MetacognitiveAssessment {
     }
 };
 
+} // namespace contracts
 } // namespace eu_digital

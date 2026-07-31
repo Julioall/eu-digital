@@ -4,10 +4,18 @@
 #include "core/ports/imemory_write_port.hpp"
 #include "core/ports/imemory_retrieval_port.hpp"
 #include "core/ports/iepisode_boundary_port.hpp"
+#include "core/ports/iworkspace_selection_port.hpp"
+#include "core/ports/iself_model_query_port.hpp"
+#include "core/ports/imetacognition_port.hpp"
+#include "core/ports/icognitive_decision_port.hpp"
 
 #include "core/adapters/world_model_adapter.hpp"
 #include "core/adapters/episodic_memory_adapter.hpp"
 #include "core/adapters/episode_segmenter_adapter.hpp"
+#include "core/adapters/global_workspace_adapter.hpp"
+#include "core/adapters/functional_self_model_adapter.hpp"
+#include "core/adapters/metacognition_curiosity_adapter.hpp"
+#include "core/adapters/cognitive_decision_adapter.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -34,6 +42,26 @@ public:
 
     static std::shared_ptr<IEpisodeBoundaryPort> create_episode_boundary_port() {
         return std::make_shared<EpisodeSegmenterAdapter>();
+    }
+
+    static std::shared_ptr<IWorkspaceSelectionPort> create_workspace_selection_port(std::shared_ptr<GlobalWorkspace> ws) {
+        if (!ws) throw std::invalid_argument("GlobalWorkspace is required");
+        return std::make_shared<GlobalWorkspaceAdapter>(std::move(ws));
+    }
+
+    static std::shared_ptr<ISelfModelQueryPort> create_self_model_query_port(std::shared_ptr<VersionedFunctionalSelfModel> sm) {
+        if (!sm) throw std::invalid_argument("VersionedFunctionalSelfModel is required");
+        return std::make_shared<FunctionalSelfModelAdapter>(std::move(sm));
+    }
+
+    static std::shared_ptr<IMetacognitionPort> create_metacognition_port(std::shared_ptr<MetacognitionCuriosityEngine> mc) {
+        if (!mc) throw std::invalid_argument("MetacognitionCuriosityEngine is required");
+        return std::make_shared<MetacognitionCuriosityAdapter>(std::move(mc));
+    }
+
+    static std::shared_ptr<ICognitiveDecisionPort> create_cognitive_decision_port(std::shared_ptr<SuggestionOrchestrator> so) {
+        if (!so) throw std::invalid_argument("SuggestionOrchestrator is required");
+        return std::make_shared<CognitiveDecisionAdapter>(std::move(so));
     }
 };
 
