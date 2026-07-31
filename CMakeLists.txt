@@ -256,6 +256,10 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
     set(CMAKE_AUTORCC ON)
     set(CMAKE_AUTOUIC ON)
 
+    if (MSVC)
+        add_compile_definitions(_HAS_DEPRECATED_UNCHECKED_ITERATORS=1)
+    endif()
+
     add_executable(qt_avatar_shell_test cpp/tests/qt_avatar_shell_test.cpp cpp/shell/qt_avatar_window.cpp)
     target_include_directories(qt_avatar_shell_test PRIVATE cpp)
     target_compile_features(qt_avatar_shell_test PRIVATE cxx_std_23)

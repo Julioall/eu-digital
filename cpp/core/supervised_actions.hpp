@@ -171,7 +171,7 @@ public:
             return false;
         }
         state.authorization = authorization;
-        emit("action.authorized", "{\"schema_version\":\"1.0\",\"plan_id\":\"" +
+        emit_event("action.authorized", "{\"schema_version\":\"1.0\",\"plan_id\":\"" +
             json_escape(plan_id) + "\",\"authorization_id\":\"" +
             json_escape(authorization.authorization_id) + "\"}", now_ms);
         return true;
@@ -335,11 +335,11 @@ private:
             payload << ",\"error_code\":\"" << json_escape(outcome.error_code) << "\"";
         }
         payload << "}";
-        emit("action.audit", payload.str(), outcome.occurred_at_ms);
-        emit("action_outcome", payload.str(), outcome.occurred_at_ms);
+        emit_event("action.audit", payload.str(), outcome.occurred_at_ms);
+        emit_event("action_outcome", payload.str(), outcome.occurred_at_ms);
     }
 
-    void emit(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
+    void emit_event(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
         if (!event_sink_) return;
         CanonicalEvent event;
         event.event_id = "action-controller-" + std::to_string(next_event_id_++);

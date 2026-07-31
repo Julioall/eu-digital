@@ -130,7 +130,7 @@ public:
         record.state.state = next;
         record.state.reason_code = std::move(reason_code);
         record.state.message = std::move(message);
-        emit("capability." + state_name(next), record);
+        emit_event("capability." + state_name(next), record);
         refresh_self_model();
     }
 
@@ -404,7 +404,7 @@ private:
         return !active_profile_ || profiles_.at(*active_profile_).contains(implementation_id);
     }
 
-    void emit(const std::string& event_type, const CapabilityRecord& record) const {
+    void emit_event(const std::string& event_type, const CapabilityRecord& record) const {
         if (event_sink_) event_sink_(event_type, record.descriptor.implementation_id);
     }
 

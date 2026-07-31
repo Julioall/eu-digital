@@ -78,7 +78,6 @@ private:
 
     // UI Adapters
     std::unique_ptr<QtTrayAdapter> tray_adapter_;
-    std::unique_ptr<QuickPanelWidget> quick_panel_;
     std::unique_ptr<SettingsWindow> settings_window_;
     QTimer* health_timer_{nullptr};
 

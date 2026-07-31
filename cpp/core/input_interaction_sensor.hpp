@@ -168,7 +168,7 @@ public:
                 << ",\"shortcut_count\":" << aggregate_.shortcut_count
                 << ",\"pause_count\":" << aggregate_.pause_count
                 << ",\"typing_rate_per_minute\":" << rate << "}";
-        emit("input.aggregate", payload.str(), last_timestamp_ms_);
+        emit_event("input.aggregate", payload.str(), last_timestamp_ms_);
         aggregate_ = {};
         aggregate_start_ms_.reset();
         aggregate_context_.reset();
@@ -237,7 +237,7 @@ private:
         payload << "}";
         const std::string event_type = input.kind == RawInputKind::key_down || input.kind == RawInputKind::key_up
             ? "input.key" : "input.pointer";
-        emit(event_type, payload.str(), input.timestamp_ms);
+        emit_event(event_type, payload.str(), input.timestamp_ms);
     }
 
     void emit_clipboard(const RawInputEvent& input, const WindowContext& context) {
@@ -246,7 +246,7 @@ private:
                 << ",\"content_length\":" << input.clipboard_length
                 << ",\"content_digest\":\"" << json_escape(input.clipboard_digest)
                 << "\",\"text_content_observed\":true}";
-        emit("input.clipboard", payload.str(), input.timestamp_ms);
+        emit_event("input.clipboard", payload.str(), input.timestamp_ms);
     }
 
     void update_aggregate(const RawInputEvent& input) {
@@ -269,7 +269,7 @@ private:
         }
     }
 
-    void emit(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
+    void emit_event(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
         if (!event_sink_) return;
         CanonicalEvent event;
         event.event_id = "input-interaction-" + std::to_string(next_event_id_++);

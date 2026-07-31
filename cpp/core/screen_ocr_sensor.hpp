@@ -273,7 +273,7 @@ private:
             append_region(payload, *region);
         }
         payload << "}";
-        emit("screen.visual_captured", payload.str(), frame.timestamp_ms);
+        emit_event("screen.visual_captured", payload.str(), frame.timestamp_ms);
     }
 
     static std::string redact_text(const std::string& value) {
@@ -307,7 +307,7 @@ private:
                     << word.bounds.height << ",\"confidence\":" << word.confidence << "}";
         }
         payload << "],\"timestamp_ms\":" << frame.timestamp_ms << "}";
-        emit("screen.ocr", payload.str(), frame.timestamp_ms);
+        emit_event("screen.ocr", payload.str(), frame.timestamp_ms);
     }
 
     void emit_ocr_unavailable(const ScreenFrame& frame, const ImageReference& image,
@@ -329,7 +329,7 @@ private:
             payload << ",\"request_id\":\"" << json_escape(request->request_id) << "\"";
         }
         payload << "}";
-        emit("screen.ocr_unavailable", payload.str(), frame.timestamp_ms);
+        emit_event("screen.ocr_unavailable", payload.str(), frame.timestamp_ms);
     }
 
     void suppress(const char* reason) {
@@ -341,7 +341,7 @@ private:
         ++health_.suppressed_captures;
     }
 
-    void emit(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
+    void emit_event(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
         if (!event_sink_) return;
         CanonicalEvent event;
         event.event_id = "screen-ocr-" + std::to_string(next_event_id_++);

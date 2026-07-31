@@ -212,7 +212,7 @@ private:
                 << "\",\"window_title\":\"" << json_escape(current->window_title)
                 << "\",\"text_content_observed\":"
                 << (config_.privacy_policy.capture_window_title ? "true" : "false") << "}";
-        emit("system.window_focus_changed", payload.str());
+        emit_event("system.window_focus_changed", payload.str());
     }
 
     void emit_process_event(const std::string& event_type, const ProcessInfo& process) {
@@ -221,10 +221,10 @@ private:
                 << ",\"process_name\":\"" << json_escape(process.process_name)
                 << "\",\"application_category\":\""
                 << json_escape(process.application_category) << "\"}";
-        emit(event_type, payload.str());
+        emit_event(event_type, payload.str());
     }
 
-    void emit(const std::string& event_type, const std::string& payload) {
+    void emit_event(const std::string& event_type, const std::string& payload) {
         if (!event_sink_) return;
         CanonicalEvent event;
         event.event_id = "system-activity-" + std::to_string(next_event_id_++);

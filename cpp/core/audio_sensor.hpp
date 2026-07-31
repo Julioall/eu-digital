@@ -114,7 +114,7 @@ public:
             health_.available = true;
             health_.last_error.clear();
             health_.last_processing_cost_ms = elapsed_ms(started);
-            emit("audio.no_signal", "{\"schema_version\":\"1.0\",\"status\":\"no_signal\",\"processing_cost_ms\":" +
+            emit_event("audio.no_signal", "{\"schema_version\":\"1.0\",\"status\":\"no_signal\",\"processing_cost_ms\":" +
                 number(health_.last_processing_cost_ms) + "}", 0);
             return health_.last_status;
         }
@@ -134,7 +134,7 @@ public:
             health_.available = true;
             health_.last_error.clear();
             health_.last_processing_cost_ms = elapsed_ms(started);
-            emit("audio.no_speech", "{\"schema_version\":\"1.0\",\"status\":\"no_speech\",\"speech_confidence\":" +
+            emit_event("audio.no_speech", "{\"schema_version\":\"1.0\",\"status\":\"no_speech\",\"speech_confidence\":" +
                 number(vad.speech_confidence) + ",\"processing_cost_ms\":" + number(health_.last_processing_cost_ms) + "}",
                 frame->timestamp_ms);
             return health_.last_status;
@@ -153,7 +153,7 @@ public:
                         << json_escape(vad.algorithm) << "\",\"speech_confidence\":"
                         << number(vad.speech_confidence) << "},\"processing_cost_ms\":"
                         << number(segment_cost_ms) << "}";
-        emit("audio.segment", segment_payload.str(), frame->timestamp_ms);
+        emit_event("audio.segment", segment_payload.str(), frame->timestamp_ms);
         ++health_.segments_emitted;
 
         health_.last_status = AudioObservationStatus::observed;
@@ -171,7 +171,7 @@ public:
                         << ",\"status\":\"transcribed\",\"text\":\"" << json_escape(result.text)
                         << "\",\"confidence\":" << number(result.confidence)
                         << ",\"processing_cost_ms\":" << number(cost_ms) << "}";
-                emit("audio.transcription", payload.str(), frame->timestamp_ms);
+                emit_event("audio.transcription", payload.str(), frame->timestamp_ms);
                 health_.last_processing_cost_ms = segment_cost_ms + cost_ms;
             } catch (const std::exception& error) {
                 ++health_.transcription_failures;
@@ -185,7 +185,7 @@ public:
                         << ",\"status\":\"failed\",\"text\":null,\"confidence\":null"
                         << ",\"error_code\":\"transcription_failed\",\"processing_cost_ms\":"
                         << number(cost_ms) << "}";
-                emit("audio.transcription_failed", payload.str(), frame->timestamp_ms);
+                emit_event("audio.transcription_failed", payload.str(), frame->timestamp_ms);
                 health_.last_processing_cost_ms = segment_cost_ms + cost_ms;
             }
         } else {
@@ -222,12 +222,12 @@ private:
         health_.available = false;
         health_.last_status = AudioObservationStatus::sensor_failed;
         health_.last_error = error;
-        emit("audio.sensor_failed", "{\"schema_version\":\"1.0\",\"status\":\"sensor_failed\",\"error\":\"" +
+        emit_event("audio.sensor_failed", "{\"schema_version\":\"1.0\",\"status\":\"sensor_failed\",\"error\":\"" +
             json_escape(error) + "}" , timestamp_ms);
         return health_.last_status;
     }
 
-    void emit(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
+    void emit_event(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
         if (!event_sink_) return;
         CanonicalEvent event;
         event.event_id = "audio-sensor-" + std::to_string(next_event_id_++);
