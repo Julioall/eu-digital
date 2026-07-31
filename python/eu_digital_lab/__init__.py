@@ -168,6 +168,7 @@ from .metacognition_curiosity import (
 from .promotion import PromotionManifest, PromotionPipeline, PromotionRegistry
 from .sandbox import SyntheticSession, generate_session, split_sessions
 from .screen_ocr_policy import ScreenOcrPolicy, ScreenOcrPolicyError
+from .snapshot import CognitiveSnapshot, SnapshotError
 from .validation import ValidationGateRunner, ValidationProtocol
 from .world_model import (
     ABLATION as WORLD_MODEL_ABLATION,
@@ -236,6 +237,7 @@ __all__ = [
     "CapabilityStatus",
     "ConsolidationPolicy",
     "ConsolidationRecord",
+    "CognitiveSnapshot",
     "CuriosityConfig",
     "CuriosityQuestion",
     "CuriosityResponse",
@@ -305,6 +307,7 @@ __all__ = [
     "SegmentationResult",
     "SegmentedEpisode",
     "SelfModelAssertion",
+    "SnapshotError",
     "SelfModelDecision",
     "SelfModelEvent",
     "SelfModelEventKind",

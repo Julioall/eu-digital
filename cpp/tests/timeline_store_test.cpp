@@ -36,7 +36,7 @@ int main() {
 
     {
         TimelineStore store(database_path.string());
-        assert(store.schema_version() == 1);
+        assert(store.schema_version() == 2);
         assert(store.append(event("event-1", "shell", 20, "{\"value\":1}"),
                             TimelineMetadata{"session-a", "editor", "correlation-1"}) ==
                eu_digital::AppendResult::accepted);
@@ -102,7 +102,7 @@ int main() {
 
     {
         TimelineStore restarted(database_path.string());
-        assert(restarted.schema_version() == 1);
+        assert(restarted.schema_version() == 2);
         assert(restarted.size() == 3);
         TimelineQuery by_source;
         by_source.source = "shell";

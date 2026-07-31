@@ -119,6 +119,41 @@ public:
         return static_cast<std::size_t>(statement.column_int64(0));
     }
 
+    void save_snapshot(const std::vector<std::uint8_t>& encrypted_payload, std::int64_t created_at_ns) {
+        exec("BEGIN IMMEDIATE");
+        try {
+            Statement statement(database_, "INSERT INTO cognitive_snapshots (created_at, payload) VALUES (?, ?)");
+            statement.bind_int64(1, static_cast<sqlite3_int64>(created_at_ns));
+            
+            const int bind_result = sqlite3_bind_blob(statement.stmt(), 2, encrypted_payload.data(), 
+                                                      static_cast<int>(encrypted_payload.size()), SQLITE_TRANSIENT);
+            if (bind_result != SQLITE_OK) throw TimelineStoreError("cannot bind snapshot blob");
+            
+            if (statement.step() != SQLITE_DONE) throw TimelineStoreError("cannot insert snapshot");
+            
+            // Cleanup old snapshots, keep only the latest 2 (current and previous for fallback)
+            exec("DELETE FROM cognitive_snapshots WHERE id NOT IN (SELECT id FROM cognitive_snapshots ORDER BY id DESC LIMIT 2)");
+            exec("COMMIT");
+        } catch (...) {
+            try { exec("ROLLBACK"); } catch (...) {}
+            throw;
+        }
+    }
+
+    std::vector<std::vector<std::uint8_t>> load_snapshots() const {
+        std::vector<std::vector<std::uint8_t>> snapshots;
+        Statement statement(database_, "SELECT payload FROM cognitive_snapshots ORDER BY id DESC LIMIT 2");
+        while (statement.step() == SQLITE_ROW) {
+            const void* blob = sqlite3_column_blob(statement.stmt(), 0);
+            const int bytes = sqlite3_column_bytes(statement.stmt(), 0);
+            if (blob && bytes > 0) {
+                const auto* data = static_cast<const std::uint8_t*>(blob);
+                snapshots.emplace_back(data, data + bytes);
+            }
+        }
+        return snapshots;
+    }
+
     TimelinePage query(const TimelineQuery& query = {}, std::size_t page_size = 100,
                        std::size_t offset = 0) const {
         if (page_size == 0) throw std::invalid_argument("timeline page_size must be positive");
@@ -168,6 +203,39 @@ public:
     std::vector<CanonicalEvent> replay(const TimelineQuery& query = {}) const {
         std::vector<CanonicalEvent> events;
         for_each_record(query, [&](const TimelineRecord& record) { events.push_back(record.event); });
+        return events;
+    }
+
+    std::vector<CanonicalEvent> replay_from(const std::string& last_applied_event_id) const {
+        std::string sql = "SELECT monotonic_ns, sequence FROM timeline_events WHERE event_id = ?";
+        Statement statement(database_, sql);
+        statement.bind_text(1, last_applied_event_id);
+        
+        std::uint64_t start_ns = 0;
+        std::uint64_t start_seq = 0;
+        if (statement.step() == SQLITE_ROW) {
+            start_ns = static_cast<std::uint64_t>(statement.column_int64(0));
+            start_seq = static_cast<std::uint64_t>(statement.column_int64(1));
+        } else {
+            // Not found, replay from beginning
+            return replay();
+        }
+        
+        std::vector<CanonicalEvent> events;
+        std::string fetch_sql =
+            "SELECT sequence, schema_version, event_id, source, event_type, payload, monotonic_ns, "
+            "session_id, application, correlation_id FROM timeline_events "
+            "WHERE monotonic_ns > ? OR (monotonic_ns = ? AND sequence > ?) "
+            "ORDER BY monotonic_ns ASC, sequence ASC";
+            
+        Statement fetch_stmt(database_, fetch_sql);
+        fetch_stmt.bind_int64(1, static_cast<sqlite3_int64>(start_ns));
+        fetch_stmt.bind_int64(2, static_cast<sqlite3_int64>(start_ns));
+        fetch_stmt.bind_int64(3, static_cast<sqlite3_int64>(start_seq));
+        
+        while (fetch_stmt.step() == SQLITE_ROW) {
+            events.push_back(read_record(fetch_stmt).event);
+        }
         return events;
     }
 
@@ -230,6 +298,8 @@ private:
 
         int last_result() const { return last_result_; }
 
+        sqlite3_stmt* stmt() const { return statement_; }
+
         sqlite3_int64 column_int64(int index) const { return sqlite3_column_int64(statement_, index); }
 
         std::string column_text(int index) const {
@@ -254,26 +324,35 @@ private:
 
     void migrate() {
         const int current = schema_version_before_tables();
-        if (current > 1) throw TimelineStoreError("unsupported timeline schema version");
-        if (current == 1) return;
+        if (current > 2) throw TimelineStoreError("unsupported timeline schema version");
+        
         try {
             exec("BEGIN IMMEDIATE");
-            exec("CREATE TABLE IF NOT EXISTS timeline_events ("
-                 "sequence INTEGER PRIMARY KEY AUTOINCREMENT,"
-                 "event_id TEXT NOT NULL UNIQUE,"
-                 "schema_version TEXT NOT NULL,"
-                 "source TEXT NOT NULL,"
-                 "event_type TEXT NOT NULL,"
-                 "payload TEXT NOT NULL,"
-                 "monotonic_ns INTEGER NOT NULL,"
-                 "session_id TEXT NOT NULL DEFAULT '',"
-                 "application TEXT NOT NULL DEFAULT '',"
-                 "correlation_id TEXT NOT NULL DEFAULT '')");
-            exec("CREATE INDEX IF NOT EXISTS timeline_events_time_idx "
-                 "ON timeline_events(monotonic_ns, sequence)");
-            exec("CREATE INDEX IF NOT EXISTS timeline_events_context_idx "
-                 "ON timeline_events(session_id, application, correlation_id, sequence)");
-            exec("PRAGMA user_version = 1");
+            if (current < 1) {
+                exec("CREATE TABLE IF NOT EXISTS timeline_events ("
+                     "sequence INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "event_id TEXT NOT NULL UNIQUE,"
+                     "schema_version TEXT NOT NULL,"
+                     "source TEXT NOT NULL,"
+                     "event_type TEXT NOT NULL,"
+                     "payload TEXT NOT NULL,"
+                     "monotonic_ns INTEGER NOT NULL,"
+                     "session_id TEXT NOT NULL DEFAULT '',"
+                     "application TEXT NOT NULL DEFAULT '',"
+                     "correlation_id TEXT NOT NULL DEFAULT '')");
+                exec("CREATE INDEX IF NOT EXISTS timeline_events_time_idx "
+                     "ON timeline_events(monotonic_ns, sequence)");
+                exec("CREATE INDEX IF NOT EXISTS timeline_events_context_idx "
+                     "ON timeline_events(session_id, application, correlation_id, sequence)");
+                exec("PRAGMA user_version = 1");
+            }
+            if (current < 2) {
+                exec("CREATE TABLE IF NOT EXISTS cognitive_snapshots ("
+                     "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "created_at INTEGER NOT NULL,"
+                     "payload BLOB NOT NULL)");
+                exec("PRAGMA user_version = 2");
+            }
             exec("COMMIT");
         } catch (...) {
             try { exec("ROLLBACK"); } catch (...) {}

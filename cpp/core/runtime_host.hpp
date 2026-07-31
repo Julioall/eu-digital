@@ -1,6 +1,7 @@
 #pragma once
 
 #include "capability_runtime.hpp"
+#include "cognitive_snapshot.hpp"
 #include "event_bus.hpp"
 #include "privacy_storage.hpp"
 #include "timeline_store.hpp"
@@ -367,7 +368,7 @@ public:
             manifest_ = parse_manifest(runtime_detail::read_file(config_.manifest_path));
             timeline_ = std::make_shared<TimelineStore>(config_.timeline_path);
             refresh_storage_usage_locked();
-            recovered_events_ = timeline_->size();
+            recover_cognitive_state();
             capability_registry_.define_profile("runtime-host-minimal", {});
             capability_registry_.activate_profile("runtime-host-minimal");
             event_bus_ = std::make_shared<EventBus>();
@@ -699,6 +700,37 @@ private:
             add_error_locked("timeline_append_failed", error.what(), true);
             state_ = RuntimeState::failed;
         }
+    }
+
+    void recover_cognitive_state() {
+        std::string last_applied_event_id;
+        if (LocalDataProtection::available()) {
+            const auto snapshots = timeline_->load_snapshots();
+            for (const auto& blob : snapshots) {
+                try {
+                    const auto plaintext = LocalDataProtection::unprotect(blob);
+                    std::string json(plaintext.begin(), plaintext.end());
+                    const auto root = runtime_detail::object(runtime_detail::JsonParser(json).parse(), "CognitiveSnapshot");
+                    if (runtime_detail::string(runtime_detail::required(root, "schema_version", "CognitiveSnapshot"), "CognitiveSnapshot.schema_version") != "1.0") {
+                        continue; // Version mismatch
+                    }
+                    last_applied_event_id = runtime_detail::string(runtime_detail::required(root, "last_applied_event_id", "CognitiveSnapshot"), "CognitiveSnapshot.last_applied_event_id");
+                    break; // Successfully loaded the most recent valid snapshot
+                } catch (...) {
+                    // Fallback to previous snapshot on corruption
+                }
+            }
+        }
+        
+        std::vector<CanonicalEvent> replayed_events;
+        if (!last_applied_event_id.empty()) {
+            replayed_events = timeline_->replay_from(last_applied_event_id);
+        } else {
+            replayed_events = timeline_->replay();
+        }
+        
+        // Pass events to CognitiveCoordinator (future work)
+        recovered_events_ = replayed_events.size();
     }
 
     void refresh_storage_usage_locked() {

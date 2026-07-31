@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CognitiveSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "timestamp",
+    "checksum",
+    "configuration_fingerprint",
+    "last_applied_event_id",
+    "payload"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1.0"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "checksum": {"type": "string", "minLength": 64},
+    "configuration_fingerprint": {"type": "string", "minLength": 1},
+    "last_applied_event_id": {"type": "string", "minLength": 1},
+    "payload": {"type": "object"}
+  }
+}
