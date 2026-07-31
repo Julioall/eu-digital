@@ -276,6 +276,12 @@ models/manifests/.gitkeep
 models/source/.gitkeep
 plans/PLAN-001-foundation.md
 plans/PLAN-002-runtime-shell.md
+plans/PLAN-045.md
+plans/PLAN-046.md
+plans/PLAN-047.md
+plans/PLAN-048.md
+plans/PLAN-049.md
+plans/PLAN-050.md
 promotions/cognition.episode_segmentation.v1.json
 promotions/cognition.episodic_memory.v1.json
 promotions/cognition.functional_self_model.v1.json
@@ -462,6 +468,12 @@ specs/SPEC-041-desktop-interface-spike.md
 specs/SPEC-042-procedural-avatar-shell.md
 specs/SPEC-043-suggestive-orchestration.md
 specs/SPEC-044-packaging-update-release.md
+specs/SPEC-045-integrated-cognitive-cycle-runtime.md
+specs/SPEC-046-cognitive-state-persistence.md
+specs/SPEC-047-component-wiring-and-contracts.md
+specs/SPEC-048-integrated-dialogue-and-decision.md
+specs/SPEC-049-supervised-action-feedback-loop.md
+specs/SPEC-050-minimum-usable-application.md
 src/.gitkeep
 templates/ADR_TEMPLATE.md
 templates/EXECUTION_REPORT.md
