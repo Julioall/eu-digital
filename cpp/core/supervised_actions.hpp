@@ -85,7 +85,7 @@ public:
     virtual ActionPolicyDecision evaluate(const ActionPlan& plan, const ActionSimulation& simulation) = 0;
 };
 
-enum class ActionOutcomeStatus { blocked, succeeded, failed, rolled_back, rollback_failed };
+enum class ActionOutcomeStatus { blocked, succeeded, failed, rolled_back, rollback_failed, outcome_unknown };
 
 struct ActionOutcome {
     std::string audit_id;
@@ -245,6 +245,26 @@ public:
         return outcome;
     }
 
+    ActionOutcome expire(const std::string& plan_id, std::uint64_t now_ms) {
+        auto found = prepared_.find(plan_id);
+        if (found == prepared_.end()) return blocked_unknown(plan_id, now_ms, "unknown_plan");
+        auto& state = found->second;
+        if (state.last_outcome) {
+            return record_blocked(state.plan, now_ms, "action_already_has_outcome");
+        }
+        ActionOutcome outcome;
+        outcome.audit_id = next_audit_id();
+        outcome.plan_id = state.plan.plan_id;
+        outcome.plan_digest = state.plan.plan_digest;
+        outcome.status = ActionOutcomeStatus::outcome_unknown;
+        outcome.occurred_at_ms = now_ms;
+        outcome.error_code = "authorization_expired_or_system_crashed";
+        state.last_outcome = outcome;
+        history_.push_back(outcome);
+        emit_audit(outcome);
+        return outcome;
+    }
+
 private:
     struct PreparedState {
         ActionPlan plan;
@@ -270,6 +290,7 @@ private:
         case ActionOutcomeStatus::failed: return "failed";
         case ActionOutcomeStatus::rolled_back: return "rolled_back";
         case ActionOutcomeStatus::rollback_failed: return "rollback_failed";
+        case ActionOutcomeStatus::outcome_unknown: return "outcome_unknown";
         }
         return "failed";
     }
@@ -315,6 +336,7 @@ private:
         }
         payload << "}";
         emit("action.audit", payload.str(), outcome.occurred_at_ms);
+        emit("action_outcome", payload.str(), outcome.occurred_at_ms);
     }
 
     void emit(const std::string& event_type, const std::string& payload, std::uint64_t timestamp_ms) {
@@ -370,6 +392,9 @@ public:
     }
     ActionOutcome rollback(const std::string& plan_id, std::uint64_t now_ms) {
         return controller_.rollback(plan_id, now_ms);
+    }
+    ActionOutcome expire(const std::string& plan_id, std::uint64_t now_ms) {
+        return controller_.expire(plan_id, now_ms);
     }
     const std::vector<ActionOutcome>& history() const { return controller_.history(); }
 

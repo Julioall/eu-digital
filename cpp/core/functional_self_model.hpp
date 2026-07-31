@@ -85,9 +85,11 @@ struct FunctionalSelfModelCapability {
     std::string status;
     std::string explanation;
     std::vector<std::string> source_event_ids;
+    double confidence_score{1.0};
 
     void validate() const {
         if (capability_id.empty() || explanation.empty()) throw std::invalid_argument("self-model capability fields are required");
+        if (confidence_score < 0.0 || confidence_score > 1.0) throw std::invalid_argument("invalid confidence score");
         if (status != "available" && status != "degraded" && status != "unavailable" && status != "removed") {
             throw std::invalid_argument("unsupported self-model capability status");
         }
@@ -244,6 +246,11 @@ public:
                 } else {
                     reason_code = "capability_removed";
                 }
+                if (allowed && entry.confidence_score < 0.2) {
+                    allowed = false;
+                    reason_code = "capability_confidence_too_low";
+                    explanation += " However, the capability was blocked because its confidence score is critically low.";
+                }
             }
         }
         const auto decision_id = digest::uuid5(
@@ -295,7 +302,8 @@ private:
         output << "{\"capability_id\":" << functional_self_model_json_string(value.capability_id)
                << ",\"explanation\":" << functional_self_model_json_string(value.explanation)
                << ",\"source_event_ids\":" << functional_self_model_json_array(value.source_event_ids)
-               << ",\"status\":" << functional_self_model_json_string(value.status) << '}';
+               << ",\"status\":" << functional_self_model_json_string(value.status)
+               << ",\"confidence_score\":" << value.confidence_score << '}';
         return output.str();
     }
 
