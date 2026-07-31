@@ -4,6 +4,8 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
+#include <QIcon>
+#include <QPixmap>
 
 namespace eu_digital {
 
@@ -14,6 +16,10 @@ class QtTrayAdapter : public QObject {
 public:
     explicit QtTrayAdapter(QObject* parent = nullptr) : QObject(parent) {
         tray_icon_ = new QSystemTrayIcon(this);
+        
+        QPixmap pixmap(32, 32);
+        pixmap.fill(Qt::darkBlue);
+        tray_icon_->setIcon(QIcon(pixmap));
         tray_menu_ = new QMenu();
 
         action_pause_ = new QAction("Pause Avatar", this);
