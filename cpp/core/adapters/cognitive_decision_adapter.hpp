@@ -27,7 +27,7 @@ public:
         
         // Use context inputs:
         if (ctx.prediction) {
-            evidence.reason = ctx.prediction->predicted_state;
+            evidence.reason = "prediction_" + ctx.prediction->prediction_id;
         } else if (ctx.metacognition) {
             evidence.reason = "Metacognitive focus";
         } else {

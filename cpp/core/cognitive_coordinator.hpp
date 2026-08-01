@@ -256,7 +256,6 @@ private:
         CanonicalEvent res_event;
         res_event.event_id = result.event_id;
         res_event.event_type = "cognitive.cycle.result";
-        res_event.correlation_id = result.correlation_id;
         res_event.payload = "{\"intent\":\"" + result.intent + "\",\"reason\":\"" + result.reason + "\",\"card_id\":\"" + result.card_id + "\",\"activity_id\":\"" + result.activity_id + "\",\"payload_text\":\"" + result.payload_text + "\"}";
         
         // Ensure registry provides event bus to publish
@@ -264,7 +263,7 @@ private:
         if (publisher_) {
             publisher_(res_event);
         }
-
+    }
     void log_state(const std::string& event_id, CycleState state, const std::string& reason) {
         std::lock_guard<std::mutex> log_lock(log_mutex_);
         logs_.push_back({event_id, state, reason});

@@ -13,7 +13,8 @@ int main() {
         ev.event_id = "ev1";
         ev.monotonic_ns = 1000;
         
-        auto decision = adapter.decide(ev);
+        CognitiveCycleContext ctx;
+        auto decision = adapter.decide(ev, ctx);
         assert(decision.success);
         
         std::cout << "CognitiveDecisionAdapter tests passed!" << std::endl;

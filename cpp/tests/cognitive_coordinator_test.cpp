@@ -73,14 +73,14 @@ public:
 
 class MockCognitiveDecisionPort : public ICognitiveDecisionPort {
 public:
-    CognitiveDecision decide(const CanonicalEvent& event) override {
+    CognitiveDecision decide(const CanonicalEvent& event, const CognitiveCycleContext& ctx) override {
         return CognitiveDecision{};
     }
 };
 
 class FailingDecisionPort : public ICognitiveDecisionPort {
 public:
-    CognitiveDecision decide(const CanonicalEvent& event) override {
+    CognitiveDecision decide(const CanonicalEvent& event, const CognitiveCycleContext& ctx) override {
         throw std::runtime_error("Simulated decision failure");
     }
 };
