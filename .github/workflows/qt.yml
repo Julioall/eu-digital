@@ -50,8 +50,7 @@ jobs:
 
       - name: Run windeployqt
         run: |
-          $qtBinDir = (Get-ChildItem -Directory $env:RUNNER_WORKSPACE\..\Qt\*\*\msvc*\bin | Select-Object -First 1).FullName
-          & "$qtBinDir\windeployqt.exe" --compiler-runtime build/windows-qt/eu_digital_desktop.exe
+          windeployqt.exe --compiler-runtime build/windows-qt/eu_digital_desktop.exe
         shell: pwsh
         continue-on-error: true
 
