@@ -257,7 +257,7 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
     set(CMAKE_AUTOUIC ON)
 
     if (MSVC)
-        add_compile_definitions(_HAS_DEPRECATED_UNCHECKED_ITERATORS=1)
+        add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
     endif()
 
     add_executable(qt_avatar_shell_test cpp/tests/qt_avatar_shell_test.cpp cpp/shell/qt_avatar_window.cpp)
