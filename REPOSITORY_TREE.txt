@@ -372,10 +372,6 @@ promotions/registry.json
 promotions/required_components.json
 pyproject.toml
 python/analysis/.gitkeep
-python/eu_digital_lab.egg-info/dependency_links.txt
-python/eu_digital_lab.egg-info/PKG-INFO
-python/eu_digital_lab.egg-info/SOURCES.txt
-python/eu_digital_lab.egg-info/top_level.txt
 python/eu_digital_lab/.gitkeep
 python/eu_digital_lab/__init__.py
 python/eu_digital_lab/annotation.py

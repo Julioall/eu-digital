@@ -19,7 +19,7 @@ $ExcludedSegments = @('.git', '.venv', '.vs', '__pycache__', '.pytest_cache', '.
 $Files = Get-ChildItem -LiteralPath $RepositoryRoot -Recurse -Force -File | Where-Object {
     $Relative = $_.FullName.Substring($RepositoryRoot.Length + 1)
     $Segments = $Relative -split '[\\/]'
-    -not ($Segments | Where-Object { $_ -in $ExcludedSegments })
+    -not ($Segments | Where-Object { $_ -in $ExcludedSegments -or $_ -match '\.egg-info$' })
 } | ForEach-Object {
     $_.FullName.Substring($RepositoryRoot.Length + 1).Replace('\', '/')
 }
