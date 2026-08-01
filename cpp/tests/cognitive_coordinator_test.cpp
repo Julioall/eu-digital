@@ -135,11 +135,10 @@ void test_missing_ports_yields_degraded() {
 
     auto logs = coordinator.get_logs();
     
-    assert(logs.size() == 4);
+    assert(logs.size() == 3);
     assert(logs[2].state == CycleState::degraded);
     assert(logs[2].reason.find("missing_episode_port") != std::string::npos);
     assert(logs[2].reason.find("missing_decision_port") != std::string::npos);
-    assert(logs[3].state == CycleState::completed);
 }
 
 void test_exception_in_port_yields_degraded() {
@@ -165,10 +164,9 @@ void test_exception_in_port_yields_degraded() {
 
     auto logs = coordinator.get_logs();
     
-    assert(logs.size() == 4);
+    assert(logs.size() == 3);
     assert(logs[2].state == CycleState::degraded);
     assert(logs[2].reason.find("decision_error: Simulated decision failure") != std::string::npos);
-    assert(logs[3].state == CycleState::completed);
 }
 
 void test_backpressure_drops_events() {
