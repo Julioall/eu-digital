@@ -348,7 +348,7 @@ void DesktopController::onCognitiveCycleResultReceived(const QString& payload) {
         appendMessageToTray("agent", payload_text);
     } else if (intent == "proactive_suggestion" && !card_id.isEmpty()) {
         if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
-            tray_adapter_->getTrayWidget()->setAssistanceCard("Sugestão", reason, "Aplicar", "suggestion");
+            tray_adapter_->getTrayWidget()->setAssistanceCard(card_id, "Sugestão", reason, "Aplicar", "suggestion");
         }
     } else if (intent == "activity_detected" && !activity_id.isEmpty()) {
         if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
