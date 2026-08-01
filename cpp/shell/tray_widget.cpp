@@ -215,6 +215,12 @@ void TrayWidget::setupUi() {
     card_layout->addWidget(card_action_btn_);
     assistance_card_widget_->hide();
 
+    connect(card_action_btn_, &QPushButton::clicked, this, [this]() {
+        if (!current_card_id_.isEmpty()) {
+            emit assistanceActionRequested(current_card_id_);
+        }
+    });
+
     container_layout->addWidget(assistance_card_widget_);
     container_layout->addWidget(chat_history_);
     container_layout->addLayout(input_layout);
@@ -340,10 +346,11 @@ void eu_digital::TrayWidget::setCurrentActivity(const QString& description, cons
     }
 }
 
-void eu_digital::TrayWidget::setAssistanceCard(const QString& title, const QString& body,
+void eu_digital::TrayWidget::setAssistanceCard(const QString& card_id, const QString& title, const QString& body,
                                                 const QString& action_label, const QString& card_type) {
     if (!assistance_card_widget_) return;
 
+    current_card_id_ = card_id;
     card_title_label_->setText(title);
     card_body_label_->setText(body);
     card_action_btn_->setText(action_label);

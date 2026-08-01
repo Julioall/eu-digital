@@ -14,8 +14,10 @@ public:
     explicit SensorControlWidget(QWidget* parent = nullptr);
 
     // Updates the widget with the current capability registry.
-    // In a real implementation, we would listen to events.
     void updateFromRegistry(const CapabilityRegistry* registry);
+
+signals:
+    void sensorStateChangeRequested(const QString& capability_id, bool pause);
 
 private:
     QVBoxLayout* main_layout_;

@@ -27,6 +27,7 @@ public:
 
 signals:
     void settingsChanged();
+    void sensorStateChangeRequested(const QString& capability_id, bool pause);
 
 protected:
     void closeEvent(QCloseEvent* event) override;

@@ -116,6 +116,7 @@ cpp/core/capability_runtime.hpp
 cpp/core/cognitive_coordinator.hpp
 cpp/core/cognitive_snapshot.hpp
 cpp/core/contracts/cognitive_cycle_context.hpp
+cpp/core/contracts/cognitive_cycle_result.hpp
 cpp/core/contracts/cognitive_decision.hpp
 cpp/core/contracts/cognitive_output.hpp
 cpp/core/contracts/contextual_assistance_card.hpp

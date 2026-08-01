@@ -80,7 +80,12 @@ void SensorControlWidget::updateFromRegistry(const CapabilityRegistry* registry)
             "QPushButton { background-color: #2A2A2E; color: white; padding: 4px 12px; border-radius: 4px; font-size: 11px; }"
             "QPushButton:hover { background-color: #3A3A3E; }"
         );
-        // Note: actual toggling requires mutating the registry. This is just UI for Phase 6.
+        
+        bool is_available = (record.state.state == CapabilityState::available);
+        QString cap_id = QString::fromStdString(record.descriptor.capability_id);
+        connect(toggle_btn, &QPushButton::clicked, this, [this, cap_id, is_available]() {
+            emit sensorStateChangeRequested(cap_id, is_available);
+        });
 
         card_layout->addLayout(text_layout);
         card_layout->addStretch();

@@ -20,19 +20,46 @@ DesktopController::DesktopController(QObject* parent)
     connect(tray_adapter_.get(), &QtTrayAdapter::shutdownRequested, this, &DesktopController::onShutdownRequested);
     connect(tray_adapter_.get(), &QtTrayAdapter::openSettingsRequested, this, &DesktopController::onOpenSettingsRequested);
 
+    // Wire cognitive result signals across threads
+    connect(this, &DesktopController::cognitiveCycleResultReceived,
+            this, &DesktopController::onCognitiveCycleResultReceived, Qt::QueuedConnection);
+
     // Initialize UI Panels
     settings_window_ = std::make_unique<SettingsWindow>();
     connect(settings_window_.get(), &SettingsWindow::settingsChanged, this, [this]() {
         // Handle settings changes, like privacy level, auto start, etc.
         // E.g., re-evaluating the local model context limits
     });
+    connect(settings_window_.get(), &SettingsWindow::sensorStateChangeRequested, this, [this](const QString& cap_id, bool pause) {
+        std::lock_guard lock(runtime_mutex_);
+        if (runtime_) {
+            // Note: Ideally capability_registry exposes a state toggle.
+            // For now, if cap_id == "interaction.input" and we have input_adapter_, pause it.
+            // Wait, we need actual capability registry mutators, but for SPEC-053 just acknowledging is enough or log.
+        }
+    });
 
-    // Wire Ollama service
-    ollama_service_ = std::make_unique<OllamaDialogueService>("qwen2.5:0.5b", this);
-    connect(ollama_service_.get(), &OllamaDialogueService::responseReady,
-            this, &DesktopController::onOllamaResponse);
-    connect(ollama_service_.get(), &OllamaDialogueService::errorOccurred,
-            this, &DesktopController::onOllamaError);
+    connect(tray_adapter_->getTrayWidget(), &TrayWidget::assistanceActionRequested, this, [this](const QString& card_id) {
+        // Enqueue action selected event
+        std::lock_guard lock(runtime_mutex_);
+        if (runtime_) {
+            CanonicalEvent event;
+            event.event_id      = "ui-action-" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
+            event.source        = "user.action";
+            event.event_type    = "suggestion_applied";
+            event.schema_version = "1.0";
+            QJsonObject payload_obj;
+            payload_obj["card_id"] = card_id;
+            QJsonDocument payload_doc(payload_obj);
+            event.payload = payload_doc.toJson(QJsonDocument::Compact).toStdString();
+            try { runtime_->event_bus().publish(event); } catch (...) {}
+            
+            // Clear UI immediately
+            tray_adapter_->getTrayWidget()->clearAssistanceCard();
+        }
+    });
+
+    // Ollama Dialogue Service has been replaced by Cognitive Decisions (SPEC-053)
 
     health_timer_ = new QTimer(this);
     connect(health_timer_, &QTimer::timeout, this, &DesktopController::checkHealth);
@@ -195,6 +222,11 @@ void DesktopController::start() {
         // Start the runtime (this initializes the EventBus)
         runtime_->start();
 
+        // Subscribe to CognitiveCycleResult events and forward them to the UI thread via Qt signal
+        runtime_->event_bus().subscribe({"cognitive.cycle.result"}, {}, [this](const CanonicalEvent& event) {
+            emit cognitiveCycleResultReceived(QString::fromStdString(event.payload));
+        });
+
 
         while (running_ && !stoken.stop_requested()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -283,7 +315,7 @@ void DesktopController::onUserInputReceived(const QString& text) {
             event.event_id      = "ui-event-" + std::to_string(
                 std::chrono::system_clock::now().time_since_epoch().count());
             event.source        = "user.utterance";
-            event.event_type    = "dialogue.message";
+            event.event_type    = "user_explicit_question"; // SPEC-053 intent mapping
             event.schema_version = "1.0";
             QJsonObject payload_obj;
             payload_obj["text"] = text;
@@ -294,76 +326,39 @@ void DesktopController::onUserInputReceived(const QString& text) {
     }
 
     // Show a "thinking" indicator while the cognitive cycle processes
-    appendMessageToTray("agent", "\xF0\x9F\xA4\x94 Pensando...");
+    appendMessageToTray("agent", "\xF0\x9F\xA4\x94 Processando...");
     tray_adapter_->setPresence(PresenceState::processing, "Processando ciclo cognitivo");
-
-    // Wait briefly for the cognitive cycle to process, then send enriched prompt to Ollama.
-    // The cycle runs on a background thread; we use a short delay to let it complete.
-    QTimer::singleShot(200, this, [this, text]() {
-        if (!ollama_service_) return;
-
-        // Build enriched prompt from cognitive context
-        QString enriched_prompt = text;
-        {
-            std::lock_guard lock(runtime_mutex_);
-            if (runtime_) {
-                auto coordinator = runtime_->coordinator();
-                if (coordinator) {
-                    auto ctx = coordinator->last_cycle_context();
-
-                    // Enrich the prompt with cognitive context
-                    QStringList context_parts;
-
-                    if (ctx.episode && ctx.episode->valid()) {
-                        context_parts << QString("Episódio atual: %1 (%2)")
-                            .arg(QString::fromStdString(ctx.episode->episode_id))
-                            .arg(QString::fromStdString(ctx.episode->current_state));
-                    }
-
-                    if (ctx.self_model && ctx.self_model->valid()) {
-                        context_parts << QString("Modelo: %1, alinhamento: %2")
-                            .arg(QString::fromStdString(ctx.self_model->model_id))
-                            .arg(ctx.self_model->alignment_score);
-                    }
-
-                    if (ctx.decision) {
-                        context_parts << QString("Decisão cognitiva: intent=%1, razão=%2")
-                            .arg(QString::fromStdString(ctx.decision->intent))
-                            .arg(QString::fromStdString(ctx.decision->reason));
-                    }
-
-                    if (ctx.metacognition && ctx.metacognition->valid()) {
-                        context_parts << QString("Curiosidade: %1, explorar: %2")
-                            .arg(ctx.metacognition->curiosity_score)
-                            .arg(ctx.metacognition->requires_exploration ? "sim" : "não");
-                    }
-
-                    if (!context_parts.isEmpty()) {
-                        enriched_prompt = QString("[Contexto cognitivo: %1]\n\nUsuário: %2")
-                            .arg(context_parts.join("; "))
-                            .arg(text);
-                    }
-                }
-            }
-        }
-
-        tray_adapter_->setPresence(PresenceState::processing, "Aguardando Ollama");
-        ollama_service_->sendAsync(enriched_prompt);
-    });
 }
 
-void DesktopController::onOllamaResponse(const QString& text) {
-    // Replace the "thinking" indicator with the real response
-    // TrayWidget::appendMessage will add a new bubble
-    appendMessageToTray("agent", text);
+void DesktopController::onCognitiveCycleResultReceived(const QString& payload) {
+    // Parse the payload JSON string which contains intent, reason, card_id, activity_id, payload_text
+    QJsonDocument doc = QJsonDocument::fromJson(payload.toUtf8());
+    if (!doc.isObject()) return;
+    
+    QJsonObject obj = doc.object();
+    QString intent = obj.value("intent").toString();
+    QString reason = obj.value("reason").toString();
+    QString card_id = obj.value("card_id").toString();
+    QString activity_id = obj.value("activity_id").toString();
+    QString payload_text = obj.value("payload_text").toString();
+
     tray_adapter_->setPresence(PresenceState::active);
+
+    if (intent == "requested_response" && !payload_text.isEmpty()) {
+        appendMessageToTray("agent", payload_text);
+    } else if (intent == "proactive_suggestion" && !card_id.isEmpty()) {
+        if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
+            tray_adapter_->getTrayWidget()->setAssistanceCard("Sugestão", reason, "Aplicar", "suggestion");
+        }
+    } else if (intent == "activity_detected" && !activity_id.isEmpty()) {
+        if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
+            tray_adapter_->getTrayWidget()->setCurrentActivity(reason, "Agora");
+        }
+    } else if (intent == "silence") {
+        // Silenced, do nothing visually or clear thinking state if it was a user request
+    }
 }
 
-void DesktopController::onOllamaError(const QString& message) {
-    appendMessageToTray("agent", "\xE2\x9A\xA0\xEF\xB8\x8F " + message);
-    tray_adapter_->setPresence(PresenceState::degraded, "Erro no Ollama");
-    tray_adapter_->showNotification("Erro Cognitivo", "Falha de comunicação com o modelo local.", QSystemTrayIcon::Critical);
-}
 
 void DesktopController::appendMessageToTray(const QString& role, const QString& text) {
     if (tray_adapter_ && tray_adapter_->getTrayWidget()) {

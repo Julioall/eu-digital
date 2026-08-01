@@ -25,7 +25,7 @@ public:
 
     // SPEC-053: Activity companion display
     void setCurrentActivity(const QString& description, const QString& duration);
-    void setAssistanceCard(const QString& title, const QString& body,
+    void setAssistanceCard(const QString& card_id, const QString& title, const QString& body,
                            const QString& action_label, const QString& card_type);
     void clearAssistanceCard();
 
@@ -34,6 +34,7 @@ signals:
     void expandRequested();
     void cancelRequested();
     void settingsRequested();
+    void assistanceActionRequested(const QString& card_id);
 
 protected:
     bool event(QEvent* e) override;
@@ -67,7 +68,7 @@ private:
     QLabel* card_title_label_{nullptr};
     QLabel* card_body_label_{nullptr};
     QPushButton* card_action_btn_{nullptr};
+    QString current_card_id_;
 };
 
 } // namespace eu_digital
-

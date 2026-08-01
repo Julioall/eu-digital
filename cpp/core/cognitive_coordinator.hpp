@@ -10,6 +10,7 @@
 #include "core/ports/iself_model_query_port.hpp"
 #include "core/ports/icognitive_decision_port.hpp"
 #include "core/contracts/cognitive_cycle_context.hpp"
+#include "core/contracts/cognitive_cycle_result.hpp"
 
 #include <atomic>
 #include <condition_variable>
@@ -52,6 +53,10 @@ public:
 
     CognitiveCoordinator(const CognitiveCoordinator&) = delete;
     CognitiveCoordinator& operator=(const CognitiveCoordinator&) = delete;
+
+    void set_publisher(std::function<void(const CanonicalEvent&)> publisher) {
+        publisher_ = std::move(publisher);
+    }
 
     void enqueue(const CanonicalEvent& event) {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -203,7 +208,7 @@ private:
         auto decision_port = registry_.resolve<ICognitiveDecisionPort>("decision");
         if (decision_port) {
             try {
-                ctx.decision = decision_port->decide(event);
+                ctx.decision = decision_port->decide(event, ctx);
             } catch (const std::exception& e) {
                 ctx.mark_degraded(std::string("decision_error: ") + e.what());
             }
@@ -223,7 +228,42 @@ private:
         } else {
             log_state(event.event_id, CycleState::completed, "");
         }
-    }
+
+        // Publish CognitiveCycleResult
+        CognitiveCycleResult result;
+        result.event_id = "res-" + event.event_id;
+        result.correlation_id = event.event_id;
+        if (ctx.decision) {
+            result.intent = ctx.decision->intent;
+            result.reason = ctx.decision->reason;
+            // Map intent to activity or card depending on intent string
+            if (result.intent == "proactive_suggestion") {
+                result.card_id = "card-" + event.event_id;
+            } else if (result.intent == "activity_detected") {
+                result.activity_id = "act-" + event.event_id;
+            } else if (result.intent == "requested_response") {
+                // Should be rendered by language model, but for now we put it in payload
+                result.payload_text = "Resposta cognitiva em breve..."; 
+            }
+        } else {
+            result.intent = "silence";
+            result.reason = ctx.degradation_reason;
+        }
+
+        // We wrap the struct in a CanonicalEvent to pass through EventBus for now,
+        // or we could add a specialized publish for CognitiveCycleResult if EventBus supports it.
+        // Actually, EventBus takes CanonicalEvent. Let's serialize it into CanonicalEvent payload.
+        CanonicalEvent res_event;
+        res_event.event_id = result.event_id;
+        res_event.event_type = "cognitive.cycle.result";
+        res_event.correlation_id = result.correlation_id;
+        res_event.payload = "{\"intent\":\"" + result.intent + "\",\"reason\":\"" + result.reason + "\",\"card_id\":\"" + result.card_id + "\",\"activity_id\":\"" + result.activity_id + "\",\"payload_text\":\"" + result.payload_text + "\"}";
+        
+        // Ensure registry provides event bus to publish
+        // We use the injected publisher callback if available
+        if (publisher_) {
+            publisher_(res_event);
+        }
 
     void log_state(const std::string& event_id, CycleState state, const std::string& reason) {
         std::lock_guard<std::mutex> log_lock(log_mutex_);
@@ -237,6 +277,7 @@ private:
     std::mutex mutex_;
     std::condition_variable condition_;
     bool active_;
+    std::function<void(const CanonicalEvent&)> publisher_;
     std::thread worker_;
 
     mutable std::mutex log_mutex_;

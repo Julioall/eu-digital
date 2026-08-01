@@ -211,6 +211,8 @@ QWidget* SettingsWindow::createPrivacidadeTab() {
 
 QWidget* SettingsWindow::createSensoresTab() {
     sensor_control_ = new SensorControlWidget();
+    connect(sensor_control_, &SensorControlWidget::sensorStateChangeRequested, 
+            this, &SettingsWindow::sensorStateChangeRequested);
     return sensor_control_;
 }
 

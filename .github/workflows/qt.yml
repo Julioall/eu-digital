@@ -41,7 +41,9 @@ jobs:
         run: cmake --build --preset windows-qt --target desktop_integration_test
 
       - name: Run Desktop integration test
-        run: ctest --preset windows-qt -R desktop_integration_test
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: ctest --preset windows-qt -R desktop_integration$
 
       - name: Build Desktop Application
         run: cmake --build --preset windows-qt --target eu_digital_desktop

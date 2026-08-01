@@ -12,7 +12,6 @@
 #include "core/suggestion_orchestrator.hpp"
 #include "shell/qt_tray_adapter.hpp"
 #include "shell/qt_avatar_window.hpp"
-#include "shell/ollama_dialogue_service.hpp"
 #include "shell/settings_window.hpp"
 
 #include <QObject>
@@ -42,6 +41,7 @@ public:
 signals:
     void healthUpdated(const QString& health_json);
     void consentChanged(bool granted);
+    void cognitiveCycleResultReceived(const QString& payload);
 
 private slots:
     void onTrayPauseRequested(bool paused);
@@ -49,11 +49,9 @@ private slots:
     void onTrayConsentRevoked(bool revoked);
     void onShutdownRequested();
     void onOpenSettingsRequested();
-    void onOpenQuickPanelRequested();
     void checkHealth();
     void onUserInputReceived(const QString& text);
-    void onOllamaResponse(const QString& text);
-    void onOllamaError(const QString& message);
+    void onCognitiveCycleResultReceived(const QString& payload);
 
 public slots:
     void appendMessageToTray(const QString& role, const QString& text);
@@ -81,8 +79,7 @@ private:
     std::unique_ptr<SettingsWindow> settings_window_;
     QTimer* health_timer_{nullptr};
 
-    // Ollama Dialogue
-    std::unique_ptr<OllamaDialogueService> ollama_service_;
+    // Ollama Dialogue (Removed in SPEC-053)
 
     // Cognitive Components (Fase 2 — SPEC-053)
     std::shared_ptr<EpisodicMemoryStore> episodic_memory_;

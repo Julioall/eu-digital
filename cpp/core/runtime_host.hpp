@@ -374,6 +374,11 @@ public:
             capability_registry_.activate_profile("runtime-host-minimal");
             coordinator_ = std::make_shared<CognitiveCoordinator>(capability_registry_);
             event_bus_ = std::make_shared<EventBus>();
+            coordinator_->set_publisher([this](const CanonicalEvent& ev) {
+                if (event_bus_) {
+                    try { event_bus_->publish(ev); } catch (...) {}
+                }
+            });
             event_bus_->subscribe({}, {}, [this](const CanonicalEvent& event) {
                 persist(event);
                 if (coordinator_) {
