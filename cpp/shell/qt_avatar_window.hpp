@@ -21,6 +21,9 @@ public:
 public slots:
     void updateFrame();
 
+protected:
+    bool event(QEvent* event) override;
+
 private:
     std::shared_ptr<ProceduralAvatarRenderer> renderer_;
     QTimer* frame_timer_;

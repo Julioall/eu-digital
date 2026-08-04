@@ -83,7 +83,7 @@ anterior interrompida e encerra sem deixar captura ou marker ativo.
   em amostras `DesktopPerformanceSample` válidas.
 - [ ] IME pt-BR, DPI 100–250%, multi-monitor, keyboard navigation, UI Automation,
   tray, click-through, transparência e suspend/resume possuem evidência Windows.
-- [ ] Build Qt, testes headless, integração desktop, lint, tipos e suites globais
+- [x] Build Qt, testes headless, integração desktop, lint, tipos e suites globais
   passam; relatório de execução é atualizado.
 
 ## Plano de testes

@@ -63,7 +63,6 @@ signals:
     void healthUpdated(const QString& health_json);
     void sessionStateUpdated(const QString& state_json);
     void consentChanged(bool granted);
-    void cognitiveCycleResultReceived(const QString& payload);
 
 private slots:
     void onTrayPauseRequested(bool paused);
@@ -73,7 +72,6 @@ private slots:
     void onOpenSettingsRequested();
     void checkHealth();
     void onUserInputReceived(const QString& text);
-    void onCognitiveCycleResultReceived(const QString& payload);
 
 public slots:
     void appendMessageToTray(const QString& role, const QString& text);
@@ -120,9 +118,7 @@ private:
     std::unique_ptr<SettingsWindow> settings_window_;
     QTimer* health_timer_{nullptr};
 
-    // Ollama Dialogue (Removed in SPEC-053)
-
-    // Cognitive Components (Fase 2 — SPEC-053)
+    // Cognitive components for the SPEC-045/048 vertical slice.
     std::shared_ptr<EpisodicMemoryStore> episodic_memory_;
     std::shared_ptr<PatternLearner> pattern_learner_;
     std::shared_ptr<WorldModel> world_model_;

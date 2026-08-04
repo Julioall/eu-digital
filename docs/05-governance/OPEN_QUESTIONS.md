@@ -34,6 +34,18 @@
     genérico ainda pendente.
 31. Requisito arquitetural da SPEC-046: quais módulos formam um checkpoint
     completo, como restaurá-los sem estado parcial e quando usar cold replay?
+32. Conflito de escopo encontrado na SPEC-050: o produto continha experiência
+    de atividade/cards e um consumidor de DTO legado atribuídos à SPEC-053,
+    embora a SPEC-053 permaneça `draft` e a SPEC-050 proíba antecipá-la.
+
+## Resolução da questão 32 pela SPEC-050
+
+Em 2026-08-04, a camada de atividade/cards foi removida do executável desktop.
+O consumidor legado também foi retirado porque esperava `card_id`,
+`activity_id` e `payload_text`, campos ausentes do `CognitiveCycleResultV1`
+canônico. Saídas de diálogo continuam exclusivamente pelo pipeline versionado
+da SPEC-048 e por `IPresentationPort`; a SPEC-053 permanece sem implementação
+autorizada.
 
 ## Resolução da questão 31 pela ADR-0034
 

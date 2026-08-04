@@ -569,6 +569,18 @@ cmake --build --preset windows-qt
 ctest --test-dir build/windows-qt -R "(desktop|qt_avatar)" --output-on-failure
 ```
 
+O grupo nativo abre o popup por menos de um segundo em cada processo, usa o
+plugin `qwindows` e cobre a escala atual mais 125%, 150%, 200% e 250%:
+
+```powershell
+ctest --test-dir build/windows-qt -R "^qt_avatar_shell_windows" --output-on-failure
+```
+
+Os relatórios locais ficam em
+`build/windows-qt/qt_windows_platform_probe*.json`. Escala injetada valida a
+adaptação Qt, mas não substitui monitor físico, leitor de tela ou ciclo real de
+Sleep/Hibernate.
+
 `desktop_integration_test` usa diretório temporário, plataforma offscreen e
 ledger DPAPI próprio. Ele não lê nem altera consentimento do perfil real. As
 amostras de performance são gravadas em

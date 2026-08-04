@@ -140,6 +140,10 @@ void TrayWidget::setupUi() {
     input_layout->setSpacing(8);
     
     input_field_ = new QLineEdit(container);
+    input_field_->setObjectName("messageInput");
+    input_field_->setAccessibleName("Mensagem para o Eu Digital");
+    input_field_->setAccessibleDescription(
+        "Campo para enviar uma mensagem local ao Eu Digital");
     input_field_->setPlaceholderText("Pergunte algo rápido...");
     input_field_->setStyleSheet(
         "QLineEdit { "
@@ -166,62 +170,6 @@ void TrayWidget::setupUi() {
 
     container_layout->addLayout(header_layout);
 
-    // SPEC-053: Current activity area (shown in compact mode)
-    QWidget* activity_area = new QWidget(container);
-    activity_area->setStyleSheet("QWidget { background-color: #1A1A2E; border-radius: 8px; }");
-    QHBoxLayout* activity_layout = new QHBoxLayout(activity_area);
-    activity_layout->setContentsMargins(12, 8, 12, 8);
-
-    QLabel* activity_icon = new QLabel(QString::fromUtf8("\xF0\x9F\x92\xBB"), activity_area);
-    activity_icon->setStyleSheet("font-size: 16px;");
-    activity_icon->setFixedWidth(24);
-
-    QVBoxLayout* activity_text_layout = new QVBoxLayout();
-    activity_text_layout->setSpacing(0);
-    activity_label_ = new QLabel("Nenhuma atividade detectada", activity_area);
-    activity_label_->setStyleSheet("color: #E2E8F0; font-size: 12px; font-family: 'Segoe UI', Arial;");
-    activity_duration_label_ = new QLabel("", activity_area);
-    activity_duration_label_->setStyleSheet("color: #64748B; font-size: 11px; font-family: 'Segoe UI', Arial;");
-    activity_text_layout->addWidget(activity_label_);
-    activity_text_layout->addWidget(activity_duration_label_);
-
-    activity_layout->addWidget(activity_icon);
-    activity_layout->addLayout(activity_text_layout);
-    activity_layout->addStretch();
-
-    container_layout->addWidget(activity_area);
-
-    // SPEC-053: Contextual assistance card (hidden by default)
-    assistance_card_widget_ = new QWidget(container);
-    assistance_card_widget_->setStyleSheet(
-        "QWidget { background-color: #1E293B; border-radius: 8px; border: 1px solid #334155; }");
-    QVBoxLayout* card_layout = new QVBoxLayout(assistance_card_widget_);
-    card_layout->setContentsMargins(12, 10, 12, 10);
-    card_layout->setSpacing(4);
-
-    card_title_label_ = new QLabel("", assistance_card_widget_);
-    card_title_label_->setStyleSheet("color: #93C5FD; font-size: 12px; font-weight: bold; font-family: 'Segoe UI', Arial;");
-    card_body_label_ = new QLabel("", assistance_card_widget_);
-    card_body_label_->setStyleSheet("color: #CBD5E1; font-size: 11px; font-family: 'Segoe UI', Arial;");
-    card_body_label_->setWordWrap(true);
-    card_action_btn_ = new QPushButton("", assistance_card_widget_);
-    card_action_btn_->setStyleSheet(
-        "QPushButton { color: #3B82F6; background: transparent; border: none; font-size: 11px; font-weight: bold; text-align: left; padding: 2px 0; }"
-        "QPushButton:hover { color: #60A5FA; }");
-    card_action_btn_->setCursor(Qt::PointingHandCursor);
-
-    card_layout->addWidget(card_title_label_);
-    card_layout->addWidget(card_body_label_);
-    card_layout->addWidget(card_action_btn_);
-    assistance_card_widget_->hide();
-
-    connect(card_action_btn_, &QPushButton::clicked, this, [this]() {
-        if (!current_card_id_.isEmpty()) {
-            emit assistanceActionRequested(current_card_id_);
-        }
-    });
-
-    container_layout->addWidget(assistance_card_widget_);
     container_layout->addWidget(chat_history_);
     container_layout->addLayout(input_layout);
 
@@ -335,43 +283,3 @@ bool TrayWidget::event(QEvent* e) {
 }
 
 } // namespace eu_digital
-
-// SPEC-053: Activity companion methods
-void eu_digital::TrayWidget::setCurrentActivity(const QString& description, const QString& duration) {
-    if (activity_label_) {
-        activity_label_->setText(description.isEmpty() ? "Nenhuma atividade detectada" : description);
-    }
-    if (activity_duration_label_) {
-        activity_duration_label_->setText(duration);
-    }
-}
-
-void eu_digital::TrayWidget::setAssistanceCard(const QString& card_id, const QString& title, const QString& body,
-                                                const QString& action_label, const QString& card_type) {
-    if (!assistance_card_widget_) return;
-
-    current_card_id_ = card_id;
-    card_title_label_->setText(title);
-    card_body_label_->setText(body);
-    card_action_btn_->setText(action_label);
-
-    // Style the card border based on type
-    if (card_type == "suggestion") {
-        assistance_card_widget_->setStyleSheet(
-            "QWidget { background-color: #1E293B; border-radius: 8px; border: 1px solid #3B82F6; }");
-    } else if (card_type == "question") {
-        assistance_card_widget_->setStyleSheet(
-            "QWidget { background-color: #1E293B; border-radius: 8px; border: 1px solid #F59E0B; }");
-    } else {
-        assistance_card_widget_->setStyleSheet(
-            "QWidget { background-color: #1E293B; border-radius: 8px; border: 1px solid #334155; }");
-    }
-
-    assistance_card_widget_->show();
-}
-
-void eu_digital::TrayWidget::clearAssistanceCard() {
-    if (assistance_card_widget_) {
-        assistance_card_widget_->hide();
-    }
-}

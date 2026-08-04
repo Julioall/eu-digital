@@ -388,6 +388,22 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
     target_compile_features(qt_avatar_shell_test PRIVATE cxx_std_23)
     target_link_libraries(qt_avatar_shell_test PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets)
     add_test(NAME qt_avatar_shell COMMAND qt_avatar_shell_test)
+    if(WIN32)
+        target_link_libraries(qt_avatar_shell_test PRIVATE User32)
+        add_test(NAME qt_avatar_shell_windows
+            COMMAND qt_avatar_shell_test
+                --require-native-windows
+                "--report=${CMAKE_BINARY_DIR}/qt_windows_platform_probe.json")
+        foreach(EU_DIGITAL_QT_SCALE IN ITEMS 1.25 1.5 2 2.5)
+            string(REPLACE "." "_" EU_DIGITAL_QT_SCALE_SUFFIX
+                "${EU_DIGITAL_QT_SCALE}")
+            add_test(NAME qt_avatar_shell_windows_scale_${EU_DIGITAL_QT_SCALE_SUFFIX}
+                COMMAND qt_avatar_shell_test
+                    --require-native-windows
+                    "--expected-scale=${EU_DIGITAL_QT_SCALE}"
+                    "--report=${CMAKE_BINARY_DIR}/qt_windows_platform_probe_${EU_DIGITAL_QT_SCALE_SUFFIX}.json")
+        endforeach()
+    endif()
 
     add_executable(qt_dialogue_presentation_adapter_test
         cpp/tests/qt_dialogue_presentation_adapter_test.cpp)
@@ -409,6 +425,24 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
             ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
             ENVIRONMENT_MODIFICATION
                 "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR};PATH=path_list_prepend:${EU_DIGITAL_CXX_RUNTIME_DIR}")
+        set_tests_properties(qt_avatar_shell_windows PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=windows"
+            RUN_SERIAL TRUE
+            TIMEOUT 15
+            ENVIRONMENT_MODIFICATION
+                "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR};PATH=path_list_prepend:${EU_DIGITAL_CXX_RUNTIME_DIR}")
+        foreach(EU_DIGITAL_QT_SCALE IN ITEMS 1.25 1.5 2 2.5)
+            string(REPLACE "." "_" EU_DIGITAL_QT_SCALE_SUFFIX
+                "${EU_DIGITAL_QT_SCALE}")
+            set_tests_properties(
+                qt_avatar_shell_windows_scale_${EU_DIGITAL_QT_SCALE_SUFFIX}
+                PROPERTIES
+                    ENVIRONMENT "QT_QPA_PLATFORM=windows;QT_SCALE_FACTOR=${EU_DIGITAL_QT_SCALE}"
+                    RUN_SERIAL TRUE
+                    TIMEOUT 15
+                    ENVIRONMENT_MODIFICATION
+                        "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR};PATH=path_list_prepend:${EU_DIGITAL_CXX_RUNTIME_DIR}")
+        endforeach()
     endif()
 
     add_executable(eu_digital_desktop WIN32

@@ -26,6 +26,13 @@ Estado: `in_progress`
   componente `runtime` continua isolado.
 - O validador compartilhado passou a executar `allOf/if/then/else`, construção
   já usada por contratos existentes mas antes ignorada.
+- Adicionado gate `qwindows` real com relatório JSON para teclado, input method,
+  acessibilidade, tray, telas, DPI e estilos nativos de click-through/foco.
+- Corrigido o HWND do avatar para aplicar `WS_EX_NOACTIVATE`; a primeira
+  execução nativa detectou que a flag Qt isolada não produzia esse estilo.
+- Removida a experiência antecipada de atividade/cards da SPEC-053 e seu
+  consumidor de DTO legado; diálogo continua pela `IPresentationPort` da
+  SPEC-048.
 
 ## Arquivos modificados
 
@@ -36,7 +43,7 @@ Estado: `in_progress`
   `cpp/shell/desktop_controller.*`, `cpp/shell/desktop_runtime_lifecycle.*`,
   `cpp/core/input_interaction_sensor.hpp`.
 - Qt: `cpp/shell/qt_avatar_window.cpp`, `cpp/shell/qt_tray_adapter.hpp`,
-  `cpp/shell/tray_state_machine.hpp`.
+  `cpp/shell/tray_state_machine.hpp`, `cpp/shell/tray_widget.*`.
 - Testes: `cpp/tests/desktop_runtime_lifecycle_test.cpp`,
   `cpp/tests/desktop_integration_test.cpp`,
   `cpp/tests/qt_avatar_shell_test.cpp`,
@@ -52,9 +59,9 @@ Estado: `in_progress`
 
 - `cmake --build --preset windows-qt`
 - `ctest --test-dir build/windows-qt --output-on-failure`
+- `ctest --test-dir build/windows-qt -R "^qt_avatar_shell_windows"`
 - `python -m pytest python/tests -q`
 - `python -m mypy python/eu_digital_lab python/reference`
-- Ruff check/format nos dois arquivos Python alterados
 - Ruff check global do repositório
 - `python tools/validate_contracts.py`
 - validadores de documentação, SPECs e configuração
@@ -62,14 +69,16 @@ Estado: `in_progress`
 
 ## Resultados
 
-- CTest Windows/Qt: 52/52 passaram.
+- CTest Windows/Qt: 57/57 passaram, incluindo `qwindows` nativo em 100%,
+  125%, 150%, 200% e 250%.
 - Python: 251/251 passaram.
 - Mypy: 29 arquivos, sem erros.
-- Ruff no escopo alterado: passou; format check passou.
+- Ruff global: passou sem ocorrências.
 - Documentação: 13/13; 54 SPECs e 1 configuração válidas.
 - Instalação: componentes `desktop` e `runtime` passaram em árvores isoladas.
-- Ruff global: falhou com 57 ocorrências preexistentes fora da SPEC-050; não
-  foram alteradas para preservar o princípio de menor mudança.
+- Probe nativo: pt-BR instalado, uma tela física 1920x1080/DPR 1.0, tray
+  disponível, input Unicode, Tab, `QAccessible::EditableText`,
+  `WS_EX_TRANSPARENT` e `WS_EX_NOACTIVATE` passaram.
 - Advertência C++ herdada: comparação tautológica em
   `privacy_storage.hpp:249`.
 - `windeployqt` informa ausência opcional de `dxcompiler.dll/dxil.dll`; o
@@ -79,11 +88,12 @@ Estado: `in_progress`
 
 - Passam: deny-by-default sem eventos, grants independentes/DPAPI,
   pausa/revogação, ausência de modelo, manifesto e relógios reais, marker e
-  recovery, stress/watchdog, pacote nativo e métricas de performance.
-- Pendente: matriz física completa de IME pt-BR, DPI 100–250%, multi-monitor,
-  Narrator/NVDA, compositor click-through/alpha e Sleep/Hibernate.
-- Pendente: lint global do repositório. Portanto a SPEC não foi marcada como
-  concluída.
+  recovery, stress/watchdog, pacote nativo, métricas de performance e todos os
+  gates globais de build/lint/tipos/testes.
+- Pendente: movimento multi-monitor, Narrator/NVDA ou cliente UI Automation
+  externo, compositor visual e Sleep/Hibernate físicos. Dead keys reais e
+  escala física diferente de 100% também ainda não foram observados. Portanto
+  a SPEC não foi marcada como concluída.
 
 ## Desvios
 
@@ -100,8 +110,8 @@ Estado: `in_progress`
 - A UI de settings ainda deriva os sensores instalados do registry; o ledger e
   a API suportam grants parciais, mas a revisão física deve confirmar o fluxo
   completo de reativação por sensor.
-- O warning de quota em `privacy_storage.hpp` e o débito Ruff global devem ser
-  tratados por SPEC própria, não por esta mudança.
+- O warning de quota em `privacy_storage.hpp` permanece herdado; o débito Ruff
+  global foi encerrado por correções mecânicas validadas em commit isolado.
 
 ## Decisões tomadas
 
@@ -111,6 +121,10 @@ Estado: `in_progress`
 - Ausência de modelo é capacidade opcional degradada; não há download, rede ou
   chamada direta da UI ao Ollama.
 - Métricas operacionais não são apresentadas como evidência cognitiva.
+- Escalas Qt injetadas não são descritas como DPI físico; a matriz separa as
+  duas evidências.
+- Código de atividade/cards da SPEC-053 não permanece no produto enquanto a
+  SPEC estiver `draft` e sem contratos aprovados.
 
 ## Evidências
 
@@ -124,4 +138,7 @@ Estado: `in_progress`
 
 O JSONL reproduzível foi emitido em
 `build/windows-qt/desktop_performance_samples.jsonl`; a matriz de plataforma
-está em `docs/06-operations/QT_AVATAR_SHELL_MATRIX.md`.
+está em `docs/06-operations/QT_AVATAR_SHELL_MATRIX.md`. Os cinco relatórios
+`qwindows` estão em
+`build/windows-qt/qt_windows_platform_probe*.json` e registram DPRs 1.0, 1.25,
+1.5, 2.0 e 2.5 com todos os invariantes aprovados.

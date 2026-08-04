@@ -68,10 +68,6 @@ DesktopController::DesktopController(DesktopControllerConfig config,
     connect(tray_adapter_.get(), &QtTrayAdapter::shutdownRequested, this, &DesktopController::onShutdownRequested);
     connect(tray_adapter_.get(), &QtTrayAdapter::openSettingsRequested, this, &DesktopController::onOpenSettingsRequested);
 
-    // Wire cognitive result signals across threads
-    connect(this, &DesktopController::cognitiveCycleResultReceived,
-            this, &DesktopController::onCognitiveCycleResultReceived, Qt::QueuedConnection);
-
     // Initialize UI Panels
     settings_window_ = std::make_unique<SettingsWindow>();
     connect(settings_window_.get(), &SettingsWindow::settingsChanged, this, [this]() {
@@ -87,33 +83,6 @@ DesktopController::DesktopController(DesktopControllerConfig config,
                              kInputInteractionPurpose, !pause);
         }
     });
-
-    connect(tray_adapter_->getTrayWidget(), &TrayWidget::assistanceActionRequested, this, [this](const QString& card_id) {
-        // Enqueue action selected event
-        std::lock_guard lock(runtime_mutex_);
-        if (runtime_) {
-            CanonicalEvent event;
-            event.event_id      = "ui-action-" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
-            event.source        = "user.action";
-            event.event_type    = "suggestion_applied";
-            event.schema_version = "1.0";
-            QJsonObject payload_obj;
-            payload_obj["card_id"] = card_id;
-            QJsonDocument payload_doc(payload_obj);
-            event.payload = payload_doc.toJson(QJsonDocument::Compact).toStdString();
-            try {
-                runtime_->event_bus().publish(event);
-            } catch (const std::exception& error) {
-                qWarning().noquote()
-                    << structuredError("desktop_action_publish_failed", error);
-            }
-            
-            // Clear UI immediately
-            tray_adapter_->getTrayWidget()->clearAssistanceCard();
-        }
-    });
-
-    // Ollama Dialogue Service has been replaced by Cognitive Decisions (SPEC-053)
 
     health_timer_ = new QTimer(this);
     connect(health_timer_, &QTimer::timeout, this, &DesktopController::checkHealth);
@@ -508,7 +477,7 @@ void DesktopController::start() {
                     "interaction.input", input_sensor_);
             }
             
-            // Instantiate cognitive components and register ports (SPEC-053 Fase 2)
+            // Instantiate the SPEC-045 cognitive cycle and SPEC-048 output ports.
             episodic_memory_ = std::make_shared<EpisodicMemoryStore>();
             pattern_learner_ = std::make_shared<PatternLearner>(
                 PatternConfig{}, "desktop-patterns");
@@ -663,12 +632,6 @@ void DesktopController::start() {
                 Qt::QueuedConnection);
         }
 
-        // Subscribe to CognitiveCycleResult events and forward them to the UI thread via Qt signal
-        runtime_->event_bus().subscribe({"cognitive.cycle.result"}, {}, [this](const CanonicalEvent& event) {
-            emit cognitiveCycleResultReceived(QString::fromStdString(event.payload));
-        });
-
-
         auto next_system_poll = std::chrono::steady_clock::now();
         while (running_ && !stoken.stop_requested()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -794,7 +757,7 @@ void DesktopController::onUserInputReceived(const QString& text) {
             event.event_id      = "ui-event-" + std::to_string(
                 std::chrono::system_clock::now().time_since_epoch().count());
             event.source        = "user.utterance";
-            event.event_type    = "user_explicit_question"; // SPEC-053 intent mapping
+            event.event_type    = "user_explicit_question";
             event.schema_version = "1.0";
             QJsonObject payload_obj;
             payload_obj["text"] = text;
@@ -813,36 +776,6 @@ void DesktopController::onUserInputReceived(const QString& text) {
     appendMessageToTray("agent", "\xF0\x9F\xA4\x94 Processando...");
     tray_adapter_->setPresence(PresenceState::processing, "Processando ciclo cognitivo");
 }
-
-void DesktopController::onCognitiveCycleResultReceived(const QString& payload) {
-    // Parse the payload JSON string which contains intent, reason, card_id, activity_id, payload_text
-    QJsonDocument doc = QJsonDocument::fromJson(payload.toUtf8());
-    if (!doc.isObject()) return;
-    
-    QJsonObject obj = doc.object();
-    QString intent = obj.value("intent").toString();
-    QString reason = obj.value("reason").toString();
-    QString card_id = obj.value("card_id").toString();
-    QString activity_id = obj.value("activity_id").toString();
-    QString payload_text = obj.value("payload_text").toString();
-
-    tray_adapter_->setPresence(PresenceState::active);
-
-    if (intent == "requested_response" && !payload_text.isEmpty()) {
-        appendMessageToTray("agent", payload_text);
-    } else if (intent == "proactive_suggestion" && !card_id.isEmpty()) {
-        if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
-            tray_adapter_->getTrayWidget()->setAssistanceCard(card_id, "Sugestão", reason, "Aplicar", "suggestion");
-        }
-    } else if (intent == "activity_detected" && !activity_id.isEmpty()) {
-        if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
-            tray_adapter_->getTrayWidget()->setCurrentActivity(reason, "Agora");
-        }
-    } else if (intent == "silence") {
-        // Silenced, do nothing visually or clear thinking state if it was a user request
-    }
-}
-
 
 void DesktopController::appendMessageToTray(const QString& role, const QString& text) {
     if (tray_adapter_ && tray_adapter_->getTrayWidget()) {
