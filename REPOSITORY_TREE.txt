@@ -515,6 +515,7 @@ reports/SPEC-042-execution-report.md
 reports/SPEC-042-headless-preparation-report.md
 reports/SPEC-043-execution-report.md
 reports/SPEC-044-execution-report.md
+reports/SPEC-045-entry-audit-2026-08-04.md
 reports/SPEC-047_REPORT.md
 reports/SPEC-047-dto-increment-2026-08-04.md
 reports/SPEC-047-increment-2026-08-04.md
