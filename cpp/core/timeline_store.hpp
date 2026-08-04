@@ -50,6 +50,12 @@ struct TimelinePage {
     bool has_more{false};
 };
 
+struct CognitiveSnapshotRecord {
+    std::uint64_t id{};
+    std::int64_t created_at_ns{};
+    std::vector<std::uint8_t> encrypted_payload;
+};
+
 class TimelineStore {
 public:
     explicit TimelineStore(const std::string& path) {
@@ -96,7 +102,8 @@ public:
         Statement statement(database_,
             "INSERT INTO timeline_events "
             "(event_id, schema_version, source, event_type, payload, monotonic_ns, "
-            "session_id, application, correlation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            "occurred_at, received_at, event_session_id, session_id, application, "
+            "correlation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         int parameter = 1;
         statement.bind_text(parameter++, event.event_id);
         statement.bind_text(parameter++, event.schema_version);
@@ -104,6 +111,9 @@ public:
         statement.bind_text(parameter++, event.event_type);
         statement.bind_text(parameter++, event.payload);
         statement.bind_int64(parameter++, static_cast<sqlite3_int64>(event.monotonic_ns));
+        statement.bind_text(parameter++, event.occurred_at);
+        statement.bind_text(parameter++, event.received_at);
+        statement.bind_text(parameter++, event.session_id);
         statement.bind_text(parameter++, metadata.session_id);
         statement.bind_text(parameter++, metadata.application);
         statement.bind_text(parameter, metadata.correlation_id);
@@ -122,6 +132,9 @@ public:
     void save_snapshot(const std::vector<std::uint8_t>& encrypted_payload, std::int64_t created_at_ns) {
         exec("BEGIN IMMEDIATE");
         try {
+            if (encrypted_payload.empty()) {
+                throw TimelineStoreError("snapshot blob cannot be empty");
+            }
             Statement statement(database_, "INSERT INTO cognitive_snapshots (created_at, payload) VALUES (?, ?)");
             statement.bind_int64(1, static_cast<sqlite3_int64>(created_at_ns));
             
@@ -142,14 +155,28 @@ public:
 
     std::vector<std::vector<std::uint8_t>> load_snapshots() const {
         std::vector<std::vector<std::uint8_t>> snapshots;
-        Statement statement(database_, "SELECT payload FROM cognitive_snapshots ORDER BY id DESC LIMIT 2");
+        for (auto& record : load_snapshot_records()) {
+            snapshots.push_back(std::move(record.encrypted_payload));
+        }
+        return snapshots;
+    }
+
+    std::vector<CognitiveSnapshotRecord> load_snapshot_records() const {
+        std::vector<CognitiveSnapshotRecord> snapshots;
+        Statement statement(
+            database_,
+            "SELECT id, created_at, payload FROM cognitive_snapshots "
+            "ORDER BY id DESC LIMIT 2");
         while (statement.step() == SQLITE_ROW) {
-            const void* blob = sqlite3_column_blob(statement.stmt(), 0);
-            const int bytes = sqlite3_column_bytes(statement.stmt(), 0);
-            if (blob && bytes > 0) {
-                const auto* data = static_cast<const std::uint8_t*>(blob);
-                snapshots.emplace_back(data, data + bytes);
-            }
+            const void* blob = sqlite3_column_blob(statement.stmt(), 2);
+            const int bytes = sqlite3_column_bytes(statement.stmt(), 2);
+            if (blob == nullptr || bytes <= 0) continue;
+            const auto* data = static_cast<const std::uint8_t*>(blob);
+            CognitiveSnapshotRecord record;
+            record.id = static_cast<std::uint64_t>(statement.column_int64(0));
+            record.created_at_ns = statement.column_int64(1);
+            record.encrypted_payload.assign(data, data + bytes);
+            snapshots.push_back(std::move(record));
         }
         return snapshots;
     }
@@ -163,7 +190,8 @@ public:
 
         std::string sql =
             "SELECT sequence, schema_version, event_id, source, event_type, payload, monotonic_ns, "
-            "session_id, application, correlation_id FROM timeline_events WHERE 1=1";
+            "occurred_at, received_at, event_session_id, session_id, application, "
+            "correlation_id FROM timeline_events WHERE 1=1";
         if (query.start_monotonic_ns) sql += " AND monotonic_ns >= ?";
         if (query.end_monotonic_ns) sql += " AND monotonic_ns < ?";
         if (query.session_id) sql += " AND session_id = ?";
@@ -206,6 +234,14 @@ public:
         return events;
     }
 
+    bool contains_event(const std::string& event_id) const {
+        if (event_id.empty()) return false;
+        Statement statement(
+            database_, "SELECT 1 FROM timeline_events WHERE event_id = ? LIMIT 1");
+        statement.bind_text(1, event_id);
+        return statement.step() == SQLITE_ROW;
+    }
+
     std::vector<CanonicalEvent> replay_from(const std::string& last_applied_event_id) const {
         std::string sql = "SELECT monotonic_ns, sequence FROM timeline_events WHERE event_id = ?";
         Statement statement(database_, sql);
@@ -224,7 +260,8 @@ public:
         std::vector<CanonicalEvent> events;
         std::string fetch_sql =
             "SELECT sequence, schema_version, event_id, source, event_type, payload, monotonic_ns, "
-            "session_id, application, correlation_id FROM timeline_events "
+            "occurred_at, received_at, event_session_id, session_id, application, "
+            "correlation_id FROM timeline_events "
             "WHERE monotonic_ns > ? OR (monotonic_ns = ? AND sequence > ?) "
             "ORDER BY monotonic_ns ASC, sequence ASC";
             
@@ -253,6 +290,9 @@ public:
                    << "\",\"event_type\":\"" << json_escape(record.event.event_type)
                    << "\",\"payload\":" << record.event.payload
                    << ",\"monotonic_ns\":" << record.event.monotonic_ns
+                   << ",\"occurred_at\":\"" << json_escape(record.event.occurred_at)
+                   << "\",\"received_at\":\"" << json_escape(record.event.received_at)
+                   << "\",\"event_session_id\":\"" << json_escape(record.event.session_id)
                    << ",\"session_id\":\"" << json_escape(record.metadata.session_id)
                    << "\",\"application\":\"" << json_escape(record.metadata.application)
                    << "\",\"correlation_id\":\"" << json_escape(record.metadata.correlation_id)
@@ -324,7 +364,7 @@ private:
 
     void migrate() {
         const int current = schema_version_before_tables();
-        if (current > 2) throw TimelineStoreError("unsupported timeline schema version");
+        if (current > 3) throw TimelineStoreError("unsupported timeline schema version");
         
         try {
             exec("BEGIN IMMEDIATE");
@@ -353,6 +393,12 @@ private:
                      "payload BLOB NOT NULL)");
                 exec("PRAGMA user_version = 2");
             }
+            if (current < 3) {
+                exec("ALTER TABLE timeline_events ADD COLUMN occurred_at TEXT NOT NULL DEFAULT ''");
+                exec("ALTER TABLE timeline_events ADD COLUMN received_at TEXT NOT NULL DEFAULT ''");
+                exec("ALTER TABLE timeline_events ADD COLUMN event_session_id TEXT NOT NULL DEFAULT ''");
+                exec("PRAGMA user_version = 3");
+            }
             exec("COMMIT");
         } catch (...) {
             try { exec("ROLLBACK"); } catch (...) {}
@@ -375,9 +421,12 @@ private:
         record.event.event_type = statement.column_text(4);
         record.event.payload = statement.column_text(5);
         record.event.monotonic_ns = static_cast<std::size_t>(statement.column_int64(6));
-        record.metadata.session_id = statement.column_text(7);
-        record.metadata.application = statement.column_text(8);
-        record.metadata.correlation_id = statement.column_text(9);
+        record.event.occurred_at = statement.column_text(7);
+        record.event.received_at = statement.column_text(8);
+        record.event.session_id = statement.column_text(9);
+        record.metadata.session_id = statement.column_text(10);
+        record.metadata.application = statement.column_text(11);
+        record.metadata.correlation_id = statement.column_text(12);
         return record;
     }
 

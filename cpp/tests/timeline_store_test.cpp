@@ -36,8 +36,12 @@ int main() {
 
     {
         TimelineStore store(database_path.string());
-        assert(store.schema_version() == 2);
-        assert(store.append(event("event-1", "shell", 20, "{\"value\":1}"),
+        assert(store.schema_version() == 3);
+        auto rich_event = event("event-1", "shell", 20, "{\"value\":1}");
+        rich_event.occurred_at = "2026-08-04T12:00:00Z";
+        rich_event.received_at = "2026-08-04T12:00:01Z";
+        rich_event.session_id = "event-session-a";
+        assert(store.append(rich_event,
                             TimelineMetadata{"session-a", "editor", "correlation-1"}) ==
                eu_digital::AppendResult::accepted);
         assert(store.append(event("event-2", "browser", 10),
@@ -48,7 +52,9 @@ int main() {
                eu_digital::AppendResult::accepted);
         assert(store.append(event("event-1", "shell", 999, "{\"changed\":true}")) ==
                eu_digital::AppendResult::duplicate);
-        assert(store.size() == 3);
+    assert(store.size() == 3);
+    assert(store.contains_event("event-1"));
+    assert(!store.contains_event("missing-event"));
 
         TimelineQuery temporal;
         temporal.start_monotonic_ns = 10;
@@ -70,6 +76,11 @@ int main() {
         const TimelinePage contextual = store.query(by_context);
         assert(contextual.events.size() == 1);
         assert(contextual.events[0].event.payload == "{\"value\":1}");
+        assert(contextual.events[0].event.occurred_at ==
+               "2026-08-04T12:00:00Z");
+        assert(contextual.events[0].event.received_at ==
+               "2026-08-04T12:00:01Z");
+        assert(contextual.events[0].event.session_id == "event-session-a");
 
         const std::string exported = store.export_json(temporal);
         assert(exported.find("event-2") < exported.find("event-1"));
@@ -102,13 +113,16 @@ int main() {
 
     {
         TimelineStore restarted(database_path.string());
-        assert(restarted.schema_version() == 2);
+        assert(restarted.schema_version() == 3);
         assert(restarted.size() == 3);
         TimelineQuery by_source;
         by_source.source = "shell";
         const TimelinePage persisted = restarted.query(by_source);
         assert(persisted.events.size() == 2);
         assert(persisted.events[0].event.event_id == "event-1");
+        assert(persisted.events[0].event.occurred_at ==
+               "2026-08-04T12:00:00Z");
+        assert(persisted.events[0].event.session_id == "event-session-a");
         assert(persisted.events[1].event.event_id == "event-3");
     }
 

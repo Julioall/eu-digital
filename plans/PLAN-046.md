@@ -1,6 +1,6 @@
 # Plano de Execução: SPEC-046 (Consistent Cognitive Snapshot and Replay)
 
-Status: em execução após aceitação da ADR-0034
+Status: concluído em 2026-08-04
 
 ## Pré-condições
 

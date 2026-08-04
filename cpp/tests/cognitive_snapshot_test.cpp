@@ -68,6 +68,17 @@ void test_save_and_load_fallback() {
         std::cout << "Saving snapshot 1" << std::endl;
         store.save_snapshot(enc1, 1000);
 
+        bool rollback_observed = false;
+        try {
+            store.save_snapshot({}, 1500);
+        } catch (const TimelineStoreError&) {
+            rollback_observed = true;
+        }
+        if (!rollback_observed || store.load_snapshot_records().size() != 1) {
+            std::cerr << "Expected invalid snapshot transaction rollback" << std::endl;
+            std::exit(1);
+        }
+
         // Save second snapshot
         auto snapshot2 = CognitiveSnapshot::create(
             "2023-10-27T11:00:00Z",
@@ -86,6 +97,12 @@ void test_save_and_load_fallback() {
         auto snapshots = store.load_snapshots();
         if (snapshots.size() != 2) {
             std::cerr << "Expected 2 snapshots, got " << snapshots.size() << std::endl;
+            std::exit(1);
+        }
+        const auto records = store.load_snapshot_records();
+        if (records.size() != 2 || records[0].created_at_ns != 2000 ||
+            records[1].created_at_ns != 1000 || records[0].id <= records[1].id) {
+            std::cerr << "Snapshot metadata order mismatch" << std::endl;
             std::exit(1);
         }
 

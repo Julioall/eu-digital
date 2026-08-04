@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:cognitive-snapshot:2.0",
+  "title": "CognitiveSnapshotV2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "captured_at", "captured_epoch_seconds", "configuration_fingerprint", "last_applied_event_id", "state", "checksum"],
+  "properties": {
+    "schema_version": {"const": "2.0"},
+    "captured_at": {"type": "string", "format": "date-time", "minLength": 1},
+    "captured_epoch_seconds": {"type": "number"},
+    "configuration_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "last_applied_event_id": {"type": "string", "minLength": 1},
+    "state": {"$ref": "cognitive_state_bundle.schema.json"},
+    "checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

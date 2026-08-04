@@ -371,6 +371,37 @@ public:
         return nullptr;
     }
 
+    template <typename T>
+    std::vector<std::shared_ptr<T>> resolve_all(
+        const std::string& operation) const {
+        std::vector<const CapabilityRecord*> candidates;
+        for (const auto& [implementation_id, record] : records_) {
+            if (!allowed_by_profile(implementation_id) ||
+                (record.state.state != CapabilityState::available &&
+                 record.state.state != CapabilityState::degraded) ||
+                !record.descriptor.provides_operation(operation) ||
+                !record.instance) {
+                continue;
+            }
+            candidates.push_back(&record);
+        }
+        std::sort(candidates.begin(), candidates.end(),
+                  [](const auto* left, const auto* right) {
+                      if (left->priority != right->priority) {
+                          return left->priority > right->priority;
+                      }
+                      return left->descriptor.implementation_id <
+                          right->descriptor.implementation_id;
+                  });
+        std::vector<std::shared_ptr<T>> instances;
+        instances.reserve(candidates.size());
+        for (const auto* candidate : candidates) {
+            instances.push_back(
+                std::static_pointer_cast<T>(candidate->instance));
+        }
+        return instances;
+    }
+
 private:
     static bool allowed(CapabilityState current, CapabilityState next) {
         if (current == next) return true;

@@ -203,8 +203,33 @@ void DesktopController::start() {
             metacognition_engine_ = std::make_shared<MetacognitionCuriosityEngine>();
             suggestion_orchestrator_ = std::make_shared<SuggestionOrchestrator>();
             
-            host->capability_registry().register_instance("episode_boundary",
-                CognitivePortFactory::create_episode_boundary_port());
+            auto episode_adapter = std::make_shared<EpisodeSegmenterAdapter>(
+                "episode_boundary_impl");
+            CapabilityDescriptor episode_descriptor;
+            episode_descriptor.capability_id = "cognition.episode_boundary";
+            episode_descriptor.implementation_id = "episode_boundary_impl";
+            episode_descriptor.implementation_version = "1.0.0";
+            episode_descriptor.kind = "cognitive_service";
+            episode_descriptor.provides.push_back(
+                {"episode_boundary", "urn:eu-digital:episode-boundary:1"});
+            episode_descriptor.supports_hot_plug = true;
+            episode_descriptor.supports_checkpoint = true;
+            host->capability_registry().register_instance<IEpisodeBoundaryPort>(
+                std::move(episode_descriptor), episode_adapter, 10);
+
+            CapabilityDescriptor episode_state_descriptor;
+            episode_state_descriptor.capability_id =
+                "cognition.episode_boundary.state";
+            episode_state_descriptor.implementation_id =
+                "episode_boundary_state_port";
+            episode_state_descriptor.implementation_version = "1.0.0";
+            episode_state_descriptor.kind = "cognitive_state_port";
+            episode_state_descriptor.provides.push_back(
+                {"cognitive_state", "urn:eu-digital:cognitive-state:1"});
+            episode_state_descriptor.supports_hot_plug = true;
+            episode_state_descriptor.supports_checkpoint = true;
+            host->capability_registry().register_instance<ICognitiveStatePort>(
+                std::move(episode_state_descriptor), episode_adapter, 10);
             host->capability_registry().register_instance("memory_write",
                 CognitivePortFactory::create_memory_write_port(episodic_memory_));
 

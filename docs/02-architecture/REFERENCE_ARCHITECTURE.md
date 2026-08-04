@@ -30,6 +30,12 @@ Converte sinais heterogêneos em `CanonicalEvent`.
 
 Mantém sequência ordenada, permite correlação e consulta temporal.
 
+A timeline SQLite é a fonte da verdade da continuidade cognitiva. Checkpoints
+2.0 protegidos localmente aceleram a inicialização, mas só são aceitos quando o
+checksum, fingerprint, expiração, cursor e conjunto completo de providers
+coincidem. O runtime tenta os dois registros mais recentes e, se necessário,
+executa replay integral sem decisão nem efeito externo.
+
 ### 5. Segmentação
 
 Agrupa eventos em episódios usando limites temporais, mudança de contexto, atividade e coerência semântica.

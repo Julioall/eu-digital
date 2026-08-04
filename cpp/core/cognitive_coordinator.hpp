@@ -3,6 +3,7 @@
 #include "core/capability_runtime.hpp"
 #include "core/contracts/cognitive_cycle_context.hpp"
 #include "core/contracts/cognitive_cycle_v1.hpp"
+#include "core/contracts/cognitive_state_v1.hpp"
 #include "core/digest.hpp"
 #include "core/event_bus.hpp"
 #include "core/ports/icognitive_decision_port.hpp"
@@ -113,6 +114,39 @@ public:
     void set_publisher(std::function<void(const CanonicalEvent&)> publisher) {
         std::lock_guard lock(publisher_mutex_);
         publisher_ = std::move(publisher);
+    }
+
+    void set_cycle_commit_handler(std::function<void(
+        const contracts::CognitiveCycleInputV1&,
+        const contracts::CognitiveCycleResultV1&)> handler) {
+        std::lock_guard lock(commit_handler_mutex_);
+        commit_handler_ = std::move(handler);
+    }
+
+    contracts::CognitiveCoordinatorCheckpointV1 capture_checkpoint() const {
+        std::lock_guard lock(queue_mutex_);
+        contracts::CognitiveCoordinatorCheckpointV1 checkpoint;
+        checkpoint.policy_id = contracts::kCognitiveCyclePolicyId;
+        checkpoint.seen_event_ids.assign(committed_event_ids_.begin(),
+                                         committed_event_ids_.end());
+        std::sort(checkpoint.seen_event_ids.begin(),
+                  checkpoint.seen_event_ids.end());
+        return checkpoint;
+    }
+
+    bool restore_checkpoint(
+        const contracts::CognitiveCoordinatorCheckpointV1& checkpoint) {
+        if (!checkpoint.valid() ||
+            checkpoint.policy_id != contracts::kCognitiveCyclePolicyId) {
+            return false;
+        }
+        std::lock_guard lock(queue_mutex_);
+        if (started_ || in_flight_ != 0 || !queue_.empty()) return false;
+        seen_event_ids_.clear();
+        seen_event_ids_.insert(checkpoint.seen_event_ids.begin(),
+                               checkpoint.seen_event_ids.end());
+        committed_event_ids_ = seen_event_ids_;
+        return true;
     }
 
     EnqueueReceiptV1 enqueue_input(const contracts::CognitiveCycleInputV1& input) {
@@ -382,6 +416,8 @@ private:
                       ? CycleState::completed
                       : CycleState::degraded,
                   join_reasons(cycle.degradation_reasons));
+        mark_committed(input.event_id);
+        notify_commit(input, cycle);
         if (!input.replay_mode) publish(cycle);
     }
 
@@ -801,11 +837,36 @@ private:
         result.replay_mode = input.replay_mode;
         append_result(result);
         log_state(input.event_id, CycleState::failed, reason);
+        mark_committed(input.event_id);
+        notify_commit(input, result);
+    }
+
+    void mark_committed(const std::string& event_id) {
+        std::lock_guard lock(queue_mutex_);
+        committed_event_ids_.insert(event_id);
     }
 
     void append_result(const contracts::CognitiveCycleResultV1& result) {
         std::lock_guard lock(result_mutex_);
         results_.push_back(result);
+    }
+
+    void notify_commit(
+        const contracts::CognitiveCycleInputV1& input,
+        const contracts::CognitiveCycleResultV1& result) const {
+        std::function<void(const contracts::CognitiveCycleInputV1&,
+                           const contracts::CognitiveCycleResultV1&)> handler;
+        {
+            std::lock_guard lock(commit_handler_mutex_);
+            handler = commit_handler_;
+        }
+        if (!handler) return;
+        try {
+            handler(input, result);
+        } catch (...) {
+            // State persistence is an optional observer of an already committed
+            // cycle and cannot change or duplicate the terminal result.
+        }
     }
 
     void publish(const contracts::CognitiveCycleResultV1& result) {
@@ -842,6 +903,7 @@ private:
     std::condition_variable idle_;
     std::deque<contracts::CognitiveCycleInputV1> queue_;
     std::unordered_set<std::string> seen_event_ids_;
+    std::unordered_set<std::string> committed_event_ids_;
     std::size_t in_flight_{0};
     bool started_{false};
     bool stopping_{false};
@@ -853,6 +915,10 @@ private:
     std::vector<CycleStatusLog> logs_;
     mutable std::mutex publisher_mutex_;
     std::function<void(const CanonicalEvent&)> publisher_;
+    mutable std::mutex commit_handler_mutex_;
+    std::function<void(const contracts::CognitiveCycleInputV1&,
+                       const contracts::CognitiveCycleResultV1&)>
+        commit_handler_;
 
     mutable std::mutex context_mutex_;
     CognitiveCycleContext last_context_;

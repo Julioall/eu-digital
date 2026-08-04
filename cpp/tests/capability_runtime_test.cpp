@@ -1,6 +1,7 @@
 #include "core/capability_runtime.hpp"
 
 #include <cassert>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -87,4 +88,49 @@ int main() {
     lifecycle.attach("broken", broken);
     assert(!lifecycle.install(broken));
     assert(registry.record("broken").state.state == CapabilityState::failed);
+
+    // Stateful providers are enumerated deterministically so a checkpoint never
+    // depends on discovery order. Removed providers disappear and may be
+    // reinstalled or substituted without becoming structural dependencies.
+    CapabilityDescriptor low_descriptor;
+    low_descriptor.capability_id = "test.state";
+    low_descriptor.implementation_id = "state-low";
+    low_descriptor.implementation_version = "1.0.0";
+    low_descriptor.kind = "state_provider";
+    low_descriptor.provides.push_back({"cognitive_state", "urn:test:state"});
+    low_descriptor.supports_checkpoint = true;
+    registry.register_instance(low_descriptor, std::make_shared<int>(1), 1);
+
+    auto high_a = low_descriptor;
+    high_a.implementation_id = "state-a";
+    auto high_z = low_descriptor;
+    high_z.implementation_id = "state-z";
+    registry.register_instance(high_z, std::make_shared<int>(3), 10);
+    registry.register_instance(high_a, std::make_shared<int>(2), 10);
+
+    auto state_providers = registry.resolve_all<int>("cognitive_state");
+    assert(state_providers.size() == 3);
+    assert(*state_providers[0] == 2);
+    assert(*state_providers[1] == 3);
+    assert(*state_providers[2] == 1);
+
+    registry.transition("state-a", CapabilityState::removed, "test_removal");
+    state_providers = registry.resolve_all<int>("cognitive_state");
+    assert(state_providers.size() == 2);
+    assert(*state_providers[0] == 3);
+
+    registry.register_instance(high_a, std::make_shared<int>(4), 10);
+    state_providers = registry.resolve_all<int>("cognitive_state");
+    assert(state_providers.size() == 3);
+    assert(*state_providers[0] == 4);
+
+    registry.transition("state-z", CapabilityState::removed, "test_substitution");
+    auto substitute = low_descriptor;
+    substitute.implementation_id = "state-substitute";
+    registry.register_instance(substitute, std::make_shared<int>(5), 20);
+    state_providers = registry.resolve_all<int>("cognitive_state");
+    assert(state_providers.size() == 3);
+    assert(*state_providers[0] == 5);
+
+    assert(registry.resolve_all<int>("missing.state").empty());
 }

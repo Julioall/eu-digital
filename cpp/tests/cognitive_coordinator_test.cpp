@@ -15,6 +15,7 @@
 #include "core/ports/iworkspace_selection_port.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 #include <chrono>
 #include <memory>
@@ -468,6 +469,46 @@ void ablation_and_replay_are_safe() {
     assert(result.valid());
 }
 
+void coordinator_checkpoint_restores_idempotence_and_commits_once() {
+    CapabilityRegistry registry;
+    CognitiveCoordinator first(registry);
+    std::atomic<int> commits{0};
+    first.set_cycle_commit_handler(
+        [&](const auto& committed_input, const auto& committed_result) {
+            assert(committed_input.event_id == committed_result.input_event_id);
+            ++commits;
+        });
+    assert(first.enqueue_input(input("checkpoint-event")).status ==
+           EnqueueStatusV1::accepted);
+    first.wait_idle();
+    assert(commits == 1);
+    const auto checkpoint = first.capture_checkpoint();
+    assert(checkpoint.valid());
+    assert(checkpoint.seen_event_ids ==
+           std::vector<std::string>{"checkpoint-event"});
+    first.stop();
+
+    CognitiveCoordinatorConfig config;
+    config.auto_start = false;
+    CognitiveCoordinator restored(registry, config);
+    assert(restored.restore_checkpoint(checkpoint));
+    const auto before_invalid = restored.capture_checkpoint();
+    auto incompatible = checkpoint;
+    incompatible.policy_id = "different-policy";
+    assert(!restored.restore_checkpoint(incompatible));
+    assert(restored.capture_checkpoint().to_json() == before_invalid.to_json());
+    restored.start();
+    assert(restored.enqueue_input(input("checkpoint-event")).status ==
+           EnqueueStatusV1::discarded_duplicate);
+    assert(restored.enqueue_input(input("new-event")).status ==
+           EnqueueStatusV1::accepted);
+    restored.wait_idle();
+    const auto continued = restored.capture_checkpoint();
+    assert((continued.seen_event_ids ==
+            std::vector<std::string>{"checkpoint-event", "new-event"}));
+    restored.stop();
+}
+
 CapabilityDescriptor real_descriptor(std::string operation,
                                      std::string implementation_id) {
     CapabilityDescriptor descriptor;
@@ -524,5 +565,6 @@ int main() {
     queue_duplicate_and_reentry_are_bounded();
     prediction_failure_and_timeout_continue_to_decision();
     ablation_and_replay_are_safe();
+    coordinator_checkpoint_restores_idempotence_and_commits_once();
     two_real_adapters_integrate_with_mocked_ports();
 }

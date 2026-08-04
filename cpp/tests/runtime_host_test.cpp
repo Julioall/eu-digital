@@ -1,11 +1,14 @@
 #include "core/runtime_host.hpp"
 
 #include <cassert>
+#include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace {
 
@@ -87,13 +90,83 @@ int main() {
 
         assert(host.start());
         assert(host.replay().size() == 2);
-        assert(contains(host.health_json(), "\"recovered_events\":2"));
+        assert(contains(host.health_json(), "\"recovered_events\":1"));
         host.stop();
 
         eu_digital::RuntimeHost recovered({manifest.string(), timeline.string(), "recovery-session", "2026-07-29T12:01:00Z"});
         assert(recovered.start());
         assert(recovered.replay().size() == 2);
         recovered.stop();
+
+        if (eu_digital::LocalDataProtection::available()) {
+            const auto make_snapshot_config = [&](const fs::path& path) {
+                eu_digital::RuntimeConfig config;
+                config.manifest_path = manifest.string();
+                config.timeline_path = path.string();
+                config.session_id = "snapshot-session";
+                config.observed_at = "2026-01-01T00:01:00Z";
+                config.enable_cognitive_snapshots = true;
+                config.cognitive_snapshot_interval_events = 1;
+                config.cognitive_snapshot_max_age = std::chrono::hours(1);
+                return config;
+            };
+
+            const auto incompatible_timeline = root / "incompatible.sqlite";
+            auto snapshot_config = make_snapshot_config(incompatible_timeline);
+            {
+                eu_digital::RuntimeHost snapshot_host(snapshot_config);
+                assert(snapshot_host.start());
+                assert(snapshot_host.publish_json(event) ==
+                       eu_digital::PublishResult::accepted);
+                snapshot_host.coordinator()->wait_idle();
+                snapshot_host.wait_snapshot_idle();
+                snapshot_host.stop();
+            }
+            {
+                eu_digital::TimelineStore store(incompatible_timeline.string());
+                const auto legacy = eu_digital::CognitiveSnapshot::create(
+                    "2026-01-01T00:00:00Z", "legacy",
+                    "00000000-0000-4000-8000-000000000001", "{}");
+                const auto json = legacy.to_json();
+                const std::vector<std::uint8_t> plaintext(json.begin(), json.end());
+                store.save_snapshot(
+                    eu_digital::LocalDataProtection::protect(plaintext), 999);
+            }
+            eu_digital::RuntimeHost version_fallback(snapshot_config);
+            assert(version_fallback.start());
+            assert(contains(version_fallback.health_json(),
+                            "\"recovered_events\":0"));
+            assert(contains(version_fallback.cognitive_recovery_json(),
+                            "snapshot_decode_or_contract_invalid"));
+            assert(contains(version_fallback.cognitive_recovery_json(),
+                            "\"source\":\"snapshot_replay\""));
+            version_fallback.stop();
+
+            const auto expired_timeline = root / "expired.sqlite";
+            auto fresh_config = make_snapshot_config(expired_timeline);
+            {
+                eu_digital::RuntimeHost fresh(fresh_config);
+                assert(fresh.start());
+                assert(fresh.publish_json(event) ==
+                       eu_digital::PublishResult::accepted);
+                fresh.coordinator()->wait_idle();
+                fresh.wait_snapshot_idle();
+                fresh.stop();
+            }
+            auto expired_config = fresh_config;
+            expired_config.observed_at = "2026-01-03T00:00:00Z";
+            expired_config.cognitive_snapshot_max_age =
+                std::chrono::seconds(1);
+            eu_digital::RuntimeHost expired(expired_config);
+            assert(expired.start());
+            assert(contains(expired.health_json(),
+                            "\"recovered_events\":1"));
+            assert(contains(expired.cognitive_recovery_json(),
+                            "snapshot_expired"));
+            assert(contains(expired.cognitive_recovery_json(),
+                            "\"source\":\"cold_replay\""));
+            expired.stop();
+        }
 
         const auto deterministic_timeline = root / "deterministic.sqlite";
         const auto run_fixture = [&] {

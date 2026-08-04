@@ -1,16 +1,16 @@
 ---
 id: SPEC-046
 title: Consistent Cognitive Snapshot and Replay
-status: in_progress
+status: done
 phase: design
 dependencies: [SPEC-006, SPEC-030, SPEC-045, SPEC-047]
 adrs: [ADR-0034]
-contracts: [cognitive_snapshot.schema.json]
+contracts: [cognitive_snapshot.schema.json, cognitive_snapshot_v2.schema.json, cognitive_state_bundle.schema.json]
 ---
 
 # SPEC-046 — Consistent Cognitive Snapshot and Replay
 
-Status: in_progress
+Status: done
 Owner: humano  
 Fase: design  
 Dependências: SPEC-006 (Timeline Store), SPEC-030 (Privacy & Storage),
@@ -73,11 +73,11 @@ Ao matar violentamente (SIGKILL) o `eu_digital_runtime` e religá-lo, ele restau
 - Não introduzir formato BSON arbitrário se o projeto usa JSON estrito.
 
 ## Critérios de aceite
-- [ ] O schema `cognitive_snapshot.schema.json` exige versão, timestamp, checksum, fingerprint da configuração e `last_applied_event_id`.
-- [ ] Escrita atômica garantida: o sistema nunca fica com um snapshot "meio escrito".
-- [ ] Teste realístico: Processo morre (`abort()`) entre dois snapshots. A reinicialização não perde a segmentação do episódio.
-- [ ] O sistema aplica fallback graciosamente se injetado lixo binário no registro do snapshot no SQLite.
-- [ ] Existe controle de expiração (se o último snapshot é velho demais, descartá-lo para evitar reconstrução imensa, dependendo do threshold configurado).
+- [x] O schema `cognitive_snapshot.schema.json` exige versão, timestamp, checksum, fingerprint da configuração e `last_applied_event_id`.
+- [x] Escrita atômica garantida: o sistema nunca fica com um snapshot "meio escrito".
+- [x] Teste realístico: Processo morre (`abort()`) entre dois snapshots. A reinicialização não perde a segmentação do episódio.
+- [x] O sistema aplica fallback graciosamente se injetado lixo binário no registro do snapshot no SQLite.
+- [x] Existe controle de expiração (se o último snapshot é velho demais, descartá-lo para evitar reconstrução imensa, dependendo do threshold configurado).
 
 ## Plano de testes
 

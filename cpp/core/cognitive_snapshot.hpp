@@ -1,8 +1,12 @@
 #pragma once
 
 #include "digest.hpp"
+#include "core/contracts/cognitive_state_v1.hpp"
 
+#include <cmath>
 #include <cstdint>
+#include <iomanip>
+#include <limits>
 #include <stdexcept>
 #include <string>
 
@@ -72,6 +76,92 @@ private:
             }
         }
         return output;
+    }
+};
+
+struct CognitiveSnapshotV2 {
+    std::string schema_version{"2.0"};
+    std::string captured_at;
+    double captured_epoch_seconds{0.0};
+    std::string checksum;
+    std::string configuration_fingerprint;
+    std::string last_applied_event_id;
+    contracts::CognitiveStateBundleV1 state;
+
+    static CognitiveSnapshotV2 create(
+        std::string captured_at,
+        double captured_epoch_seconds,
+        std::string configuration_fingerprint,
+        std::string last_applied_event_id,
+        contracts::CognitiveStateBundleV1 state) {
+        CognitiveSnapshotV2 snapshot;
+        snapshot.captured_at = std::move(captured_at);
+        snapshot.captured_epoch_seconds = captured_epoch_seconds;
+        snapshot.configuration_fingerprint =
+            std::move(configuration_fingerprint);
+        snapshot.last_applied_event_id = std::move(last_applied_event_id);
+        snapshot.state = std::move(state);
+        if (!snapshot.valid_without_checksum()) {
+            throw CognitiveSnapshotError("invalid cognitive snapshot v2 input");
+        }
+        snapshot.checksum = digest::hex(
+            digest::sha256(snapshot.unsigned_json()));
+        return snapshot;
+    }
+
+    bool valid() const {
+        return valid_without_checksum() && checksum.size() == 64 &&
+               std::all_of(checksum.begin(), checksum.end(), [](char character) {
+                   return (character >= '0' && character <= '9') ||
+                          (character >= 'a' && character <= 'f');
+               });
+    }
+
+    std::string unsigned_json() const {
+        std::ostringstream output;
+        output << "{\"captured_at\":" << contracts::state_json_string(captured_at)
+               << ",\"captured_epoch_seconds\":"
+               << std::setprecision(std::numeric_limits<double>::max_digits10)
+               << captured_epoch_seconds
+               << ",\"configuration_fingerprint\":"
+               << contracts::state_json_string(configuration_fingerprint)
+               << ",\"last_applied_event_id\":"
+               << contracts::state_json_string(last_applied_event_id)
+               << ",\"schema_version\":\"2.0\",\"state\":"
+               << state.to_json() << '}';
+        return output.str();
+    }
+
+    std::string to_json() const {
+        if (!valid()) throw CognitiveSnapshotError("invalid cognitive snapshot v2");
+        auto output = unsigned_json();
+        output.pop_back();
+        output += ",\"checksum\":" + contracts::state_json_string(checksum) + '}';
+        return output;
+    }
+
+    static bool serialized_checksum_valid(const std::string& serialized) {
+        constexpr std::string_view marker = ",\"checksum\":\"";
+        const auto position = serialized.rfind(marker);
+        if (position == std::string::npos || serialized.size() !=
+                position + marker.size() + 64 + 2) {
+            return false;
+        }
+        const auto checksum = serialized.substr(position + marker.size(), 64);
+        if (serialized[serialized.size() - 2] != '"' ||
+            serialized.back() != '}') {
+            return false;
+        }
+        const auto unsigned_serialized = serialized.substr(0, position) + '}';
+        return digest::hex(digest::sha256(unsigned_serialized)) == checksum;
+    }
+
+private:
+    bool valid_without_checksum() const {
+        return schema_version == "2.0" && !captured_at.empty() &&
+               std::isfinite(captured_epoch_seconds) &&
+               !configuration_fingerprint.empty() &&
+               !last_applied_event_id.empty() && state.valid();
     }
 };
 

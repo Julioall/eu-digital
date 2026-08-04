@@ -68,6 +68,9 @@ decisão criaria efeitos duplicados.
 14. A integração é reversível por
     `RuntimeConfig.enable_cognitive_snapshots=false`; dados existentes não são
     apagados durante reversão.
+15. O plaintext canônico possui limite inicial de 4 MiB, configurável no host.
+    O worker rejeita snapshots maiores antes de invocar DPAPI; o limite deve ser
+    revisto somente com evidência de benchmark, sem truncar estado silenciosamente.
 
 ## Contratos
 

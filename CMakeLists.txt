@@ -149,6 +149,41 @@ target_compile_features(cognitive_snapshot_test PRIVATE cxx_std_23)
 if(NOT WIN32)
     target_link_libraries(cognitive_snapshot_test PRIVATE "${EU_DIGITAL_SQLITE3_LIBRARY}")
 endif()
+
+add_executable(cognitive_snapshot_v2_test cpp/tests/cognitive_snapshot_v2_test.cpp)
+target_include_directories(cognitive_snapshot_v2_test PRIVATE cpp)
+target_compile_features(cognitive_snapshot_v2_test PRIVATE cxx_std_23)
+target_compile_definitions(cognitive_snapshot_v2_test PRIVATE EU_DIGITAL_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+
+add_executable(cognitive_state_manager_test cpp/tests/cognitive_state_manager_test.cpp)
+target_include_directories(cognitive_state_manager_test PRIVATE cpp)
+target_compile_features(cognitive_state_manager_test PRIVATE cxx_std_23)
+
+add_executable(async_cognitive_snapshot_writer_test
+    cpp/tests/async_cognitive_snapshot_writer_test.cpp)
+target_include_directories(async_cognitive_snapshot_writer_test PRIVATE cpp)
+target_compile_features(async_cognitive_snapshot_writer_test PRIVATE cxx_std_23)
+if(NOT WIN32)
+    target_link_libraries(async_cognitive_snapshot_writer_test PRIVATE
+        "${EU_DIGITAL_SQLITE3_LIBRARY}")
+endif()
+
+add_executable(cognitive_recovery_crash_test
+    cpp/tests/cognitive_recovery_crash_test.cpp)
+target_include_directories(cognitive_recovery_crash_test PRIVATE cpp)
+target_compile_features(cognitive_recovery_crash_test PRIVATE cxx_std_23)
+target_compile_definitions(cognitive_recovery_crash_test PRIVATE
+    EU_DIGITAL_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+if(NOT WIN32)
+    target_link_libraries(cognitive_recovery_crash_test PRIVATE
+        "${EU_DIGITAL_SQLITE3_LIBRARY}")
+endif()
+if(WIN32)
+    target_link_libraries(cognitive_recovery_crash_test PRIVATE Crypt32)
+endif()
+if(WIN32)
+    target_link_libraries(async_cognitive_snapshot_writer_test PRIVATE Crypt32)
+endif()
 if(WIN32)
     target_link_libraries(cognitive_snapshot_test PRIVATE Crypt32)
 endif()
@@ -256,6 +291,13 @@ add_test(NAME ollama_model_backend COMMAND ollama_model_backend_test)
 
 add_test(NAME event_bus COMMAND event_bus_test)
 add_test(NAME cognitive_coordinator COMMAND cognitive_coordinator_test)
+add_test(NAME cognitive_snapshot_v2 COMMAND cognitive_snapshot_v2_test)
+add_test(NAME cognitive_state_manager COMMAND cognitive_state_manager_test)
+add_test(NAME async_cognitive_snapshot_writer
+    COMMAND async_cognitive_snapshot_writer_test)
+add_test(NAME cognitive_recovery_crash COMMAND cognitive_recovery_crash_test)
+add_test(NAME cognitive_snapshot COMMAND cognitive_snapshot_test)
+add_test(NAME timeline_store COMMAND timeline_store_test)
 add_test(NAME runtime_host COMMAND runtime_host_test)
 add_test(NAME capability_runtime COMMAND capability_runtime_test)
 add_test(NAME promotion_registry COMMAND promotion_registry_test)

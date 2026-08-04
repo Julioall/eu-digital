@@ -1,5 +1,6 @@
 #include "core/adapters/episode_segmenter_adapter.hpp"
 
+#include <chrono>
 #include <iostream>
 #include <stdexcept>
 
@@ -42,6 +43,48 @@ void test_episode_segmenter_adapter() {
     const auto rejected = adapter.evaluate_result(legacy);
     if (rejected.success || !rejected.error) {
         throw std::runtime_error("Expected legacy request rejection");
+    }
+
+    contracts::PortInvocationContextV1 context;
+    context.correlation_id = "checkpoint-test";
+    context.deadline = std::chrono::steady_clock::now() +
+        std::chrono::seconds(1);
+    const auto captured = adapter.capture_state(context);
+    if (!captured.success || !captured.value || !captured.value->valid()) {
+        throw std::runtime_error("Expected a valid episode checkpoint");
+    }
+
+    EpisodeSegmenterAdapter restored;
+    const auto restore_result = restored.restore_state(*captured.value, context);
+    if (!restore_result.success || !restore_result.value ||
+        restore_result.value->provider_id != restored.provider_id()) {
+        throw std::runtime_error("Expected episode checkpoint restoration");
+    }
+
+    observation.event_id = "test-event-2";
+    observation.occurred_at = "2026-08-04T12:00:01Z";
+    observation.epoch_seconds = 2.0;
+    const auto continued = restored.evaluate_observation_result(observation);
+    if (!continued.success || !continued.value || continued.value->is_new_episode) {
+        throw std::runtime_error("Restored episode must continue at exact boundary");
+    }
+
+    const auto before_invalid = restored.capture_state(context);
+    auto invalid_fragment = *captured.value;
+    invalid_fragment.entries["session.0.event.0.epoch_seconds"] = "not-a-number";
+    if (restored.restore_state(invalid_fragment, context).success) {
+        throw std::runtime_error("Invalid episode state must be rejected");
+    }
+    const auto after_invalid = restored.capture_state(context);
+    if (!before_invalid.value || !after_invalid.value ||
+        before_invalid.value->to_json() != after_invalid.value->to_json()) {
+        throw std::runtime_error("Failed restore must leave episode state unchanged");
+    }
+
+    auto wrong_provider = *captured.value;
+    wrong_provider.provider_id = "replacement-provider";
+    if (restored.restore_state(wrong_provider, context).success) {
+        throw std::runtime_error("State from a substituted provider must be rejected");
     }
 }
 

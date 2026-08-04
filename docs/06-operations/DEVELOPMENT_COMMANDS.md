@@ -339,6 +339,18 @@ The deployed C++ runtime links to a local SQLite library. The store applies
 versioned migrations at startup, keeps events append-only, and provides
 temporal/context pagination, JSON export, and deterministic replay. Windows CI
 installs the SQLite development/runtime package locally through vcpkg.
+
+SPEC-046 mantém snapshots desabilitados por padrão. A ativação embutida usa
+`RuntimeConfig.enable_cognitive_snapshots=true`, intervalo padrão de 100 eventos,
+expiração de 24 horas, orçamento de cópia de 5 ms e limite de plaintext de 4
+MiB. Providers stateful sem `ICognitiveStatePort` forçam cold replay; o runtime
+nunca grava um bundle parcial. Os testes de crash, fallback e escrita assíncrona
+podem ser executados com:
+
+```powershell
+ctest --test-dir build -C Release -R "cognitive_(snapshot|state|recovery)|runtime_host" --output-on-failure
+```
+
 The SPEC-008 episodic-memory tests are run with:
 
 ```powershell

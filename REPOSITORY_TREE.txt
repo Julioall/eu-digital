@@ -15,6 +15,7 @@ contracts/fixtures/capture_policy.invalid.json
 contracts/fixtures/capture_policy.json
 contracts/fixtures/cognitive_cycle_input.json
 contracts/fixtures/cognitive_cycle_result.json
+contracts/fixtures/cognitive_snapshot_v2.json
 contracts/fixtures/component_maturity.invalid.json
 contracts/fixtures/component_maturity.json
 contracts/fixtures/consent_policy.invalid.json
@@ -55,6 +56,8 @@ contracts/schemas/cognitive_cycle_result.schema.json
 contracts/schemas/cognitive_cycle_stage.schema.json
 contracts/schemas/cognitive_decision_request.schema.json
 contracts/schemas/cognitive_snapshot.schema.json
+contracts/schemas/cognitive_snapshot_v2.schema.json
+contracts/schemas/cognitive_state_bundle.schema.json
 contracts/schemas/component_maturity.schema.json
 contracts/schemas/consent_policy.schema.json
 contracts/schemas/consolidation_record.schema.json
@@ -132,16 +135,19 @@ cpp/core/adapters/ollama_model_backend.cpp
 cpp/core/adapters/ollama_model_backend.hpp
 cpp/core/adapters/pattern_learner_adapter.hpp
 cpp/core/adapters/world_model_adapter.hpp
+cpp/core/async_cognitive_snapshot_writer.hpp
 cpp/core/audio_sensor.hpp
 cpp/core/capability_runtime.hpp
 cpp/core/cognitive_coordinator.hpp
 cpp/core/cognitive_snapshot.hpp
+cpp/core/cognitive_state_manager.hpp
 cpp/core/contracts/cognitive_cycle_context.hpp
 cpp/core/contracts/cognitive_cycle_result.hpp
 cpp/core/contracts/cognitive_cycle_v1.hpp
 cpp/core/contracts/cognitive_decision.hpp
 cpp/core/contracts/cognitive_output.hpp
 cpp/core/contracts/cognitive_port_requests.hpp
+cpp/core/contracts/cognitive_state_v1.hpp
 cpp/core/contracts/contextual_assistance_card.hpp
 cpp/core/contracts/current_activity.hpp
 cpp/core/contracts/episode_update.hpp
@@ -167,6 +173,7 @@ cpp/core/pattern_learner.hpp
 cpp/core/policies/cognitive_decision_policy.hpp
 cpp/core/policies/self_model_feedback_policy.hpp
 cpp/core/ports/icognitive_decision_port.hpp
+cpp/core/ports/icognitive_state_port.hpp
 cpp/core/ports/iepisode_boundary_port.hpp
 cpp/core/ports/ihypothesis_formation_port.hpp
 cpp/core/ports/ilanguage_renderer.hpp
@@ -219,6 +226,7 @@ cpp/shell/tray_widget.cpp
 cpp/shell/tray_widget.hpp
 cpp/storage/.gitkeep
 cpp/tests/.gitkeep
+cpp/tests/async_cognitive_snapshot_writer_test.cpp
 cpp/tests/audio_sensor_test.cpp
 cpp/tests/capability_runtime_test.cpp
 cpp/tests/cognitive_coordinator_test.cpp
@@ -227,7 +235,10 @@ cpp/tests/cognitive_decision_adapter_test.cpp
 cpp/tests/cognitive_decision_policy_test.cpp
 cpp/tests/cognitive_port_factory_test.cpp
 cpp/tests/cognitive_port_requests_test.cpp
+cpp/tests/cognitive_recovery_crash_test.cpp
 cpp/tests/cognitive_snapshot_test.cpp
+cpp/tests/cognitive_snapshot_v2_test.cpp
+cpp/tests/cognitive_state_manager_test.cpp
 cpp/tests/desktop_integration_test.cpp
 cpp/tests/episode_segmentation_test.cpp
 cpp/tests/episode_segmenter_adapter_test.cpp
@@ -453,6 +464,7 @@ python/tests/test_avatar_presentation_profile.py
 python/tests/test_capabilities.py
 python/tests/test_capability_adaptation.py
 python/tests/test_cognitive_cycle_contracts.py
+python/tests/test_cognitive_snapshot_v2.py
 python/tests/test_component_maturity.py
 python/tests/test_desktop_interface_spike.py
 python/tests/test_dialogue_avatar.py
@@ -538,6 +550,7 @@ reports/SPEC-043-execution-report.md
 reports/SPEC-044-execution-report.md
 reports/SPEC-045-entry-audit-2026-08-04.md
 reports/SPEC-045-execution-report.md
+reports/SPEC-046_REPORT.md
 reports/SPEC-047_REPORT.md
 reports/SPEC-047-dto-increment-2026-08-04.md
 reports/SPEC-047-increment-2026-08-04.md
