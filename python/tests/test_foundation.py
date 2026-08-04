@@ -5,13 +5,12 @@ import tomllib
 import unittest
 from pathlib import Path
 
-
 REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
 LAB_ROOT = REPOSITORY_ROOT / "python"
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
-from eu_digital_lab.fixture_reader import read_canonical_event  # noqa: E402
+from eu_digital_lab.fixture_reader import read_canonical_event
 
 
 class FoundationTests(unittest.TestCase):

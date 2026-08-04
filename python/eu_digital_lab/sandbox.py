@@ -6,14 +6,13 @@ import json
 import random
 import uuid
 from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
-
 
 SCHEMA_VERSION = "1.0"
 GENERATOR_VERSION = "1.0.0"
 _NAMESPACE = uuid.UUID("9e7ac52e-93c4-4a85-8d31-b8e1b25c6d02")
-_START = datetime(2026, 1, 1, tzinfo=timezone.utc)
+_START = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 @dataclass(frozen=True)

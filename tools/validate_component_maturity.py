@@ -14,7 +14,6 @@ if str(LAB_ROOT) not in sys.path:
 from eu_digital_lab.component_maturity import ComponentMaturityRegistry
 
 
-
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(

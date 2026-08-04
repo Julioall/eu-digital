@@ -6,7 +6,7 @@ import copy
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from .schema_validation import SchemaValidationError, validate_shared_schema
@@ -30,7 +30,7 @@ class CognitiveSnapshot:
         # Create without checksum first
         raw = {
             "schema_version": "1.0",
-            "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "timestamp": datetime.now(UTC).isoformat(timespec="seconds"),
             "checksum": "",
             "configuration_fingerprint": configuration_fingerprint,
             "last_applied_event_id": last_applied_event_id,

@@ -10,8 +10,9 @@ LAB = ROOT / "python"
 if str(LAB) not in sys.path:
     sys.path.insert(0, str(LAB))
 
-from eu_digital_lab.privacy_storage import validate_privacy_storage_fixtures  # noqa: E402
-
+from eu_digital_lab.privacy_storage import (
+    validate_privacy_storage_fixtures,
+)
 
 if __name__ == "__main__":
     validate_privacy_storage_fixtures(ROOT)

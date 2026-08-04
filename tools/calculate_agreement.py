@@ -12,7 +12,7 @@ LAB_ROOT = REPOSITORY_ROOT / "python"
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
-from eu_digital_lab.annotation import calculate_agreement  # noqa: E402
+from eu_digital_lab.annotation import calculate_agreement
 
 
 def main() -> int:

@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import copy
-import json
 import unittest
 from pathlib import Path
 
 from eu_digital_lab.event_bus import AsyncEventBus, InvalidCanonicalEvent
 from eu_digital_lab.fixture_reader import read_canonical_event
-
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE = ROOT / "contracts" / "fixtures" / "canonical_event.json"

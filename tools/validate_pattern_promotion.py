@@ -20,7 +20,12 @@ if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
 from eu_digital_lab.pattern_learning import PatternConfig, PatternLearner
-from eu_digital_lab.promotion import PromotionManifest, PromotionPipeline, compare_outputs, python_runner
+from eu_digital_lab.promotion import (
+    PromotionManifest,
+    PromotionPipeline,
+    compare_outputs,
+    python_runner,
+)
 
 
 def cases(path: Path) -> list[dict[str, Any]]:

@@ -10,8 +10,7 @@ LAB = ROOT / "python"
 if str(LAB) not in sys.path:
     sys.path.insert(0, str(LAB))
 
-from eu_digital_lab.observation_policy import load_capture_policy  # noqa: E402
-
+from eu_digital_lab.observation_policy import load_capture_policy
 
 if __name__ == "__main__":
     load_capture_policy(ROOT / "contracts/fixtures/capture_policy.json")

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import pathlib
-
 import unittest
 
 from reference.suggestion_orchestrator import (
@@ -14,7 +13,6 @@ from reference.suggestion_orchestrator import (
     SUGGESTION_SCHEMA_VERSION,
     SuggestionDecision,
     SuggestionEvidence,
-    SuggestionFeedbackRecord,
     SuggestionOrchestrator,
     SuggestionPolicy,
 )

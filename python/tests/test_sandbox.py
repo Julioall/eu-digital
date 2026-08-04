@@ -4,17 +4,16 @@ import sys
 import unittest
 from pathlib import Path
 
-
 LAB_ROOT = Path(__file__).resolve().parents[1]
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
-from eu_digital_lab.annotation import (  # noqa: E402
+from eu_digital_lab.annotation import (
     AnnotationError,
     annotate_session,
     calculate_agreement,
 )
-from eu_digital_lab.sandbox import (  # noqa: E402
+from eu_digital_lab.sandbox import (
     generate_session,
     session_from_dict,
     session_to_dict,

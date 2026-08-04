@@ -4,7 +4,7 @@
 import hashlib
 import json
 import pathlib
-import sys
+
 
 def get_hash(path: pathlib.Path) -> str:
     """Calculate SHA256 hash of a file."""

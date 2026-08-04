@@ -10,11 +10,9 @@ from __future__ import annotations
 import hashlib
 import json
 import math
-import re
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, datetime, timedelta
 
 SUGGESTION_SCHEMA_VERSION = "1.0"
 SUGGESTION_POLICY_ID = "suggestive_orchestration_v1"
@@ -42,12 +40,12 @@ def _parse_timestamp(value: str) -> datetime:
     value = value.strip()
     if value.endswith("Z"):
         value = value[:-1] + "+00:00"
-    return datetime.fromisoformat(value).astimezone(timezone.utc)
+    return datetime.fromisoformat(value).astimezone(UTC)
 
 
 def _format_timestamp(dt: datetime) -> str:
     """Format datetime to ISO-8601 UTC string matching C++ output."""
-    utc = dt.astimezone(timezone.utc)
+    utc = dt.astimezone(UTC)
     return utc.strftime("%Y-%m-%dT%H:%M:%S+00:00")
 
 
@@ -167,7 +165,7 @@ class SuggestionDecision:
     information_gain: float = 0.0
     reason: str = ""
     suppressed: bool = False
-    suppression_reason: Optional[str] = None
+    suppression_reason: str | None = None
     budget_before: int = 0
     budget_after: int = 0
     cooldown_remaining_seconds: float = 0.0
@@ -223,7 +221,7 @@ class SuggestionFeedbackRecord:
     feedback_id: str
     decision_id: str
     action: str  # "correct", "defer", "silence"
-    correction: Optional[str] = None
+    correction: str | None = None
     occurred_at: str = ""
 
     def validate(self) -> None:
@@ -252,7 +250,7 @@ class SuggestionOrchestrator:
 
     def __init__(
         self,
-        policy: Optional[SuggestionPolicy] = None,
+        policy: SuggestionPolicy | None = None,
         model_available: bool = False,
     ) -> None:
         self._policy = policy or SuggestionPolicy()
@@ -348,7 +346,7 @@ class SuggestionOrchestrator:
         self,
         decision_id: str,
         action: str,
-        correction: Optional[str],
+        correction: str | None,
         now: str,
     ) -> SuggestionFeedbackRecord:
         """Record user feedback on a delivered suggestion."""
@@ -487,7 +485,7 @@ class SuggestionOrchestrator:
 
     def _compute_suppression(
         self, evidence: SuggestionEvidence, now: datetime
-    ) -> Optional[str]:
+    ) -> str | None:
         if self._policy.budget_enabled and self._remaining_budget(now) <= 0:
             return "budget_exhausted"
 
@@ -505,13 +503,13 @@ class SuggestionOrchestrator:
         if (
             self._policy.redundancy_suppression
             and evidence.hypothesis_id in self._delivered_fingerprints
+            and evidence.hypothesis_id not in self._correction_count
         ):
-            if evidence.hypothesis_id not in self._correction_count:
-                return "redundant_hypothesis"
+            return "redundant_hypothesis"
 
         return None
 
-    def _find_decision(self, decision_id: str) -> Optional[SuggestionDecision]:
+    def _find_decision(self, decision_id: str) -> SuggestionDecision | None:
         for d in self._decisions:
             if d.decision_id == decision_id:
                 return d

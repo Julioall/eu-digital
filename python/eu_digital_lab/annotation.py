@@ -60,7 +60,10 @@ def calculate_agreement(first: dict[str, Any], second: dict[str, Any]) -> dict[s
         raise AnnotationError("at least one shared episode is required")
 
     exact = sum(first_labels[item] == second_labels[item] for item in shared) / len(shared)
-    labels = sorted(set(first_labels[item] for item in shared) | set(second_labels[item] for item in shared))
+    labels = sorted(
+        {first_labels[item] for item in shared}
+        | {second_labels[item] for item in shared}
+    )
     expected = sum(
         (sum(first_labels[item] == label for item in shared) / len(shared))
         * (sum(second_labels[item] == label for item in shared) / len(shared))

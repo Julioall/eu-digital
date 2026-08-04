@@ -12,8 +12,8 @@ LAB_ROOT = REPOSITORY_ROOT / "python"
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
-from eu_digital_lab.annotation import annotate_session  # noqa: E402
-from eu_digital_lab.sandbox import read_session  # noqa: E402
+from eu_digital_lab.annotation import annotate_session
+from eu_digital_lab.sandbox import read_session
 
 
 def main() -> int:

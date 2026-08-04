@@ -3,13 +3,12 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[2]
 LAB = ROOT / "python"
 if str(LAB) not in sys.path:
     sys.path.insert(0, str(LAB))
 
-from eu_digital_lab.screen_ocr_policy import (  # noqa: E402
+from eu_digital_lab.screen_ocr_policy import (
     ScreenOcrPolicy,
     ScreenOcrPolicyError,
     validate_screen_ocr_fixtures,

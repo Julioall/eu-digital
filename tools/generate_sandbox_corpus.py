@@ -13,7 +13,12 @@ LAB_ROOT = REPOSITORY_ROOT / "python"
 if str(LAB_ROOT) not in sys.path:
     sys.path.insert(0, str(LAB_ROOT))
 
-from eu_digital_lab.sandbox import GENERATOR_VERSION, generate_session, split_sessions, write_session  # noqa: E402
+from eu_digital_lab.sandbox import (
+    GENERATOR_VERSION,
+    generate_session,
+    split_sessions,
+    write_session,
+)
 
 
 def sha256(path: Path) -> str:

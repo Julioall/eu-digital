@@ -1,7 +1,7 @@
-import json
 import unittest
 
 from eu_digital_lab.snapshot import CognitiveSnapshot, SnapshotError
+
 
 class TestCognitiveSnapshot(unittest.TestCase):
     def test_cognitive_snapshot_generation(self):

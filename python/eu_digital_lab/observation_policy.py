@@ -8,7 +8,6 @@ from typing import Any
 
 from .schema_validation import SchemaValidationError, validate_shared_schema
 
-
 MANDATORY_DENYLIST = frozenset(
     {"keepass", "1password", "bitwarden", "lastpass", "dashlane", "password", "private", "incognito", "inprivate", "tor"}
 )

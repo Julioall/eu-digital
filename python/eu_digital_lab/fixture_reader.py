@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 
 def _schema_path(schema_path: str | Path | None) -> Path:
@@ -18,7 +19,8 @@ def validate_canonical_event(
 ) -> None:
     """Validate the bus envelope using the executable shared JSON schema."""
     if not isinstance(value, Mapping):
-        raise ValueError("CanonicalEvent must be an object")
+        # Keep one stable exception type for every CanonicalEvent schema violation.
+        raise ValueError("CanonicalEvent must be an object")  # noqa: TRY004
     schema = json.loads(_schema_path(schema_path).read_text(encoding="utf-8"))
     missing = set(schema["required"]) - set(value)
     if missing:
