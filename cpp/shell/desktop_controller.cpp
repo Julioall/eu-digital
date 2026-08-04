@@ -255,6 +255,42 @@ void DesktopController::start() {
                 CognitivePortFactory::create_metacognition_port(metacognition_engine_));
             host->capability_registry().register_instance("decision",
                 CognitivePortFactory::create_cognitive_decision_port(suggestion_orchestrator_));
+
+            CapabilityDescriptor renderer_descriptor;
+            renderer_descriptor.capability_id = "dialogue.local_renderer";
+            renderer_descriptor.implementation_id =
+                "local_language_renderer.safe_fallback";
+            renderer_descriptor.implementation_version = "1.0.0";
+            renderer_descriptor.kind = "language_renderer";
+            renderer_descriptor.supports_hot_plug = true;
+            renderer_descriptor.provides.push_back(
+                {kLanguageRenderOperation,
+                 "urn:eu-digital:contracts:cognitive-output:1.0"});
+            auto safe_renderer = std::make_shared<LocalLanguageRenderer>(
+                LocalLanguageRenderer::GenerationFunction{});
+            host->capability_registry().register_instance<ILanguageRenderer>(
+                std::move(renderer_descriptor), safe_renderer, 1);
+
+            CapabilityDescriptor presentation_descriptor;
+            presentation_descriptor.capability_id = "presentation.qt_dialogue";
+            presentation_descriptor.implementation_id =
+                "qt_dialogue_presentation";
+            presentation_descriptor.implementation_version = "1.0.0";
+            presentation_descriptor.kind = "presentation";
+            presentation_descriptor.supports_hot_plug = true;
+            presentation_descriptor.provides.push_back(
+                {kPresentationOperation,
+                 "urn:eu-digital:contracts:cognitive-output:1.0"});
+            auto qt_presentation =
+                std::make_shared<QtDialoguePresentationAdapter>(
+                    this, [this](const QString& text) {
+                        appendMessageToTray("agent", text);
+                        if (tray_adapter_) {
+                            tray_adapter_->setPresence(PresenceState::active);
+                        }
+                    });
+            host->capability_registry().register_instance<IPresentationPort>(
+                std::move(presentation_descriptor), qt_presentation, 10);
             
             runtime_ = std::move(host);
         }

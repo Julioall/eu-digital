@@ -21,7 +21,9 @@
 17. Conflito documental: SPECs 046 e 048 a 050 estão como `draft` apesar de
     existirem commits pesados de implementação. Elas devem ser promovidas para
     `active`/`implemented` após auditoria individual?
-18. Conflito documental: `docs/03-contracts` possui markdown vazio enquanto `contracts/schemas` possui os schemas reais. Qual é a pasta canônica?
+18. Resolvida pela ADR-0035: `contracts/schemas` é a fonte normativa dos
+    schemas executáveis; `docs/03-contracts` documenta os contratos sem
+    duplicá-los, e `schemas/` na raiz permanece legado não normativo.
 19. Conflito documental: A estrutura de governança indica que cabeçalhos devem referenciar contratos reais (ex: `contracts: []`), mas há schemas órfãos.
 20. Conflito arquitetural: SPEC-051 seleciona Ollama e sua API HTTP concreta sem
     a ADR própria exigida pela ADR-0015; o backend deve permanecer experimental
@@ -45,6 +47,13 @@ forma transacional. Incompletude, corrupção, versão, fingerprint, expiração
 cursor ou provider incompatível levam ao snapshot anterior e depois ao replay
 integral. Replay não publica decisão, UI ou ação, e a timeline permanece a
 fonte da verdade.
+
+## Resolução da questão 18 pela ADR-0035
+
+Em 2026-08-04, a aprovação humana dos DTOs versionados e a autoridade delegada
+aceitaram a ADR-0035. Schemas executáveis canônicos pertencem a
+`contracts/schemas/`; documentos em `docs/03-contracts/` explicam seu uso e a
+pasta `schemas/` na raiz não recebe novas cópias manuais.
 ## Resolução das questões 22 e 26–30 pela ADR-0033
 
 A delegação explícita do responsável humano em 2026-08-04 autorizou o agente a

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:language-rendering-candidate:1.0",
+  "title": "LanguageRenderingCandidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "request_id", "intent", "rendered_text", "evidence_refs"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "intent": {"type": "string", "enum": ["question", "requested_response", "proactive_suggestion"]},
+    "rendered_text": {"type": "string", "minLength": 1, "maxLength": 8192},
+    "evidence_refs": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 256}}
+  }
+}

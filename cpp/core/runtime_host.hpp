@@ -3,6 +3,7 @@
 #include "async_cognitive_snapshot_writer.hpp"
 #include "capability_runtime.hpp"
 #include "cognitive_coordinator.hpp"
+#include "cognitive_output_coordinator.hpp"
 #include "cognitive_snapshot.hpp"
 #include "cognitive_state_manager.hpp"
 #include "event_bus.hpp"
@@ -63,6 +64,8 @@ struct RuntimeConfig {
     std::chrono::milliseconds cognitive_snapshot_capture_budget{
         std::chrono::milliseconds(5)};
     std::size_t cognitive_snapshot_max_plaintext_bytes{4U * 1024U * 1024U};
+    bool enable_cognitive_output{true};
+    std::size_t cognitive_output_queue_size{32};
 };
 
 struct RuntimeManifest {
@@ -544,6 +547,14 @@ public:
             }
             event_bus_ = std::make_shared<EventBus>();
             if (coordinator_) {
+                if (config_.enable_cognitive_output) {
+                    CognitiveOutputCoordinatorConfig output_config;
+                    output_config.max_queue_size =
+                        config_.cognitive_output_queue_size;
+                    cognitive_output_coordinator_ =
+                        std::make_shared<CognitiveOutputCoordinator>(
+                            capability_registry_, output_config);
+                }
                 coordinator_->set_publisher([this](const CanonicalEvent& ev) {
                     if (event_bus_) {
                         try { event_bus_->publish(ev); } catch (...) {}
@@ -552,6 +563,15 @@ public:
                 coordinator_->set_cycle_commit_handler(
                     [this](const auto& input, const auto&) {
                         on_cycle_committed(input);
+                    });
+                coordinator_->set_cognitive_output_handler(
+                    [this](const auto& request) {
+                        std::shared_ptr<CognitiveOutputCoordinator> output;
+                        {
+                            std::lock_guard lock(mutex_);
+                            output = cognitive_output_coordinator_;
+                        }
+                        if (output) (void)output->enqueue(request);
                     });
             }
             event_bus_->subscribe({}, {}, [this](const CanonicalEvent& event) {
@@ -578,6 +598,7 @@ public:
             return true;
         } catch (const std::exception& error) {
             event_bus_.reset();
+            cognitive_output_coordinator_.reset();
             snapshot_writer_.reset();
             state_manager_.reset();
             coordinator_.reset();
@@ -591,26 +612,31 @@ public:
     void stop() {
         std::shared_ptr<EventBus> event_bus;
         std::shared_ptr<CognitiveCoordinator> coordinator;
+        std::shared_ptr<CognitiveOutputCoordinator> output_coordinator;
         AsyncCognitiveSnapshotWriter* snapshot_writer = nullptr;
         {
             std::lock_guard lock(mutex_);
             if (state_ == RuntimeState::stopped) return;
             event_bus = event_bus_;
             coordinator = coordinator_;
+            output_coordinator = cognitive_output_coordinator_;
             snapshot_writer = snapshot_writer_.get();
             if (event_bus) state_ = RuntimeState::stopping;
         }
         if (event_bus) event_bus->wait_idle();
         if (coordinator) coordinator->wait_idle();
+        if (output_coordinator) output_coordinator->wait_idle();
         if (snapshot_writer) {
             (void)checkpoint_now();
             snapshot_writer->wait_idle();
         }
         if (coordinator) coordinator->stop();
+        if (output_coordinator) output_coordinator->stop();
         if (snapshot_writer) snapshot_writer->stop();
         {
             std::lock_guard lock(mutex_);
             event_bus_.reset();
+            cognitive_output_coordinator_.reset();
             snapshot_writer_.reset();
             state_manager_.reset();
             coordinator_.reset();
@@ -659,6 +685,12 @@ public:
     std::shared_ptr<CognitiveCoordinator> coordinator() const {
         std::lock_guard lock(mutex_);
         return coordinator_;
+    }
+
+    std::shared_ptr<CognitiveOutputCoordinator> cognitive_output_coordinator()
+        const {
+        std::lock_guard lock(mutex_);
+        return cognitive_output_coordinator_;
     }
 
     bool checkpoint_now() {
@@ -1230,6 +1262,7 @@ private:
     std::optional<RuntimeManifest> manifest_;
     CapabilityRegistry capability_registry_;
     std::shared_ptr<CognitiveCoordinator> coordinator_;
+    std::shared_ptr<CognitiveOutputCoordinator> cognitive_output_coordinator_;
     std::unique_ptr<CognitiveStateManager> state_manager_;
     std::unique_ptr<AsyncCognitiveSnapshotWriter> snapshot_writer_;
     std::shared_ptr<EventBus> event_bus_;

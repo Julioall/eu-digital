@@ -1,21 +1,23 @@
 ---
 id: SPEC-048
 title: Structured Cognitive Output and Dialogue
-status: draft
+status: done
 phase: design
 dependencies: [SPEC-045, SPEC-040, SPEC-042]
-adrs: []
-contracts: []
+adrs: [ADR-0035]
+contracts: [COGNITIVE_OUTPUT_CONTRACTS.md, cognitive_output_request.schema.json, language_rendering_candidate.schema.json, cognitive_output.schema.json]
 ---
 
 # SPEC-048 — Structured Cognitive Output and Dialogue
 
-Status: draft  
+Status: done
 Owner: humano  
 Fase: design  
 Dependências: SPEC-045 (Integrated Cycle), SPEC-040 (Local Model), SPEC-042 (Avatar Shell)  
-ADRs aplicáveis: Nenhuma  
-Contratos afetados: Novo schema `cognitive_output.schema.json`.
+ADRs aplicáveis: ADR-0035
+Contratos afetados: `COGNITIVE_OUTPUT_CONTRACTS.md`,
+`cognitive_output_request.schema.json`,
+`language_rendering_candidate.schema.json` e `cognitive_output.schema.json`.
 
 ## Problema
 A implementação original de decisão no projeto misturava as responsabilidades de decidir falar, construir o prompt do modelo e invocar a interface gráfica em um único módulo maciço (`DecisionOutputRouter`). Isso violava o princípio de responsabilidade única e tornava inviável tratar timeouts linguísticos ou falhas sem corromper a decisão raiz. Além disso, as interrupções proativas concorriam com respostas ativas do usuário pelo mesmo orçamento.
@@ -68,10 +70,10 @@ Ao ocorrer uma interação, o log mostrará a intenção desvinculada do texto g
 - Não alterar a implementação do QML (apenas usar a Porta).
 
 ## Critérios de aceite
-- [ ] A arquitetura C++ cria as interfaces `ILanguageRenderer` e `IPresentationPort`.
-- [ ] Respostas a perguntas do usuário ignoram e não debitam o limite configurado de sugestões proativas (Cooldown não sofre reset).
-- [ ] O modelo local possui Fallback forçado caso demore mais de `N` ms, não travando a thread coordenadora.
-- [ ] Todos os outputs do `LocalLanguageRenderer` são validados contra um schema rígido para evitar alucinações de formato.
+- [x] A arquitetura C++ cria as interfaces `ILanguageRenderer` e `IPresentationPort`.
+- [x] Respostas a perguntas do usuário ignoram e não debitam o limite configurado de sugestões proativas (Cooldown não sofre reset).
+- [x] O modelo local possui Fallback forçado caso demore mais de `N` ms, não travando a thread coordenadora.
+- [x] Todos os outputs do `LocalLanguageRenderer` são validados contra um schema rígido para evitar alucinações de formato.
 
 ## Plano de testes
 

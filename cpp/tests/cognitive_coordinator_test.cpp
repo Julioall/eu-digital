@@ -109,6 +109,11 @@ public:
                             const contracts::PortInvocationContextV1&) override {
         trace_.add("memory_retrieval");
         contracts::MemoryRetrievalResponse response;
+        contracts::MemoryRetrievalItem item;
+        item.memory_id = "memory-1";
+        item.session_id = "session-1";
+        item.event_ids = {"event-1"};
+        response.items.push_back(std::move(item));
         return contracts::PortResult<contracts::MemoryRetrievalResponse>::ok(
             std::move(response));
     }
@@ -376,6 +381,9 @@ void full_sequence_is_exactly_once() {
     Fixtures fixtures;
     fixtures.register_all(registry);
     CognitiveCoordinator coordinator(registry);
+    std::vector<contracts::CognitiveOutputRequestV1> output_requests;
+    coordinator.set_cognitive_output_handler(
+        [&](const auto& request) { output_requests.push_back(request); });
     assert(coordinator.enqueue_input(input()).status == EnqueueStatusV1::accepted);
     coordinator.wait_idle();
     coordinator.stop();
@@ -389,6 +397,14 @@ void full_sequence_is_exactly_once() {
     assert(results.front().state == contracts::CycleStateV1::completed);
     assert(results.front().decision.has_value());
     assert(results.front().valid());
+    assert(output_requests.size() == 1);
+    assert(output_requests.front().valid());
+    assert(output_requests.front().intent ==
+           contracts::CognitiveOutputIntentV1::proactive_suggestion);
+    assert(std::find(output_requests.front().evidence_refs.begin(),
+                     output_requests.front().evidence_refs.end(),
+                     "memory-1") != output_requests.front().evidence_refs.end());
+    assert(output_requests.front().self_model_id == "self-1");
 }
 
 void queue_duplicate_and_reentry_are_bounded() {
@@ -454,18 +470,24 @@ void prediction_failure_and_timeout_continue_to_decision() {
 
 void ablation_and_replay_are_safe() {
     CapabilityRegistry registry;
+    Fixtures fixtures;
+    fixtures.register_all(registry);
     CognitiveCoordinator coordinator(registry);
     auto replay_input = input("replay");
     replay_input.replay_mode = true;
     int published = 0;
+    int output_requests = 0;
     coordinator.set_publisher([&](const CanonicalEvent&) { ++published; });
+    coordinator.set_cognitive_output_handler(
+        [&](const auto&) { ++output_requests; });
     coordinator.enqueue_input(replay_input);
     coordinator.wait_idle();
     coordinator.stop();
     const auto result = coordinator.results().back();
-    assert(result.state == contracts::CycleStateV1::degraded);
+    assert(result.state == contracts::CycleStateV1::completed);
     assert(!result.decision.has_value());
     assert(published == 0);
+    assert(output_requests == 0);
     assert(result.valid());
 }
 

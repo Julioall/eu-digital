@@ -15,6 +15,8 @@ contracts/fixtures/capture_policy.invalid.json
 contracts/fixtures/capture_policy.json
 contracts/fixtures/cognitive_cycle_input.json
 contracts/fixtures/cognitive_cycle_result.json
+contracts/fixtures/cognitive_output.json
+contracts/fixtures/cognitive_output_request.json
 contracts/fixtures/cognitive_snapshot_v2.json
 contracts/fixtures/component_maturity.invalid.json
 contracts/fixtures/component_maturity.json
@@ -22,6 +24,7 @@ contracts/fixtures/consent_policy.invalid.json
 contracts/fixtures/consent_policy.json
 contracts/fixtures/data_management_request.invalid.json
 contracts/fixtures/data_management_request.json
+contracts/fixtures/language_rendering_candidate.json
 contracts/fixtures/runtime_manifest.invalid.json
 contracts/fixtures/runtime_manifest.json
 contracts/fixtures/screen_ocr_capture_policy.default.json
@@ -55,6 +58,8 @@ contracts/schemas/cognitive_cycle_input.schema.json
 contracts/schemas/cognitive_cycle_result.schema.json
 contracts/schemas/cognitive_cycle_stage.schema.json
 contracts/schemas/cognitive_decision_request.schema.json
+contracts/schemas/cognitive_output.schema.json
+contracts/schemas/cognitive_output_request.schema.json
 contracts/schemas/cognitive_snapshot.schema.json
 contracts/schemas/cognitive_snapshot_v2.schema.json
 contracts/schemas/cognitive_state_bundle.schema.json
@@ -74,6 +79,7 @@ contracts/schemas/episode_segmentation_response.schema.json
 contracts/schemas/functional_self_model_snapshot.schema.json
 contracts/schemas/hypothesis.schema.json
 contracts/schemas/hypothesis_formation.schema.json
+contracts/schemas/language_rendering_candidate.schema.json
 contracts/schemas/local_model_request.schema.json
 contracts/schemas/local_model_response.schema.json
 contracts/schemas/longitudinal_protocol.schema.json
@@ -139,6 +145,7 @@ cpp/core/async_cognitive_snapshot_writer.hpp
 cpp/core/audio_sensor.hpp
 cpp/core/capability_runtime.hpp
 cpp/core/cognitive_coordinator.hpp
+cpp/core/cognitive_output_coordinator.hpp
 cpp/core/cognitive_snapshot.hpp
 cpp/core/cognitive_state_manager.hpp
 cpp/core/contracts/cognitive_cycle_context.hpp
@@ -213,6 +220,7 @@ cpp/shell/log_manager.hpp
 cpp/shell/ollama_dialogue_service.hpp
 cpp/shell/qt_avatar_window.cpp
 cpp/shell/qt_avatar_window.hpp
+cpp/shell/qt_dialogue_presentation_adapter.hpp
 cpp/shell/qt_tray_adapter.hpp
 cpp/shell/sensor_control_widget.cpp
 cpp/shell/sensor_control_widget.hpp
@@ -233,6 +241,8 @@ cpp/tests/cognitive_coordinator_test.cpp
 cpp/tests/cognitive_cycle_contracts_test.cpp
 cpp/tests/cognitive_decision_adapter_test.cpp
 cpp/tests/cognitive_decision_policy_test.cpp
+cpp/tests/cognitive_output_contracts_test.cpp
+cpp/tests/cognitive_output_coordinator_test.cpp
 cpp/tests/cognitive_port_factory_test.cpp
 cpp/tests/cognitive_port_requests_test.cpp
 cpp/tests/cognitive_recovery_crash_test.cpp
@@ -264,6 +274,7 @@ cpp/tests/privacy_storage_test.cpp
 cpp/tests/procedural_avatar_test.cpp
 cpp/tests/promotion_registry_test.cpp
 cpp/tests/qt_avatar_shell_test.cpp
+cpp/tests/qt_dialogue_presentation_adapter_test.cpp
 cpp/tests/runtime_host_test.cpp
 cpp/tests/runtime_install_tree_test.cmake
 cpp/tests/screen_ocr_sensor_test.cpp
@@ -301,6 +312,7 @@ docs/03-contracts/CAPABILITY_ADAPTATION_SCHEMA.md
 docs/03-contracts/CAPABILITY_DESCRIPTOR.md
 docs/03-contracts/CAPABILITY_STATE_SCHEMA.md
 docs/03-contracts/COGNITIVE_CYCLE_CONTRACTS.md
+docs/03-contracts/COGNITIVE_OUTPUT_CONTRACTS.md
 docs/03-contracts/COGNITIVE_PORT_REQUESTS.md
 docs/03-contracts/COMPONENT_MATURITY_CONTRACT.md
 docs/03-contracts/CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md
@@ -368,6 +380,7 @@ docs/04-adrs/ADR-0031-atomic-pattern-learning-promotion.md
 docs/04-adrs/ADR-0032-desktop-interface-substitution.md
 docs/04-adrs/ADR-0033-integrated-cognitive-cycle-boundaries.md
 docs/04-adrs/ADR-0034-consistent-cognitive-checkpoint-and-replay.md
+docs/04-adrs/ADR-0035-structured-cognitive-output-pipeline.md
 docs/05-governance/CHANGE_CONTROL.md
 docs/05-governance/OPEN_QUESTIONS.md
 docs/05-governance/RISK_REGISTER.md
@@ -464,6 +477,7 @@ python/tests/test_avatar_presentation_profile.py
 python/tests/test_capabilities.py
 python/tests/test_capability_adaptation.py
 python/tests/test_cognitive_cycle_contracts.py
+python/tests/test_cognitive_output_contracts.py
 python/tests/test_cognitive_snapshot_v2.py
 python/tests/test_component_maturity.py
 python/tests/test_desktop_interface_spike.py

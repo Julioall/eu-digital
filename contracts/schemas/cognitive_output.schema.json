@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:cognitive-output:1.0",
+  "title": "ValidatedDialogueOutput",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "output_id", "request_id", "intent", "status", "rendered_text", "evidence_refs", "renderer_id", "reason_code"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "output_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "request_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "intent": {"type": "string", "enum": ["silence", "question", "requested_response", "proactive_suggestion"]},
+    "status": {"type": "string", "enum": ["rendered", "malformed", "timeout", "fallback_used", "silence", "unavailable"]},
+    "rendered_text": {"type": "string", "maxLength": 8192},
+    "evidence_refs": {"type": "array", "maxItems": 256, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 256}},
+    "renderer_id": {"type": "string", "minLength": 1, "maxLength": 256},
+    "reason_code": {"type": "string", "minLength": 1, "maxLength": 256}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"enum": ["rendered", "fallback_used"]}}}, "then": {"properties": {"rendered_text": {"minLength": 1}}}},
+    {"if": {"properties": {"status": {"enum": ["malformed", "timeout", "silence", "unavailable"]}}}, "then": {"properties": {"rendered_text": {"maxLength": 0}}}}
+  ]
+}

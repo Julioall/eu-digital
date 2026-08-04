@@ -18,6 +18,7 @@
 #include "core/ports/isalience_assessment_port.hpp"
 #include "core/ports/iself_model_query_port.hpp"
 #include "core/ports/iworkspace_selection_port.hpp"
+#include "core/policies/cognitive_decision_policy.hpp"
 
 #include <algorithm>
 #include <atomic>
@@ -121,6 +122,12 @@ public:
         const contracts::CognitiveCycleResultV1&)> handler) {
         std::lock_guard lock(commit_handler_mutex_);
         commit_handler_ = std::move(handler);
+    }
+
+    void set_cognitive_output_handler(std::function<void(
+        const contracts::CognitiveOutputRequestV1&)> handler) {
+        std::lock_guard lock(output_handler_mutex_);
+        output_handler_ = std::move(handler);
     }
 
     contracts::CognitiveCoordinatorCheckpointV1 capture_checkpoint() const {
@@ -418,6 +425,13 @@ private:
                   join_reasons(cycle.degradation_reasons));
         mark_committed(input.event_id);
         notify_commit(input, cycle);
+        if (const auto output_request = CognitiveDecisionPolicy::create_request(
+                input, values.decision.value_or(CognitiveDecision::fail(
+                           "decision_unavailable")),
+                values.segmentation, values.memories, values.workspace,
+                values.metacognition, values.self_model, values.hypothesis)) {
+            notify_output(*output_request);
+        }
         if (!input.replay_mode) publish(cycle);
     }
 
@@ -869,6 +883,22 @@ private:
         }
     }
 
+    void notify_output(
+        const contracts::CognitiveOutputRequestV1& request) const {
+        std::function<void(const contracts::CognitiveOutputRequestV1&)> handler;
+        {
+            std::lock_guard lock(output_handler_mutex_);
+            handler = output_handler_;
+        }
+        if (!handler) return;
+        try {
+            handler(request);
+        } catch (...) {
+            // Output is an optional observer of an already committed cycle.
+            // It cannot mutate or duplicate the terminal result.
+        }
+    }
+
     void publish(const contracts::CognitiveCycleResultV1& result) {
         std::function<void(const CanonicalEvent&)> publisher;
         {
@@ -919,6 +949,9 @@ private:
     std::function<void(const contracts::CognitiveCycleInputV1&,
                        const contracts::CognitiveCycleResultV1&)>
         commit_handler_;
+    mutable std::mutex output_handler_mutex_;
+    std::function<void(const contracts::CognitiveOutputRequestV1&)>
+        output_handler_;
 
     mutable std::mutex context_mutex_;
     CognitiveCycleContext last_context_;

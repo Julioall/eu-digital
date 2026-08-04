@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "request_id": "output-request-1",
+  "correlation_id": "correlation-1",
+  "input_event_id": "event-1",
+  "intent": "requested_response",
+  "occurred_at": "2026-08-04T12:00:00Z",
+  "critical": true,
+  "reason": "explicit user request",
+  "input_content": {"text": "Qual é o contexto atual?"},
+  "self_model_id": "self-model-1",
+  "self_constraints": ["local_only", "no_unverified_factual_claims"],
+  "evidence_refs": ["event-1", "hypothesis-1"]
+}

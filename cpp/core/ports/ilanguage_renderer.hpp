@@ -4,11 +4,14 @@
 
 namespace eu_digital {
 
+inline constexpr char kLanguageRenderOperation[] = "language.render";
+
 class ILanguageRenderer {
 public:
     virtual ~ILanguageRenderer() = default;
 
-    virtual ValidatedDialogueOutput render(const CognitiveOutputRequest& request) = 0;
+    virtual contracts::ValidatedDialogueOutputV1 render(
+        const contracts::CognitiveOutputRequestV1& request) = 0;
 };
 
-} // namespace eu_digital
+}  // namespace eu_digital

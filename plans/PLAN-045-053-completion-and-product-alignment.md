@@ -29,9 +29,9 @@ envio de dados à nuvem ou substituição dos módulos cognitivos por um LLM.
 | SPEC | Estado documental | Evidência existente | Lacuna que impede conclusão |
 | --- | --- | --- | --- |
 | 045 | `done` | contratos 1.0, coordenador, integração no host, benchmark, validação operacional e relatório | nenhuma pendência crítica na SPEC; replay persistente permanece exclusivamente na SPEC-046 |
-| 046 | `draft` | schema, DTO, persistência e relatório existem | o próprio relatório informa que o replay ainda não é reaplicado ao coordenador; crash recovery e criptografia não estão comprovados ponta a ponta |
-| 047 | `draft` | portas, adaptadores, factory, testes e relatório existem | falta reconciliar o registro dinâmico, o ciclo completo de remoção/reinstalação/substituição e a ausência de uma porta para aprendizagem de padrões |
-| 048 | `draft` | política, portas, renderer, testes e relatório existem | o relatório admite que validação JSON real permanece pendente; timeout deve provar que não bloqueia na destruição do trabalho assíncrono |
+| 046 | `done` | checkpoint 2.0, replay sem efeitos, crash recovery, DPAPI, testes e relatório | nenhuma pendência crítica na SPEC |
+| 047 | `done` | portas, adaptadores, pattern port, factory, hot-plug, benchmark, testes e relatório | nenhuma pendência crítica na SPEC |
+| 048 | `done` | ADR-0035, schemas 1.0, parser estrito, isolamento assíncrono, Qt por porta, testes e relatório | nenhuma pendência crítica na SPEC; backend/modelo concreto permanece na SPEC-051 |
 | 049 | `draft` | dispatcher, feedback e relatório existem | adiciona `outcome_unknown` e taxas de confiança sem versionamento contratual, hipótese, baseline, métrica, ablação ou falsificação |
 | 050 | `draft` | entrypoint, controller, teste e relatório existem | não há evidência dos limites p99, idle, ausência de deadlock, consentimento por sensor e recuperação de crash exigidos pela SPEC |
 | 051 | `done` | backend Ollama e teste existem | dois critérios permanecem desmarcados; não existe ADR autorizando o backend/API concretos, em conflito com ADR-0015 |
@@ -51,18 +51,15 @@ decididos e registrados:
    apenas, seleção por configuração, ausência de download implícito, modelo
    permitido, licença, timeout, cancelamento, unload e reversão. Até lá, o
    backend permanece experimental e desabilitado por padrão.
-2. Escolher a pasta canônica de contratos executáveis e eliminar referências
-   ambíguas entre `docs/03-contracts`, `contracts/schemas` e `schemas` por
-   migração versionada, sem cópia manual divergente.
+2. Resolvido pela ADR-0035: `contracts/schemas` é a fonte normativa;
+   `docs/03-contracts` documenta e `schemas` permanece legado não normativo.
 3. Versionar a extensão de contratos de ação antes de introduzir
    `outcome_unknown` e documentar compatibilidade com registros antigos.
 4. Registrar protocolo científico para a política de atualização de confiança
    da SPEC-049. Constantes empíricas não podem entrar no runtime como evidência
    cognitiva sem baseline e critério de falsificação.
-5. Decidir se a aprendizagem incremental de padrões será adicionada, por
-   emenda aprovada, às SPECs 045/047 ou se será tratada em uma SPEC atômica
-   própria. O coordenador atual não satisfaz a visão de “aprender observando”
-   sem essa ligação.
+5. Resolvido pelas SPECs 045/047: aprendizagem incremental é uma capacidade
+   removível própria e participa do ciclo por DTOs versionados.
 6. Reescrever os critérios da SPEC-053 para que sejam únicos, mensuráveis e
    rastreáveis a contratos e testes.
 
@@ -190,6 +187,9 @@ Saída: episódios, padrões, predições e self-model continuam coerentes entre
 sessões; a timeline permanece a fonte da verdade.
 
 ### Marco 4 — Fechar SPEC-048 e regularizar SPEC-051: linguagem como renderer
+
+Estado: SPEC-048 concluída; regularização da SPEC-051 permanece pendente e não
+foi antecipada.
 
 Objetivo: comunicar decisões sem entregar o núcleo cognitivo ao modelo local.
 

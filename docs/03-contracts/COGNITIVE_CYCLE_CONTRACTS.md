@@ -61,6 +61,11 @@ evidências, erros estruturados, degradações e decisão opcional. Não contém
 texto renderizado, atividade de UI nem ação. Os estados terminais são
 `completed`, `degraded`, `failed` e `discarded`.
 
+Pela SPEC-048 e ADR-0035, um observador opcional pode receber um
+`CognitiveOutputRequest` 1.0 somente depois do commit live. Esse contrato é uma
+saída lateral assíncrona, não um campo novo do resultado 1.0. O callback apenas
+enfileira o request; renderer e apresentação executam fora da thread do ciclo.
+
 O ID do ciclo deriva de `event_id` e `bounded_ports_v1`. A fila é limitada e
 usa `drop_newest_v1`: excesso produz `discarded_backpressure`. Duplicata retorna
 `discarded_duplicate` e registra o descarte, mas não cria um segundo resultado
@@ -69,6 +74,7 @@ em `cognitive.coordinator` não reentram no pipeline.
 
 Replay executa a mesma ordem e os mesmos contratos, mas não publica decisão,
 UI ou ação. A reaplicação de snapshots e timeline permanece na SPEC-046.
+Também não publica `CognitiveOutputRequest`.
 
 ## Schemas executáveis
 

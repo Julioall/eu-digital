@@ -11,6 +11,15 @@ The SPEC-014 contracts are local and represent presentation, not personality:
 The desktop host is an optional port. Its absence does not erase history and is
 not treated as a negative observation.
 
+## SPEC-048 structured dialogue delivery
+
+`IPresentationPort` receives only a `ValidatedDialogueOutput` 1.0 in state
+`rendered` or `fallback_used`. The optional Qt adapter queues delivery on the UI
+thread and does not import Qt into the cognitive core. Invalid, silent, timed
+out or unavailable outputs never reach the tray. The safe desktop renderer has
+no model backend and can only communicate local generation unavailability;
+selecting a production model remains outside this contract.
+
 ## SPEC-042 headless presentation boundary
 
 `avatar_presentation_profile.schema.json` is a versioned sidecar to

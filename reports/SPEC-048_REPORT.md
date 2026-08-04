@@ -1,49 +1,101 @@
 # Relatório de Execução
 
-SPEC: SPEC-048 (Structured Cognitive Output and Dialogue)
-Agente: Antigravity
-Data: 2026-07-31
-Commit: (Pendente)
+SPEC: SPEC-048 — Structured Cognitive Output and Dialogue
+Agente: Codex
+Data: 2026-08-04
+Commit: incluído no commit de conclusão da SPEC-048
 
 ## Alterações realizadas
-- Adicionado o schema `cognitive_output.schema.json` estrito para saída de linguagem.
-- Criadas interfaces `ILanguageRenderer` e `IPresentationPort`.
-- Criado o contrato `CognitiveOutputRequest` e o struct de retorno `ValidatedDialogueOutput`.
-- Implementado o adapter `LocalLanguageRenderer` com suporte a execução assíncrona (com timeout e fallback).
-- Implementado a política `CognitiveDecisionPolicy` acoplada ao `SuggestionOrchestrator` para contagem e verificação de proatividade.
+
+- Aceita a ADR-0035 e definida a saída como observador assíncrono pós-commit,
+  sem alterar `CognitiveCycleResult` 1.0.
+- Publicados request, candidato do renderer e output validado em schemas 1.0.
+- Implementado parser JSON estrito: campos extras/duplicados, tipos, intenção,
+  request ID e referências não autorizadas são rejeitados.
+- Substituído `std::async` por isolamento com `stop_token`; timeout não aguarda
+  destrutor de `future`, e trabalho não cooperativo não acessa o renderer após
+  sua destruição.
+- Adicionado `CognitiveOutputCoordinator` com worker, fila limitada, supressão
+  de duplicata, métricas e logs estruturados.
+- Corrigido `CognitiveDecisionAdapter`: resposta explícita é classificada antes
+  do `SuggestionOrchestrator`, sem decisão proativa, débito ou cooldown.
+- Integrado o request ao final do ciclo live e ao `RuntimeHost`; replay não
+  produz request nem UI.
+- Registrados no shell um renderer sem backend, limitado ao fallback seguro, e
+  um adaptador Qt que entrega na thread da UI sem mudança de QML.
 
 ## Arquivos modificados
-- `schemas/cognitive_output.schema.json` (novo)
-- `cpp/core/contracts/cognitive_output.hpp` (novo)
-- `cpp/core/ports/ilanguage_renderer.hpp` (novo)
-- `cpp/core/ports/ipresentation_port.hpp` (novo)
-- `cpp/core/policies/cognitive_decision_policy.hpp` (novo)
-- `cpp/core/adapters/local_language_renderer.hpp` (novo)
-- `cpp/tests/local_language_renderer_test.cpp` (novo)
-- `cpp/tests/cognitive_decision_policy_test.cpp` (novo)
-- `CMakeLists.txt` (modificado)
+
+- contratos e fixtures em `contracts/schemas/` e `contracts/fixtures/`;
+- contratos/portas/runtime em `cpp/core/`;
+- adaptador Qt e registro desktop em `cpp/shell/`;
+- testes C++, Python e configuração CMake;
+- ADR-0035, SPEC-048, PLAN-048, contratos documentais e questões abertas.
 
 ## Testes executados
-- `local_language_renderer_test`: Validado fallback em falhas assíncronas e timeout, e renderização em modo silence.
-- `cognitive_decision_policy_test`: Validado bypass do `SuggestionOrchestrator` para perguntas explícitas, e o débito proativo para intenções assíncronas do sistema.
+
+- build C++ headless completo em `build/windows-dev`;
+- CTest headless completo;
+- suíte Python completa;
+- testes de schemas e lint do arquivo Python alterado;
+- mypy do pacote de laboratório;
+- validadores documentais e de SPECs;
+- build de `eu_digital_desktop`, `desktop_integration_test` e do adaptador Qt;
+- teste Qt do adaptador e execução delimitada da integração desktop;
+- microbenchmark embutido de enqueue.
 
 ## Resultados
-Todos os testes foram compilados e passaram com êxito. A arquitetura de fallback evita travamentos na thread principal caso o modelo demore. O orchestrator é usado corretamente pela política.
+
+- build headless: sucesso;
+- CTest headless: 46/46;
+- pytest: 244/244;
+- mypy: sucesso em 28 arquivos;
+- lint focado: sucesso;
+- documentação: 13/13;
+- SPECs: 54 válidas;
+- Qt adapter: 1/1 e shell/integração compilados;
+- integração desktop delimitada: exit code 0;
+- mediana de enqueue: 1 µs, abaixo do limite de 1 ms.
 
 ## Critérios de aceite
-- [x] A arquitetura C++ cria as interfaces `ILanguageRenderer` e `IPresentationPort`.
-- [x] Respostas a perguntas do usuário ignoram e não debitam o limite configurado de sugestões proativas (Cooldown não sofre reset).
-- [x] O modelo local possui Fallback forçado caso demore mais de `N` ms, não travando a thread coordenadora.
-- [x] Todos os outputs do `LocalLanguageRenderer` são validados contra um schema rígido (ainda pendente parse complexo, mas schema JSON existe).
+
+- [x] `ILanguageRenderer` e `IPresentationPort` existem e são substituíveis.
+- [x] Resposta solicitada não muta orçamento, decisões ou cooldown proativo.
+- [x] Timeout retorna fallback/silêncio sem bloquear o coordenador.
+- [x] Todo output do renderer satisfaz o contrato 1.0 estrito.
 
 ## Desvios
-O adapter no teste simula o erro de validação ("malformed"). A integração com parsers JSON real dependerá do backend de comunicação a ser escrito nas próximas specs.
+
+O lint global foi executado e encontrou 40 violações preexistentes fora dos
+arquivos da SPEC (imports, `Optional`, `timezone.utc` e no-ops de noqa). O único
+arquivo Python alterado pela SPEC passa isoladamente; os 40 itens não foram
+modificados para respeitar o princípio de menor mudança.
 
 ## Riscos e pendências
-- Garantir que a integração do `ILanguageRenderer` em Qt Avatar não exija bibliotecas além do `IPresentationPort`.
+
+- O renderer de produção continua sem backend/modelo selecionado, conforme
+  ADR-0015 e a questão arquitetural 20 da SPEC-051.
+- Validação estrutural limita formato e proveniência, mas não prova veracidade
+  ou qualidade semântica; isso requer avaliação própria.
+- Uma implementação arbitrária de `IPresentationPort` ainda deve cumprir o
+  contrato não bloqueante da ADR-0016.
+
+Nenhuma pendência é crítica para os critérios da SPEC-048.
 
 ## Decisões tomadas
-- `LocalLanguageRenderer` fará uso de `std::async` internamente para assegurar que a chamada bloqueante à LlmFunction não segure a thread do coordenador além do `timeout_ms`.
+
+- `contracts/schemas/` é a fonte normativa; a pasta raiz `schemas/` é legado.
+- Falha crítica usa frase fixa de indisponibilidade; falha proativa silencia.
+- Capacidades são resolvidas por request para permitir remoção, reinstalação e
+  substituição sem dependência estrutural.
+- Nenhuma implementação Ollama/HTTP foi promovida ou usada pelo pipeline.
 
 ## Evidências
-- Logs locais de testes compilados e passados via `ctest`.
+
+- `cognitive_output_enqueue_median_us=1`;
+- testes de timeout cooperativo e não cooperativo;
+- testes de campo extra, JSON truncado, evidência externa e ID divergente;
+- testes de ausência/falha/remoção/reinstalação/substituição das duas portas;
+- teste de replay com zero requests de saída;
+- teste de identidade do estado do `SuggestionOrchestrator` antes/depois de
+  respostas explícitas.

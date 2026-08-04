@@ -10,7 +10,9 @@
 #include "core/functional_self_model.hpp"
 #include "core/metacognition_curiosity.hpp"
 #include "core/suggestion_orchestrator.hpp"
+#include "core/adapters/local_language_renderer.hpp"
 #include "shell/qt_tray_adapter.hpp"
+#include "shell/qt_dialogue_presentation_adapter.hpp"
 #include "shell/qt_avatar_window.hpp"
 #include "shell/settings_window.hpp"
 

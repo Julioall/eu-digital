@@ -222,6 +222,14 @@ add_executable(cognitive_cycle_contracts_test cpp/tests/cognitive_cycle_contract
 target_include_directories(cognitive_cycle_contracts_test PRIVATE cpp)
 target_compile_features(cognitive_cycle_contracts_test PRIVATE cxx_std_23)
 
+add_executable(cognitive_output_contracts_test cpp/tests/cognitive_output_contracts_test.cpp)
+target_include_directories(cognitive_output_contracts_test PRIVATE cpp)
+target_compile_features(cognitive_output_contracts_test PRIVATE cxx_std_23)
+
+add_executable(cognitive_output_coordinator_test cpp/tests/cognitive_output_coordinator_test.cpp)
+target_include_directories(cognitive_output_coordinator_test PRIVATE cpp)
+target_compile_features(cognitive_output_coordinator_test PRIVATE cxx_std_23)
+
 add_executable(port_dispatch_benchmark cpp/benchmarks/port_dispatch_benchmark.cpp)
 target_include_directories(port_dispatch_benchmark PRIVATE cpp)
 target_compile_features(port_dispatch_benchmark PRIVATE cxx_std_23)
@@ -334,6 +342,22 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
     target_link_libraries(qt_avatar_shell_test PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets)
     add_test(NAME qt_avatar_shell COMMAND qt_avatar_shell_test)
 
+    add_executable(qt_dialogue_presentation_adapter_test
+        cpp/tests/qt_dialogue_presentation_adapter_test.cpp)
+    target_include_directories(qt_dialogue_presentation_adapter_test PRIVATE cpp)
+    target_compile_features(qt_dialogue_presentation_adapter_test PRIVATE cxx_std_23)
+    target_link_libraries(qt_dialogue_presentation_adapter_test PRIVATE Qt6::Core)
+    add_test(NAME qt_dialogue_presentation_adapter
+        COMMAND qt_dialogue_presentation_adapter_test)
+    if(WIN32)
+        get_target_property(EU_DIGITAL_QT_CORE_LOCATION Qt6::Core IMPORTED_LOCATION)
+        get_filename_component(EU_DIGITAL_QT_RUNTIME_DIR
+            "${EU_DIGITAL_QT_CORE_LOCATION}" DIRECTORY)
+        set_tests_properties(qt_dialogue_presentation_adapter PROPERTIES
+            ENVIRONMENT_MODIFICATION
+                "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR}")
+    endif()
+
     add_executable(eu_digital_desktop WIN32
         cpp/app/eu_digital_desktop.cpp
         cpp/shell/desktop_controller.cpp
@@ -400,6 +424,8 @@ add_test(NAME ports_mock COMMAND ports_mock_test)
 add_test(NAME port_result COMMAND port_result_test)
 add_test(NAME cognitive_port_requests COMMAND cognitive_port_requests_test)
 add_test(NAME cognitive_cycle_contracts COMMAND cognitive_cycle_contracts_test)
+add_test(NAME cognitive_output_contracts COMMAND cognitive_output_contracts_test)
+add_test(NAME cognitive_output_coordinator COMMAND cognitive_output_coordinator_test)
 add_test(NAME cognitive_coordinator_queue_benchmark
     COMMAND cognitive_coordinator_queue_benchmark)
 add_test(NAME world_model_adapter COMMAND world_model_adapter_test)

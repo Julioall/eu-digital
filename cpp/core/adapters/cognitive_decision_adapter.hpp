@@ -2,6 +2,7 @@
 
 #include "core/ports/icognitive_decision_port.hpp"
 #include "core/suggestion_orchestrator.hpp"
+#include "core/digest.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -33,6 +34,16 @@ public:
         }
         std::lock_guard lock(mutex_);
 
+        if (request.event_type == "user_explicit_question" ||
+            request.event_type == "requested_response") {
+            const auto decision_id = digest::uuid5(
+                SUGGESTION_NAMESPACE,
+                "requested_response:" + request.event_id + ":" +
+                    request.occurred_at);
+            return CognitiveDecision::ok(
+                "requested_response", "explicit_user_request", decision_id);
+        }
+
         SuggestionEvidence evidence;
         evidence.hypothesis_id = request.hypothesis_id;
         evidence.confidence = request.confidence;
@@ -48,10 +59,6 @@ public:
             orchestrator_->evaluate(evidence, request.occurred_at);
         if (decision.suppressed) {
             return CognitiveDecision::ok("silence", decision.reason, "");
-        }
-        if (request.event_type == "user_explicit_question") {
-            return CognitiveDecision::ok(
-                "requested_response", decision.reason, decision.decision_id);
         }
         if (request.event_type == "system_observation") {
             return CognitiveDecision::ok(

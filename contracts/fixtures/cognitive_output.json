@@ -1,0 +1,11 @@
+{
+  "schema_version": "1.0",
+  "output_id": "dialogue-output-1",
+  "request_id": "output-request-1",
+  "intent": "requested_response",
+  "status": "rendered",
+  "rendered_text": "Posso responder apenas com o contexto local disponível.",
+  "evidence_refs": ["event-1"],
+  "renderer_id": "local-language-renderer-v1",
+  "reason_code": "candidate_validated"
+}

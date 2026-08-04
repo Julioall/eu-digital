@@ -25,15 +25,25 @@ int main() {
         assert(result.value);
         assert(result.value->success);
         assert(result.value->intent == "requested_response");
+        assert(result.value->reason == "explicit_user_request");
+        assert(!result.value->target_action.empty());
+        assert(so->decisions().empty());
+        const auto metrics_before = so->metrics_json();
+        const auto repeated = adapter.decide_evidence_result(request);
+        assert(repeated.success);
+        assert(so->decisions().empty());
+        assert(so->metrics_json() == metrics_before);
+
+        auto proactive = request;
+        proactive.event_id = "event-2";
+        proactive.event_type = "other_observation";
+        proactive.occurred_at = "2026-08-04T12:10:00Z";
+        proactive.hypothesis_id = "hypothesis-2";
+        proactive.evidence_ids = {"event-2"};
+        proactive.workspace_snapshot_id.reset();
+        const auto proactive_result = adapter.decide_evidence_result(proactive);
+        assert(proactive_result.success);
         assert(so->decisions().size() == 1);
-        const auto& native = so->decisions().front();
-        assert(native.created_at == "2026-08-04T12:00:00+00:00");
-        assert(native.hypothesis_id == request.hypothesis_id);
-        assert(native.confidence == request.confidence);
-        assert(native.information_gain == request.information_gain);
-        assert(native.reason == request.reason);
-        assert(native.evidence_ids ==
-               std::vector<std::string>({"event-1", "snapshot-1"}));
 
         auto invalid = request;
         invalid.occurred_at.clear();
