@@ -107,6 +107,12 @@ O contrato de captura visual e OCR consentidos da SPEC-032 é
 `screen_ocr_capture_policy.schema.json`, documentado em
 `docs/03-contracts/SCREEN_OCR_CAPTURE_CONTRACT.md`.
 
+O envelope operacional das portas cognitivas da SPEC-047 está em
+`port_result.schema.json`, documentado em
+`docs/03-contracts/PORT_RESULT.md`. Ele separa falha de integração de um valor
+válido do domínio e não transforma ausência de observação em resultado
+negativo.
+
 Python e C++ consomem esses contratos; nenhum plugin concreto faz parte do
 núcleo.
 

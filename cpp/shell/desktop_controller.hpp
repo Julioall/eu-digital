@@ -83,6 +83,7 @@ private:
 
     // Cognitive Components (Fase 2 — SPEC-053)
     std::shared_ptr<EpisodicMemoryStore> episodic_memory_;
+    std::shared_ptr<PatternLearner> pattern_learner_;
     std::shared_ptr<WorldModel> world_model_;
     std::shared_ptr<GlobalWorkspace> global_workspace_;
     std::shared_ptr<VersionedFunctionalSelfModel> self_model_;

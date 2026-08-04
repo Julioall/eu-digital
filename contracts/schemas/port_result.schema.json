@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:port-result:1.0",
+  "title": "PortResult",
+  "type": "object",
+  "required": ["schema_version", "success"],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "value": {},
+    "error": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/port_error"}
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"success": {"const": true}},
+        "required": ["success"]
+      },
+      "then": {
+        "required": ["value"],
+        "properties": {"error": {"type": "null"}}
+      },
+      "else": {
+        "required": ["error"],
+        "not": {"required": ["value"]},
+        "properties": {"error": {"$ref": "#/$defs/port_error"}}
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "port_error": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "operation",
+        "code",
+        "message",
+        "retryable"
+      ],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "operation": {"type": "string", "minLength": 1},
+        "code": {"type": "string", "minLength": 1},
+        "message": {"type": "string"},
+        "retryable": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

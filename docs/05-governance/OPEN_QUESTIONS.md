@@ -21,7 +21,25 @@
 17. Conflito documental: SPECs 045 a 050 estão como `draft` apesar de existirem commits pesados de implementação. Elas devem ser promovidas para `active`/`implemented`?
 18. Conflito documental: `docs/03-contracts` possui markdown vazio enquanto `contracts/schemas` possui os schemas reais. Qual é a pasta canônica?
 19. Conflito documental: A estrutura de governança indica que cabeçalhos devem referenciar contratos reais (ex: `contracts: []`), mas há schemas órfãos.
-
+20. Conflito arquitetural: SPEC-051 seleciona Ollama e sua API HTTP concreta sem
+    a ADR própria exigida pela ADR-0015; o backend deve permanecer experimental
+    e desabilitado por padrão até decisão humana.
+21. Conflito contratual e científico: SPEC-049 declara que não afeta contratos,
+    mas adiciona `outcome_unknown`, e introduz taxas empíricas de atualização de
+    confiança sem hipótese, baseline, métrica, ablação ou falsificação.
+22. Lacuna arquitetural: o pipeline da SPEC-045 e as portas da SPEC-047 não
+    incluem explicitamente a aprendizagem incremental de padrões já promovida
+    pela SPEC-035, embora a visão do produto exija aprender por observação.
+23. Conflito documental: SPEC-053 possui critérios de aceite duplicados e
+    contraditórios, marca itens como concluídos sem contratos versionados para
+    `CurrentActivity` e `ContextualAssistanceCard` e termina com um critério
+    genérico ainda pendente.
+25. Requisito contratual ausente na SPEC-047: as entradas atuais não permitem
+    delegação fiel em todos os adapters. `IMemoryWritePort` recebe evento onde o
+    store exige episódio; metacognição recebe workspace onde o motor exige
+    hipótese e tempo; decisão não recebe timestamp; workspace não expõe tensão
+    equivalente. Devem ser criados DTOs versionados suficientes ou as portas
+    devem ser redefinidas antes de remover os valores fabricados?
 
 ## Resoluções registradas pela SPEC-023
 
@@ -32,6 +50,15 @@
    e checkpoints tornam o reinício seguro nos demais casos.
 13. Não há ontologia fixa de operações: cada `CapabilityDescriptor` declara as
    operações que fornece, e o resolver seleciona por operação.
+
+## Resolução da questão 24 pela SPEC-047
+
+Em 2026-08-04, o responsável humano aprovou o envelope genérico e versionado
+`PortResult<T>` 1.0 com `PortError`. A adoção é aditiva: as portas cognitivas
+expõem operações seguras `*_result()` e preservam as assinaturas legadas até a
+migração da SPEC-045. Exceções de implementações concretas tornam-se falhas
+estruturadas; DTO vazio não representa falha e ausência de observação não é
+convertida em observação negativa.
 
 ## Resoluções registradas pela SPEC-010
 

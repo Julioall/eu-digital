@@ -73,6 +73,7 @@ contracts/schemas/observability_profile.schema.json
 contracts/schemas/observation_envelope.schema.json
 contracts/schemas/pattern.schema.json
 contracts/schemas/plugin_manifest.schema.json
+contracts/schemas/port_result.schema.json
 contracts/schemas/prediction_drift.schema.json
 contracts/schemas/prediction_error.schema.json
 contracts/schemas/retention_decision.schema.json
@@ -98,6 +99,7 @@ cpp/app/main.cpp
 cpp/app/procedural_avatar_probe.cpp
 cpp/app/promotion_fixture_runner.cpp
 cpp/benchmarks/.gitkeep
+cpp/benchmarks/port_dispatch_benchmark.cpp
 cpp/core/.gitkeep
 cpp/core/adapters/action_dispatcher_adapter.hpp
 cpp/core/adapters/cognitive_decision_adapter.hpp
@@ -110,6 +112,7 @@ cpp/core/adapters/local_language_renderer.hpp
 cpp/core/adapters/metacognition_curiosity_adapter.hpp
 cpp/core/adapters/ollama_model_backend.cpp
 cpp/core/adapters/ollama_model_backend.hpp
+cpp/core/adapters/pattern_learner_adapter.hpp
 cpp/core/adapters/world_model_adapter.hpp
 cpp/core/audio_sensor.hpp
 cpp/core/capability_runtime.hpp
@@ -125,6 +128,8 @@ cpp/core/contracts/episode_update.hpp
 cpp/core/contracts/memory_retrieval_result.hpp
 cpp/core/contracts/memory_write_result.hpp
 cpp/core/contracts/metacognitive_assessment.hpp
+cpp/core/contracts/pattern_learning.hpp
+cpp/core/contracts/port_result.hpp
 cpp/core/contracts/prediction_assessment.hpp
 cpp/core/contracts/self_constraint_snapshot.hpp
 cpp/core/contracts/workspace_snapshot.hpp
@@ -147,6 +152,7 @@ cpp/core/ports/ilanguage_renderer.hpp
 cpp/core/ports/imemory_retrieval_port.hpp
 cpp/core/ports/imemory_write_port.hpp
 cpp/core/ports/imetacognition_port.hpp
+cpp/core/ports/ipattern_learning_port.hpp
 cpp/core/ports/iprediction_port.hpp
 cpp/core/ports/ipresentation_port.hpp
 cpp/core/ports/iself_model_query_port.hpp
@@ -214,7 +220,9 @@ cpp/tests/metacognition_curiosity_adapter_test.cpp
 cpp/tests/metacognition_curiosity_test.cpp
 cpp/tests/ollama_model_backend_test.cpp
 cpp/tests/packaging_test.cpp
+cpp/tests/pattern_learner_adapter_test.cpp
 cpp/tests/pattern_learning_test.cpp
+cpp/tests/port_result_test.cpp
 cpp/tests/ports_mock_test.cpp
 cpp/tests/privacy_storage_test.cpp
 cpp/tests/procedural_avatar_test.cpp
@@ -278,6 +286,7 @@ docs/03-contracts/OBSERVATION_ENVELOPE.md
 docs/03-contracts/OBSERVATION_POLICY_CONTRACT.md
 docs/03-contracts/PATTERN_PROMOTION_CONTRACT.md
 docs/03-contracts/PATTERN_SCHEMA.md
+docs/03-contracts/PORT_RESULT.md
 docs/03-contracts/PRIVACY_STORAGE_CONTRACTS.md
 docs/03-contracts/SCREEN_OCR_CAPTURE_CONTRACT.md
 docs/03-contracts/SELF_MODEL_SCHEMA.md
@@ -356,6 +365,7 @@ models/source/.gitkeep
 plans/PLAN-001-foundation.md
 plans/PLAN-002-runtime-shell.md
 plans/PLAN-045.md
+plans/PLAN-045-053-completion-and-product-alignment.md
 plans/PLAN-046.md
 plans/PLAN-047.md
 plans/PLAN-048.md
@@ -449,6 +459,7 @@ python/training/.gitkeep
 README.md
 reports/.gitkeep
 reports/EXECUTION_REPORT_SPEC-046.md
+reports/PLAN-045-053-completion-report.md
 reports/SPEC-001-execution-report.md
 reports/SPEC-002-execution-report.md
 reports/SPEC-003-execution-report.md
@@ -495,6 +506,7 @@ reports/SPEC-042-headless-preparation-report.md
 reports/SPEC-043-execution-report.md
 reports/SPEC-044-execution-report.md
 reports/SPEC-047_REPORT.md
+reports/SPEC-047-increment-2026-08-04.md
 reports/SPEC-048_REPORT.md
 reports/SPEC-049_REPORT.md
 reports/SPEC-050_REPORT.md

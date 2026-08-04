@@ -12,8 +12,11 @@ int main() {
         contracts::WorkspaceSnapshot ws_snap;
         ws_snap.workspace_id = "ws1";
         
-        auto assessment = adapter.evaluate(ws_snap);
-        assert(assessment.valid());
+        auto result = adapter.evaluate_result(ws_snap);
+        assert(result.valid());
+        assert(result.success);
+        assert(result.value);
+        assert(result.value->valid());
         
         std::cout << "MetacognitionCuriosityAdapter tests passed!" << std::endl;
         return 0;

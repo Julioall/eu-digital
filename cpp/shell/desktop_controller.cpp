@@ -188,6 +188,8 @@ void DesktopController::start() {
             
             // Instantiate cognitive components and register ports (SPEC-053 Fase 2)
             episodic_memory_ = std::make_shared<EpisodicMemoryStore>();
+            pattern_learner_ = std::make_shared<PatternLearner>(
+                PatternConfig{}, "desktop-patterns");
             
             WorldModelConfig wm_config;
             world_model_ = std::make_shared<WorldModel>(wm_config, "desktop");
@@ -205,6 +207,19 @@ void DesktopController::start() {
                 CognitivePortFactory::create_episode_boundary_port());
             host->capability_registry().register_instance("memory_write",
                 CognitivePortFactory::create_memory_write_port(episodic_memory_));
+
+            CapabilityDescriptor pattern_descriptor;
+            pattern_descriptor.capability_id = "cognition.pattern_learning";
+            pattern_descriptor.implementation_id = "native.pattern_learning.desktop";
+            pattern_descriptor.implementation_version = "1.0.0";
+            pattern_descriptor.kind = "cognitive_service";
+            pattern_descriptor.provides.push_back(
+                {"learn.patterns", "urn:eu-digital:pattern:1"});
+            pattern_descriptor.supports_hot_plug = true;
+            host->capability_registry().register_instance(
+                std::move(pattern_descriptor),
+                CognitivePortFactory::create_pattern_learning_port(pattern_learner_), 10);
+
             host->capability_registry().register_instance("prediction",
                 CognitivePortFactory::create_prediction_port(world_model_));
             host->capability_registry().register_instance("workspace",

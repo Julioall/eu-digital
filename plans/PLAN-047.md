@@ -6,6 +6,8 @@
 
 ## Contratos Congelados
 - `CanonicalEvent` não será modificado.
+- `PortResult<T>` 1.0 será aditivo; as assinaturas legadas permanecem até a
+  migração coordenada pela SPEC-045.
 
 ## Arquivos por Etapa
 
@@ -19,6 +21,7 @@
   - `cpp/core/ports/iworkspace_selection_port.hpp`
   - `cpp/core/ports/imetacognition_port.hpp`
   - `cpp/core/ports/iself_model_query_port.hpp`
+  - `cpp/core/ports/ipattern_learning_port.hpp`
 - **Testes (TDD):** `cpp/tests/ports_mock_test.cpp` (verificar GMock instantiation).
 
 ### Etapa 2: DTOs Imutáveis
@@ -27,6 +30,9 @@
   - `cpp/core/contracts/episode_update.hpp`
   - `cpp/core/contracts/memory_write_result.hpp`
   - `cpp/core/contracts/prediction_assessment.hpp`
+  - `cpp/core/contracts/pattern_learning.hpp`
+  - `cpp/core/contracts/port_result.hpp`
+  - `contracts/schemas/port_result.schema.json`
   - (etc)
 
 ### Etapa 3: Adaptadores
@@ -34,7 +40,10 @@
 - **Arquivos:**
   - `cpp/core/adapters/world_model_adapter.hpp` (implementa `IPredictionPort`, wrap `WorldModel`)
   - `cpp/core/adapters/episodic_memory_adapter.hpp`
+  - `cpp/core/adapters/pattern_learner_adapter.hpp`
   - `cpp/tests/world_model_adapter_test.cpp`
+  - `cpp/tests/pattern_learner_adapter_test.cpp`
+  - `cpp/tests/port_result_test.cpp`
 
 ### Etapa 4: Integração no Registry
 - **Ação:** Registrar os adaptadores no startup.
@@ -44,6 +53,8 @@
 ```bash
 cmake --build build/windows-msvc --target all
 ctest --test-dir build/windows-msvc --output-on-failure
+cmake --build build/perf --target port_dispatch_benchmark
+./build/perf/port_dispatch_benchmark
 ```
 
 ## Migrações
@@ -58,3 +69,7 @@ ctest --test-dir build/windows-msvc --output-on-failure
 
 ## Critérios para Parar
 - Se a compilação falhar devido a dependências circulares entre as DTOs, abortar e revisar a inclusão dos headers.
+- Se o overhead mediano de despacho virtual exceder 1%, manter a SPEC
+  `in_progress` e não mascarar o resultado ajustando o benchmark.
+- Se uma porta não possuir dados suficientes para delegar fielmente ao módulo
+  promovido, registrar a lacuna contratual e não fabricar valores no adapter.

@@ -330,19 +330,31 @@ public:
 
     template <typename T>
     void register_instance(const std::string& operation, std::shared_ptr<T> instance) {
-        // Quick setup for registering test/mock instances directly
-        CapabilityDescriptor desc;
-        desc.capability_id = operation;
-        desc.implementation_id = operation + "_impl";
-        desc.implementation_version = "1.0.0";
-        desc.kind = "mock";
-        desc.provides.push_back({operation, "{}"});
-        
-        discover(desc, 100);
-        
-        auto& record = records_[desc.implementation_id];
-        record.instance = instance;
-        record.state.state = CapabilityState::available;
+        CapabilityDescriptor descriptor;
+        descriptor.capability_id = operation;
+        descriptor.implementation_id = operation + "_impl";
+        descriptor.implementation_version = "1.0.0";
+        descriptor.kind = "mock";
+        descriptor.provides.push_back({operation, "{}"});
+        register_instance(std::move(descriptor), std::move(instance), 100);
+    }
+
+    template <typename T>
+    void register_instance(CapabilityDescriptor descriptor, std::shared_ptr<T> instance,
+                           int priority = 0) {
+        if (!instance) {
+            throw CapabilityLifecycleError("cannot register a null capability instance");
+        }
+        if (descriptor.provides.empty()) {
+            throw CapabilityLifecycleError("capability instance must provide an operation");
+        }
+
+        const auto implementation_id = descriptor.implementation_id;
+        discover(std::move(descriptor), priority);
+        records_.at(implementation_id).instance = std::move(instance);
+        transition(implementation_id, CapabilityState::discovered);
+        transition(implementation_id, CapabilityState::calibrating);
+        transition(implementation_id, CapabilityState::available);
     }
 
     template <typename T>

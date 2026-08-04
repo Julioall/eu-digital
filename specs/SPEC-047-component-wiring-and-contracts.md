@@ -1,21 +1,22 @@
 ---
 id: SPEC-047
 title: Component Wiring, Ports and Contracts
-status: draft
+status: in_progress
 phase: design
 dependencies: [SPEC-023, SPEC-033, SPEC-034, SPEC-035, SPEC-036, SPEC-037, SPEC-038, SPEC-039]
-adrs: []
-contracts: []
+adrs: [ADR-0009, ADR-0010, ADR-0011, ADR-0031]
+contracts: [PATTERN_SCHEMA.md, PATTERN_PROMOTION_CONTRACT.md, PORT_RESULT.md]
 ---
 
 # SPEC-047 — Component Wiring, Ports and Contracts
 
-Status: draft  
+Status: in_progress
 Owner: humano  
 Fase: design  
 Dependências: SPEC-023 (Pluggable Capability Runtime), SPECs 033-039 (Native Promotions)  
-ADRs aplicáveis: Nenhuma  
-Contratos afetados: Novos contratos C++ internos.
+ADRs aplicáveis: ADR-0009, ADR-0010, ADR-0011 e ADR-0031
+Contratos afetados: `PortResult<T>` 1.0 e contratos C++ internos; o resultado
+de aprendizagem preserva `ObservedPattern` sem alterar seu schema público.
 
 ## Problema
 Atualmente, as implementações C++ dos módulos cognitivos promovidos são fortemente acopladas a tipos concretos e não oferecem pontos de injeção polimórficos seguros para um orquestrador. Modificar as classes concretas diretamente quebra a estabilidade e viola a SPEC-023. O orquestrador central não deve conhecer `EpisodicMemory` ou `WorldModel` como instâncias concretas, mas sim operar sobre portas de serviço.
@@ -31,6 +32,10 @@ O sistema será capaz de registrar, via `CapabilityRegistry`, instâncias dos ad
 - Criar Adaptadores C++ que herdam das portas virtuais e delegam a chamada aos módulos concretos promovidos.
 - Substituir a ideia do "objeto Deus" (`CognitiveContext`) por retornos estritos e imutáveis em cadeia (ex: `PredictionAssessment`, `WorkspaceCandidateSet`).
 - Integrar as portas ao mecanismo de resolução de capacidades (SPEC-023).
+- Expor a aprendizagem incremental promovida na SPEC-035 por uma porta própria,
+  sem importar `PatternLearner` no consumidor.
+- Expor falhas de delegação por `PortResult<T>` 1.0 sem remover as assinaturas
+  legadas antes da migração da SPEC-045.
 
 ## Requisitos não funcionais
 - **Estabilidade:** Os componentes promovidos originais (ex: `cpp/core/episodic_memory.hpp`) não devem ser modificados de forma a quebrar seus testes unitários atuais.
@@ -41,7 +46,8 @@ O sistema será capaz de registrar, via `CapabilityRegistry`, instâncias dos ad
 - Registro explícito de capacidades na subida do Runtime.
 
 ## Saídas
-- Contratos tipados imutáveis: `EpisodeUpdate`, `MemoryWriteResult`, `MemoryRetrievalResult`, `PredictionAssessment`, `WorkspaceSnapshot`, `MetacognitiveAssessment`, `SelfConstraintSnapshot`, `CognitiveDecision`.
+- Contratos tipados imutáveis: `EpisodeUpdate`, `MemoryWriteResult`, `MemoryRetrievalResult`, `PatternLearningResult`, `PredictionAssessment`, `WorkspaceSnapshot`, `MetacognitiveAssessment`, `SelfConstraintSnapshot`, `CognitiveDecision`.
+- Envelope operacional versionado `PortResult<T>` com `PortError` tipado.
 
 ## Fluxo
 1. Subida do `RuntimeHost`.
@@ -64,11 +70,19 @@ O sistema será capaz de registrar, via `CapabilityRegistry`, instâncias dos ad
 - Não invocar a persistência de disco na camada de portas.
 
 ## Critérios de aceite
-- [ ] A arquitetura C++ deve possuir pelo menos 8 portas de abstração distintas mapeadas.
-- [ ] Nenhuma classe promovida (ex: `episodic_memory.hpp`) foi alterada para herdar dessas portas novas.
-- [ ] A compilação CMake (`core`) é bem-sucedida sem dependências cíclicas.
-- [ ] Testes de ausência: Solicitar uma porta não registrada retorna estado de ausência controlada.
-- [ ] Testes de substituição: Possibilidade de instanciar um `MockPredictionPort` e trocá-lo pelo real dinamicamente via registro.
+- [x] A arquitetura C++ possui pelo menos 8 portas de abstração distintas mapeadas.
+- [x] Nenhuma classe promovida (ex: `episodic_memory.hpp`) foi alterada para herdar dessas portas novas.
+- [x] A compilação CMake (`core`) é bem-sucedida sem dependências cíclicas.
+- [x] Testes de ausência: solicitar uma porta não registrada retorna estado de ausência controlada.
+- [x] Testes de substituição: uma implementação fixture pode substituir a real por prioridade e ser removida sem interromper o registry.
+- [x] A aprendizagem incremental é acessível por `IPatternLearningPort`, com
+  ausência, remoção, reinstalação, substituição e erro de delegação testados.
+- [x] As portas cognitivas expõem operações seguras que convertem exceções em
+  `PortResult<T>` 1.0 sem remover as assinaturas existentes.
+- [x] O microbenchmark em build Release demonstra overhead de despacho virtual
+  menor ou igual a 1% em relação à chamada concreta equivalente.
+- [ ] Cada adapter delega ao componente promovido sem fabricar episódio,
+  hipótese, tensão, timestamp ou outro dado ausente na entrada contratual.
 
 ## Plano de testes
 
@@ -97,3 +111,20 @@ O sistema será capaz de registrar, via `CapabilityRegistry`, instâncias dos ad
 ## Evidências de conclusão
 - Relatório de cobertura de testes mostrando os novos arquivos de interfaces e adaptadores.
 - Código no `main` sem violação das regras estruturais do C++.
+
+## Estado da implementação em 2026-08-04
+
+Os incrementos de aprendizagem de padrões, lifecycle do registry e recuperação
+uniforme estão validados. A decisão humana de 2026-08-04 adotou `PortResult<T>`
+1.0 como envelope comum, preservando temporariamente as assinaturas legadas
+para a migração da SPEC-045. O preset Qt 6.7.2 compilou a composition root e os
+36 testes do build `windows-qt` passaram em modo offscreen. O benchmark revisado
+usa ciclos da thread, afinidade de CPU e blocos pareados ABBA/BAAB; sete de sete
+execuções passaram, com mediana global aproximada de -0,27%, sem degradação
+virtual mensurável.
+
+A SPEC permanece `in_progress` porque `EpisodicMemoryAdapter`,
+`GlobalWorkspaceAdapter`, `MetacognitionCuriosityAdapter` e
+`CognitiveDecisionAdapter` ainda fabricam dados que suas entradas não fornecem.
+A decisão sobre contratos versionados de episódio, hipótese e tempo está
+registrada como questão aberta 25 e deve preceder mudanças nessas interfaces.

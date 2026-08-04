@@ -14,17 +14,19 @@ void test_world_model_adapter() {
     
     WorldModelAdapter adapter(wm);
     
-    // Predição vazia deve falhar de forma gracefully retornando inválido
-    auto failed = adapter.predict({}, "now");
-    if (failed.valid()) {
-        throw std::runtime_error("Expected invalid prediction on empty context");
+    // Predição vazia deve produzir falha estruturada sem derrubar o processo.
+    auto failed = adapter.predict_result({}, "now");
+    if (!failed.valid() || failed.success || !failed.error ||
+        failed.error->code != "adapter_delegation_error") {
+        throw std::runtime_error("Expected structured failure on empty context");
     }
     
     wm->observe("state1", "ref1", 10.0);
     wm->observe("state2", "ref2", 20.0);
     
-    auto success = adapter.predict({"state1"}, "now");
-    if (!success.valid() || success.predicted_distribution.empty()) {
+    auto success = adapter.predict_result({"state1"}, "now");
+    if (!success.valid() || !success.success || !success.value ||
+        success.value->predicted_distribution.empty()) {
         throw std::runtime_error("Expected valid prediction");
     }
 }

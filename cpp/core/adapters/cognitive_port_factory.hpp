@@ -8,6 +8,7 @@
 #include "core/ports/iself_model_query_port.hpp"
 #include "core/ports/imetacognition_port.hpp"
 #include "core/ports/icognitive_decision_port.hpp"
+#include "core/ports/ipattern_learning_port.hpp"
 
 #include "core/adapters/world_model_adapter.hpp"
 #include "core/adapters/episodic_memory_adapter.hpp"
@@ -16,6 +17,7 @@
 #include "core/adapters/functional_self_model_adapter.hpp"
 #include "core/adapters/metacognition_curiosity_adapter.hpp"
 #include "core/adapters/cognitive_decision_adapter.hpp"
+#include "core/adapters/pattern_learner_adapter.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -62,6 +64,12 @@ public:
     static std::shared_ptr<ICognitiveDecisionPort> create_cognitive_decision_port(std::shared_ptr<SuggestionOrchestrator> so) {
         if (!so) throw std::invalid_argument("SuggestionOrchestrator is required");
         return std::make_shared<CognitiveDecisionAdapter>(std::move(so));
+    }
+
+    static std::shared_ptr<IPatternLearningPort> create_pattern_learning_port(
+        std::shared_ptr<PatternLearner> learner) {
+        if (!learner) throw std::invalid_argument("PatternLearner is required");
+        return std::make_shared<PatternLearnerAdapter>(std::move(learner));
     }
 };
 

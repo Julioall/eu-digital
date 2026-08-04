@@ -1,5 +1,11 @@
 # Execution Report: SPEC-047 - Component Wiring, Ports and Contracts
 
+> Nota de governança (2026-08-04): este relatório registra a implementação
+> original, mas sua conclusão não satisfaz isoladamente a Definition of Done.
+> A auditoria e o incremento posteriores estão em
+> `reports/SPEC-047-increment-2026-08-04.md`; a SPEC permanece `in_progress` enquanto
+> a questão contratual 24 estiver aberta.
+
 ## Resumo
 A SPEC-047 definiu a arquitetura de Portas e Contratos para o ecossistema cognitivo do `eu-digital`. O objetivo era desacoplar os 8 componentes principais da arquitetura C++ de suas implementações concretas e centralizar a orquestração via uma Factory (injeção de dependência). 
 

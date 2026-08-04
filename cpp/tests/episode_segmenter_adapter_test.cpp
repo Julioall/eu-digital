@@ -13,7 +13,11 @@ void test_episode_segmenter_adapter() {
     ev.event_id = "test-event-1";
     ev.monotonic_ns = 1000000000; // 1 segundo
     
-    auto update = adapter.evaluate(ev);
+    auto result = adapter.evaluate_result(ev);
+    if (!result.valid() || !result.success || !result.value) {
+        throw std::runtime_error("Expected successful structured result");
+    }
+    const auto& update = *result.value;
     
     // O primeiro evento cria uma boundary (start)
     if (!update.is_new_episode) {

@@ -13,8 +13,11 @@ int main() {
         ev.event_id = "ev1";
         ev.monotonic_ns = 12345;
         
-        auto snapshot = adapter.select(ev);
-        assert(!snapshot.workspace_id.empty());
+        auto result = adapter.select_result(ev);
+        assert(result.valid());
+        assert(result.success);
+        assert(result.value);
+        assert(!result.value->workspace_id.empty());
         
         std::cout << "GlobalWorkspaceAdapter tests passed!" << std::endl;
         return 0;
