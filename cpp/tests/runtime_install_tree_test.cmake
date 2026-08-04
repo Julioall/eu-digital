@@ -4,6 +4,7 @@ endif()
 
 execute_process(
     COMMAND "${CMAKE_COMMAND}" --install "${BUILD_DIR}" --prefix "${STAGING_DIR}"
+        --component runtime
     RESULT_VARIABLE install_result
 )
 if(NOT install_result EQUAL 0)

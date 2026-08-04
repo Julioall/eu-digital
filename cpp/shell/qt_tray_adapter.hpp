@@ -47,6 +47,10 @@ public:
     ~QtTrayAdapter() { delete tray_widget_; }
 
     void show() { tray_icon_->show(); }
+    void activateAt(const QPoint& position) {
+        state_machine_->requestSurface(SurfaceMode::compact);
+        tray_widget_->toggleVisibility(position);
+    }
     TrayWidget*       getTrayWidget()   const { return tray_widget_; }
     TrayStateMachine* getStateMachine() const { return state_machine_; }
 
@@ -71,8 +75,7 @@ signals:
 private slots:
     void onTrayIconActivated(QSystemTrayIcon::ActivationReason reason) {
         if (reason == QSystemTrayIcon::Trigger || reason == QSystemTrayIcon::DoubleClick) {
-            state_machine_->requestSurface(SurfaceMode::compact);
-            tray_widget_->toggleVisibility(QCursor::pos());
+            activateAt(QCursor::pos());
         }
     }
 

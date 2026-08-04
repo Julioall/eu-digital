@@ -7,7 +7,9 @@
 AGENTS.md
 CMakeLists.txt
 CMakePresets.json
+config/ollama_backend.json
 config/project.yaml
+config/runtime_manifest.desktop.json.in
 contracts/compatibility/.gitkeep
 contracts/fixtures/.gitkeep
 contracts/fixtures/canonical_event.json
@@ -69,6 +71,8 @@ contracts/schemas/consolidation_record.schema.json
 contracts/schemas/curiosity_question.schema.json
 contracts/schemas/curiosity_response.schema.json
 contracts/schemas/data_management_request.schema.json
+contracts/schemas/desktop_performance_sample.schema.json
+contracts/schemas/desktop_session_state.schema.json
 contracts/schemas/dialogue_feedback.schema.json
 contracts/schemas/dialogue_notice.schema.json
 contracts/schemas/digital_body_state.schema.json
@@ -93,6 +97,8 @@ contracts/schemas/model_prompt_template.schema.json
 contracts/schemas/observability_profile.schema.json
 contracts/schemas/observation_envelope.schema.json
 contracts/schemas/observation_features.schema.json
+contracts/schemas/ollama_backend_config.schema.json
+contracts/schemas/ollama_model_binding.schema.json
 contracts/schemas/pattern.schema.json
 contracts/schemas/plugin_manifest.schema.json
 contracts/schemas/port_invocation_context.schema.json
@@ -122,6 +128,7 @@ cpp/app/.gitkeep
 cpp/app/desktop_interface_spike.cpp
 cpp/app/eu_digital_desktop.cpp
 cpp/app/main.cpp
+cpp/app/ollama_live_probe.cpp
 cpp/app/procedural_avatar_probe.cpp
 cpp/app/promotion_fixture_runner.cpp
 cpp/benchmarks/.gitkeep
@@ -137,6 +144,7 @@ cpp/core/adapters/functional_self_model_adapter.hpp
 cpp/core/adapters/global_workspace_adapter.hpp
 cpp/core/adapters/local_language_renderer.hpp
 cpp/core/adapters/metacognition_curiosity_adapter.hpp
+cpp/core/adapters/ollama_json.hpp
 cpp/core/adapters/ollama_model_backend.cpp
 cpp/core/adapters/ollama_model_backend.hpp
 cpp/core/adapters/pattern_learner_adapter.hpp
@@ -215,9 +223,10 @@ cpp/README.md
 cpp/runtime/.gitkeep
 cpp/shell/desktop_controller.cpp
 cpp/shell/desktop_controller.hpp
+cpp/shell/desktop_runtime_lifecycle.cpp
+cpp/shell/desktop_runtime_lifecycle.hpp
 cpp/shell/log_manager.cpp
 cpp/shell/log_manager.hpp
-cpp/shell/ollama_dialogue_service.hpp
 cpp/shell/qt_avatar_window.cpp
 cpp/shell/qt_avatar_window.hpp
 cpp/shell/qt_dialogue_presentation_adapter.hpp
@@ -249,7 +258,9 @@ cpp/tests/cognitive_recovery_crash_test.cpp
 cpp/tests/cognitive_snapshot_test.cpp
 cpp/tests/cognitive_snapshot_v2_test.cpp
 cpp/tests/cognitive_state_manager_test.cpp
+cpp/tests/desktop_install_tree_test.cmake
 cpp/tests/desktop_integration_test.cpp
+cpp/tests/desktop_runtime_lifecycle_test.cpp
 cpp/tests/episode_segmentation_test.cpp
 cpp/tests/episode_segmenter_adapter_test.cpp
 cpp/tests/episodic_memory_adapter_test.cpp
@@ -316,6 +327,7 @@ docs/03-contracts/COGNITIVE_OUTPUT_CONTRACTS.md
 docs/03-contracts/COGNITIVE_PORT_REQUESTS.md
 docs/03-contracts/COMPONENT_MATURITY_CONTRACT.md
 docs/03-contracts/CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md
+docs/03-contracts/DESKTOP_RUNTIME_CONTRACT.md
 docs/03-contracts/DIALOGUE_AVATAR_SCHEMA.md
 docs/03-contracts/DIGITAL_PROPRIOCEPTION_AGENCY_SCHEMA.md
 docs/03-contracts/EPISODE_PROMOTION_CONTRACT.md
@@ -334,6 +346,7 @@ docs/03-contracts/MODULE_LIFECYCLE.md
 docs/03-contracts/NATIVE_RUNTIME_CONTRACTS.md
 docs/03-contracts/OBSERVATION_ENVELOPE.md
 docs/03-contracts/OBSERVATION_POLICY_CONTRACT.md
+docs/03-contracts/OLLAMA_BACKEND_CONTRACT.md
 docs/03-contracts/PATTERN_PROMOTION_CONTRACT.md
 docs/03-contracts/PATTERN_SCHEMA.md
 docs/03-contracts/PORT_RESULT.md
@@ -381,6 +394,8 @@ docs/04-adrs/ADR-0032-desktop-interface-substitution.md
 docs/04-adrs/ADR-0033-integrated-cognitive-cycle-boundaries.md
 docs/04-adrs/ADR-0034-consistent-cognitive-checkpoint-and-replay.md
 docs/04-adrs/ADR-0035-structured-cognitive-output-pipeline.md
+docs/04-adrs/ADR-0036-ollama-loopback-backend.md
+docs/04-adrs/ADR-0037-desktop-host-lifecycle-consent-and-liveness.md
 docs/05-governance/CHANGE_CONTROL.md
 docs/05-governance/OPEN_QUESTIONS.md
 docs/05-governance/RISK_REGISTER.md
@@ -412,9 +427,11 @@ experiments/.gitkeep
 install_desktop_shortcut.ps1
 install_desktop_visual.ps1
 LICENSE
+manifest.json
 models/benchmarks/.gitkeep
 models/exported/.gitkeep
 models/manifests/.gitkeep
+models/manifests/qwen3-vl-2b-ollama.json
 models/source/.gitkeep
 plans/PLAN-001-foundation.md
 plans/PLAN-002-runtime-shell.md
@@ -481,6 +498,7 @@ python/tests/test_cognitive_output_contracts.py
 python/tests/test_cognitive_snapshot_v2.py
 python/tests/test_component_maturity.py
 python/tests/test_desktop_interface_spike.py
+python/tests/test_desktop_runtime_contracts.py
 python/tests/test_dialogue_avatar.py
 python/tests/test_digital_proprioception_agency.py
 python/tests/test_episode_promotion.py
@@ -501,6 +519,7 @@ python/tests/test_memory_consolidation.py
 python/tests/test_metacognition_curiosity.py
 python/tests/test_metacognition_curiosity_promotion.py
 python/tests/test_observation_policy.py
+python/tests/test_ollama_backend_contracts.py
 python/tests/test_pattern_learning.py
 python/tests/test_pattern_promotion.py
 python/tests/test_privacy_storage.py
@@ -571,6 +590,7 @@ reports/SPEC-047-increment-2026-08-04.md
 reports/SPEC-048_REPORT.md
 reports/SPEC-049_REPORT.md
 reports/SPEC-050_REPORT.md
+reports/SPEC-050-execution-report.md
 reports/SPEC-051_REPORT.md
 reports/SPEC-052-execution-report.md
 REPOSITORY_TREE.txt

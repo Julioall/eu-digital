@@ -107,6 +107,7 @@ private:
     /// SPEC-052 §Presença transitions
     static bool isPresenceTransitionAllowed(PresenceState from, PresenceState to) {
         using P = PresenceState;
+        if (from == to) return true;
         // Any state -> offline is always allowed
         if (to == P::offline) return true;
         switch (from) {
@@ -117,11 +118,11 @@ private:
             case P::asking:
                 return to == P::active || to == P::paused;
             case P::paused:
-                return to == P::active;
-            case P::offline:
                 return to == P::active || to == P::degraded;
+            case P::offline:
+                return to == P::active || to == P::paused || to == P::degraded;
             case P::degraded:
-                return to == P::active || to == P::offline;
+                return to == P::active || to == P::paused || to == P::offline;
         }
         return false;
     }
@@ -129,6 +130,7 @@ private:
     /// SPEC-052 §Superfície transitions
     static bool isSurfaceTransitionAllowed(SurfaceMode from, SurfaceMode to) {
         using S = SurfaceMode;
+        if (from == to) return true;
         // Any surface -> tray_only is always allowed (close/dismiss)
         if (to == S::tray_only) return true;
         switch (from) {

@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "runtime_id": "eu-digital-desktop",
+  "runtime_version": "@PROJECT_VERSION@",
+  "build": {
+    "platform": "@CMAKE_SYSTEM_NAME@",
+    "compiler": "@CMAKE_CXX_COMPILER_ID@-@CMAKE_CXX_COMPILER_VERSION@",
+    "profile": "@EU_DIGITAL_DESKTOP_BUILD_PROFILE@",
+    "commit": "@EU_DIGITAL_GIT_COMMIT@",
+    "python_runtime_dependency": false
+  },
+  "contract_versions": {
+    "canonical_event": "1.0",
+    "desktop_session_state": "1.0",
+    "runtime_health": "1.0",
+    "runtime_manifest": "1.0"
+  },
+  "promoted_components": [],
+  "optional_capabilities": [
+    "dialogue.local_renderer",
+    "interaction.input",
+    "system.activity"
+  ]
+}

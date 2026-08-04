@@ -2,15 +2,15 @@
 #include "shell/log_manager.hpp"
 
 #include <QApplication>
-#include <QSurfaceFormat>
-#include <QDir>
-#include <iostream>
+#include <QGuiApplication>
 
 using namespace eu_digital;
 
 int main(int argc, char* argv[]) {
     LogManager::instance().install();
 
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
+        Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     QApplication app(argc, argv);
     app.setApplicationName("EU-Digital Desktop");
     app.setOrganizationName("EU-Digital");

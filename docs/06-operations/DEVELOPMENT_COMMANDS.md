@@ -199,8 +199,9 @@ cmake --install build/dev --prefix build/release
 cpack --config build/dev/CPackConfig.cmake -B build/package
 ```
 
-O instalador CMake contém apenas `eu_digital_runtime`; o pacote ZIP da fase
-0.3 não contém Python, ambientes virtuais, notebooks, datasets nem pesos.
+O componente CMake `runtime` contém apenas `eu_digital_runtime`; o componente
+`desktop`, quando Qt está habilitado, é validado separadamente. Nenhum deles
+contém Python, ambientes virtuais, notebooks, datasets ou pesos.
 
 No Windows nativo, use o preset separado para não reutilizar o cache Linux/WSL:
 
@@ -545,9 +546,8 @@ $env:PATH = "C:\Users\Julio\vcpkg\installed\x64-windows\debug\bin;$env:PATH"
 .\build\windows-msvc-vcpkg\desktop_interface_spike.exe validation/reports/desktop_interface_spike_windows.json
 ```
 
-The probe is a hidden-window SDL2/ImGui integration check, not a product shell.
-Read the complete scenario matrix and the substitutive ADR before implementing
-the future Qt/QML adapter.
+The probe is a historical hidden-window SDL2/ImGui integration check, not a
+product shell. ADR-0032 replaced that route with the optional Qt host below.
 
 The permitted pre-shell increment of SPEC-042 is the dependency-free native
 procedural renderer. It is headless and does not complete the desktop-shell
@@ -561,8 +561,30 @@ python -m unittest python.tests.test_avatar_presentation_profile -v
 python -m unittest python.tests.test_avatar_frame_schema -v
 ```
 
-Do not enable a product host or add Qt until ADR-0032 has human review and the
-manual Windows matrix is captured.
+ADR-0032 foi aceita e o host desktop da SPEC-050 usa o preset Qt isolado:
+
+```powershell
+cmake --preset windows-qt
+cmake --build --preset windows-qt
+ctest --test-dir build/windows-qt -R "(desktop|qt_avatar)" --output-on-failure
+```
+
+`desktop_integration_test` usa diretório temporário, plataforma offscreen e
+ledger DPAPI próprio. Ele não lê nem altera consentimento do perfil real. As
+amostras de performance são gravadas em
+`build/windows-qt/desktop_performance_samples.jsonl`.
+
+Para validar o pacote autossuficiente, use um prefixo absoluto; o componente
+`desktop` instala o manifesto gerado, Qt/plugins e runtimes LLVM necessários:
+
+```powershell
+$desktopPrefix = (New-Item -ItemType Directory -Force `
+  build/desktop-install-test).FullName
+cmake --install build/windows-qt --prefix $desktopPrefix --component desktop
+```
+
+O gate automatizado não substitui a matriz física registrada em
+`QT_AVATAR_SHELL_MATRIX.md`.
 
 The headless probe can emit a local metadata report without opening a window:
 

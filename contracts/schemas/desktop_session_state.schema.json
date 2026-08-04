@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:desktop-session-state:1.0",
+  "title": "DesktopSessionState",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "session_id", "state", "observed_at",
+    "consent_ready", "active_sensor_ids", "paused",
+    "previous_shutdown_unclean", "model_available", "reason_code"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "session_id": {"type": "string", "minLength": 1},
+    "state": {"enum": ["onboarding", "starting", "running", "paused", "degraded", "stopping", "stopped"]},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "consent_ready": {"type": "boolean"},
+    "active_sensor_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "paused": {"type": "boolean"},
+    "previous_shutdown_unclean": {"type": "boolean"},
+    "model_available": {"type": "boolean"},
+    "reason_code": {"type": ["string", "null"]}
+  }
+}

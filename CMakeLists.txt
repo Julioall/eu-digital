@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.25)
 
 project(eu_digital_runtime VERSION 0.1.0 LANGUAGES CXX)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -118,8 +120,14 @@ target_compile_features(supervised_actions_feedback_test PRIVATE cxx_std_23)
 add_executable(privacy_storage_test cpp/tests/privacy_storage_test.cpp)
 target_include_directories(privacy_storage_test PRIVATE cpp)
 target_compile_features(privacy_storage_test PRIVATE cxx_std_23)
+add_executable(desktop_runtime_lifecycle_test
+    cpp/tests/desktop_runtime_lifecycle_test.cpp
+    cpp/shell/desktop_runtime_lifecycle.cpp)
+target_include_directories(desktop_runtime_lifecycle_test PRIVATE cpp)
+target_compile_features(desktop_runtime_lifecycle_test PRIVATE cxx_std_23)
 if(WIN32)
     target_link_libraries(privacy_storage_test PRIVATE Crypt32)
+    target_link_libraries(desktop_runtime_lifecycle_test PRIVATE Crypt32)
     target_link_libraries(eu_digital_runtime PRIVATE Crypt32)
 endif()
 
@@ -330,6 +338,8 @@ add_test(NAME procedural_avatar_probe COMMAND procedural_avatar_probe)
 add_test(NAME local_model_gateway COMMAND local_model_gateway_test)
 add_test(NAME suggestion_orchestrator COMMAND suggestion_orchestrator_test)
 add_test(NAME packaging COMMAND packaging_test)
+add_test(NAME privacy_storage COMMAND privacy_storage_test)
+add_test(NAME desktop_runtime_lifecycle COMMAND desktop_runtime_lifecycle_test)
 if(EU_DIGITAL_BUILD_DESKTOP_INTERFACE_SPIKE)
     add_test(NAME desktop_interface_spike COMMAND desktop_interface_spike)
 endif()
@@ -345,7 +355,35 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         add_compile_definitions(_SCL_SECURE_NO_WARNINGS)
     endif()
 
-    add_executable(qt_avatar_shell_test cpp/tests/qt_avatar_shell_test.cpp cpp/shell/qt_avatar_window.cpp)
+    execute_process(
+        COMMAND git rev-parse --short=12 HEAD
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        OUTPUT_VARIABLE EU_DIGITAL_GIT_COMMIT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET)
+    if(NOT EU_DIGITAL_GIT_COMMIT)
+        set(EU_DIGITAL_GIT_COMMIT "source-archive")
+    endif()
+    set(EU_DIGITAL_DESKTOP_BUILD_PROFILE "${CMAKE_BUILD_TYPE}")
+    if(NOT EU_DIGITAL_DESKTOP_BUILD_PROFILE)
+        set(EU_DIGITAL_DESKTOP_BUILD_PROFILE "Release")
+    endif()
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/config/runtime_manifest.desktop.json.in"
+        "${CMAKE_BINARY_DIR}/runtime_manifest.json"
+        @ONLY)
+
+    add_executable(qt_avatar_shell_test
+        cpp/tests/qt_avatar_shell_test.cpp
+        cpp/shell/qt_avatar_window.cpp
+        cpp/shell/qt_avatar_window.hpp
+        cpp/shell/qt_tray_adapter.hpp
+        cpp/shell/tray_widget.cpp
+        cpp/shell/tray_widget.hpp
+        cpp/shell/tray_state_machine.cpp
+        cpp/shell/tray_state_machine.hpp
+        cpp/shell/toast_notification.cpp
+        cpp/shell/toast_notification.hpp)
     target_include_directories(qt_avatar_shell_test PRIVATE cpp)
     target_compile_features(qt_avatar_shell_test PRIVATE cxx_std_23)
     target_link_libraries(qt_avatar_shell_test PRIVATE Qt6::Core Qt6::Gui Qt6::Quick Qt6::Widgets)
@@ -365,12 +403,20 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         set_tests_properties(qt_dialogue_presentation_adapter PROPERTIES
             ENVIRONMENT_MODIFICATION
                 "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR}")
+        get_filename_component(EU_DIGITAL_CXX_RUNTIME_DIR
+            "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        set_tests_properties(qt_avatar_shell PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+            ENVIRONMENT_MODIFICATION
+                "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR};PATH=path_list_prepend:${EU_DIGITAL_CXX_RUNTIME_DIR}")
     endif()
 
     add_executable(eu_digital_desktop WIN32
         cpp/app/eu_digital_desktop.cpp
         cpp/shell/desktop_controller.cpp
         cpp/shell/desktop_controller.hpp
+        cpp/shell/desktop_runtime_lifecycle.cpp
+        cpp/shell/desktop_runtime_lifecycle.hpp
         cpp/shell/qt_tray_adapter.hpp
         cpp/shell/tray_widget.cpp
         cpp/shell/tray_widget.hpp
@@ -394,11 +440,40 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
     if(WIN32)
         target_link_libraries(eu_digital_desktop PRIVATE Crypt32 Winhttp)
     endif()
+    add_custom_command(TARGET eu_digital_desktop POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${CMAKE_BINARY_DIR}/runtime_manifest.json"
+            "$<TARGET_FILE_DIR:eu_digital_desktop>/runtime_manifest.json")
+    install(TARGETS eu_digital_desktop
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT desktop)
+    install(FILES "${CMAKE_BINARY_DIR}/runtime_manifest.json"
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT desktop)
+    qt_generate_deploy_app_script(
+        TARGET eu_digital_desktop
+        OUTPUT_SCRIPT EU_DIGITAL_DESKTOP_DEPLOY_SCRIPT)
+    install(SCRIPT ${EU_DIGITAL_DESKTOP_DEPLOY_SCRIPT} COMPONENT desktop)
+    if(WIN32)
+        get_filename_component(EU_DIGITAL_CXX_RUNTIME_DIR
+            "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        foreach(EU_DIGITAL_RUNTIME_DLL
+                libc++.dll libunwind.dll libwinpthread-1.dll)
+            if(EXISTS "${EU_DIGITAL_CXX_RUNTIME_DIR}/${EU_DIGITAL_RUNTIME_DLL}")
+                install(FILES
+                    "${EU_DIGITAL_CXX_RUNTIME_DIR}/${EU_DIGITAL_RUNTIME_DLL}"
+                    DESTINATION ${CMAKE_INSTALL_BINDIR}
+                    COMPONENT desktop)
+            endif()
+        endforeach()
+    endif()
 
     add_executable(desktop_integration_test
         cpp/tests/desktop_integration_test.cpp
         cpp/shell/desktop_controller.cpp
         cpp/shell/desktop_controller.hpp
+        cpp/shell/desktop_runtime_lifecycle.cpp
+        cpp/shell/desktop_runtime_lifecycle.hpp
         cpp/shell/qt_tray_adapter.hpp
         cpp/shell/tray_widget.cpp
         cpp/shell/tray_widget.hpp
@@ -423,6 +498,20 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         target_link_libraries(desktop_integration_test PRIVATE Crypt32 Winhttp)
     endif()
     add_test(NAME desktop_integration COMMAND desktop_integration_test)
+    add_test(
+        NAME desktop_install_tree
+        COMMAND "${CMAKE_COMMAND}"
+            "-DBUILD_DIR=${CMAKE_BINARY_DIR}"
+            "-DSTAGING_DIR=${CMAKE_BINARY_DIR}/desktop-install-test-component"
+            -P "${CMAKE_SOURCE_DIR}/cpp/tests/desktop_install_tree_test.cmake")
+    if(WIN32)
+        get_filename_component(EU_DIGITAL_CXX_RUNTIME_DIR
+            "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        set_tests_properties(desktop_integration PROPERTIES
+            ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+            ENVIRONMENT_MODIFICATION
+                "PATH=path_list_prepend:${EU_DIGITAL_QT_RUNTIME_DIR};PATH=path_list_prepend:${EU_DIGITAL_CXX_RUNTIME_DIR}")
+    endif()
 endif()
 add_test(NAME supervised_actions_feedback COMMAND supervised_actions_feedback_test)
 add_test(NAME ports_mock COMMAND ports_mock_test)
@@ -458,12 +547,13 @@ add_test(
     NAME runtime_install_tree
     COMMAND "${CMAKE_COMMAND}"
         "-DBUILD_DIR=${CMAKE_BINARY_DIR}"
-        "-DSTAGING_DIR=${CMAKE_BINARY_DIR}/runtime-install-test"
+        "-DSTAGING_DIR=${CMAKE_BINARY_DIR}/runtime-install-test-runtime"
         -P "${CMAKE_SOURCE_DIR}/cpp/tests/runtime_install_tree_test.cmake"
 )
 
-include(GNUInstallDirs)
-install(TARGETS eu_digital_runtime RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(TARGETS eu_digital_runtime
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT runtime)
 
 set(CPACK_PACKAGE_NAME "eu-digital-runtime")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})

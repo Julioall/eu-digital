@@ -63,6 +63,28 @@ def _validate(
             _validate(value, target, target, path, target_path)
             return
 
+    for branch in schema.get("allOf", []):
+        if not isinstance(branch, Mapping):
+            raise SchemaValidationError(f"{name}: allOf entries must be objects")
+        condition = branch.get("if")
+        if condition is None:
+            _validate(value, branch, root, path, schema_path)
+            continue
+        if not isinstance(condition, Mapping):
+            raise SchemaValidationError(f"{name}: if must be an object")
+        condition_matches = True
+        try:
+            _validate(value, condition, root, path, schema_path)
+        except SchemaValidationError:
+            condition_matches = False
+        selected = branch.get("then" if condition_matches else "else")
+        if selected is not None:
+            if not isinstance(selected, Mapping):
+                raise SchemaValidationError(
+                    f"{name}: conditional branch must be an object"
+                )
+            _validate(value, selected, root, path, schema_path)
+
     if "const" in schema and value != schema["const"]:
         raise SchemaValidationError(
             f"{name}{path}: expected constant {schema['const']!r}"
@@ -136,9 +158,7 @@ def _validate(
                 )
         for key, child_schema in properties.items():
             if key in value:
-                _validate(
-                    value[key], child_schema, root, f"{path}.{key}", schema_path
-                )
+                _validate(value[key], child_schema, root, f"{path}.{key}", schema_path)
         additional = schema.get("additionalProperties")
         if isinstance(additional, Mapping):
             for key in set(value) - set(properties):
@@ -158,9 +178,7 @@ def _validate(
         item_schema = schema.get("items")
         if item_schema:
             for index, item in enumerate(value):
-                _validate(
-                    item, item_schema, root, f"{path}[{index}]", schema_path
-                )
+                _validate(item, item_schema, root, f"{path}[{index}]", schema_path)
 
 
 def _is_type(value: Any, kind: str) -> bool:

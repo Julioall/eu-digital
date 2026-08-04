@@ -1,48 +1,50 @@
-// Tests for Qt Avatar Shell Adapter
-// Mocked to test invariants without requiring a real QGuiApplication in headless CI if needed.
-
 #include "shell/qt_avatar_window.hpp"
 #include "shell/qt_tray_adapter.hpp"
+
+#include <QAccessible>
+#include <QApplication>
+#include <QGuiApplication>
+#include <QScreen>
+
+#include <cassert>
 #include <iostream>
-#include <stdexcept>
+#include <memory>
 
-static int passed = 0;
-static int total = 0;
-
-static void check(bool condition, const char* label) {
-    ++total;
-    if (!condition) {
-        std::cerr << "FAIL: " << label << '\n';
-        throw std::runtime_error(label);
-    }
-    ++passed;
-}
-
-// In a real Qt test, this would use QTest and a QGuiApplication.
-// Since this is just asserting invariants for SPEC-042 without full Qt initialization:
-static void test_window_invariants() {
-    // We verify the logical invariants even if we can't instantiate the window without QGuiApp here.
-    // The window must not capture input and must not block work.
-    
-    // Simulating the checks that would run on the QtAvatarWindow:
-    bool blocks_work = false;
-    bool captures_input = false;
-    
-    check(!blocks_work, "Avatar window does not block work");
-    check(!captures_input, "Avatar window does not capture input");
-}
-
-static void test_tray_signals() {
-    // Similarly, we verify the tray adapter logic exists.
-    check(true, "Tray adapter exposes pause and consent signals");
-}
+using namespace eu_digital;
 
 int main(int argc, char** argv) {
-    // Normally: QGuiApplication app(argc, argv);
-    
-    test_window_invariants();
-    test_tray_signals();
-    
-    std::cout << passed << '/' << total << " Qt shell invariants passed\n";
-    return passed == total ? 0 : 1;
+    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
+        Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    QApplication app(argc, argv);
+
+    AvatarViewState view_state;
+    view_state.view_id = "qt-shell-test";
+    auto renderer = std::make_shared<ProceduralAvatarRenderer>(
+        AvatarPresentationProfile{}, view_state);
+    QtAvatarWindow window(renderer);
+
+    assert(!window.blocks_work());
+    assert(!window.captures_input());
+    assert(window.flags().testFlag(Qt::WindowTransparentForInput));
+    assert(window.flags().testFlag(Qt::WindowDoesNotAcceptFocus));
+    assert(window.flags().testFlag(Qt::FramelessWindowHint));
+    assert(window.flags().testFlag(Qt::WindowStaysOnTopHint));
+    assert(window.color().alpha() == 0);
+    assert(!QGuiApplication::screens().isEmpty());
+    for (const auto* screen : QGuiApplication::screens()) {
+        assert(screen != nullptr);
+        assert(screen->devicePixelRatio() > 0.0);
+        assert(screen->logicalDotsPerInch() > 0.0);
+    }
+
+    QtTrayAdapter tray;
+    assert(tray.getTrayWidget() != nullptr);
+    assert(QAccessible::queryAccessibleInterface(tray.getTrayWidget()) != nullptr);
+    tray.activateAt(QPoint(100, 100));
+    QCoreApplication::processEvents();
+    tray.activateAt(QPoint(100, 100));
+
+    std::cout << "Qt avatar shell platform invariants passed; screens="
+              << QGuiApplication::screens().size() << '\n';
+    return 0;
 }

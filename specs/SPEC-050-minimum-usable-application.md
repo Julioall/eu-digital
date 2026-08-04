@@ -1,105 +1,109 @@
 ---
 id: SPEC-050
 title: Desktop Application and Vertical Slice
-status: draft
-phase: design
-dependencies: [SPEC-045, SPEC-042, SPEC-028]
-adrs: []
-contracts: []
+status: in_progress
+phase: product_beta
+dependencies: [SPEC-028, SPEC-030, SPEC-031, SPEC-042, SPEC-045, SPEC-046, SPEC-048]
+adrs: [ADR-0016, ADR-0026, ADR-0027, ADR-0032, ADR-0034, ADR-0035, ADR-0037]
+contracts: [DESKTOP_RUNTIME_CONTRACT.md, PRIVACY_STORAGE_CONTRACTS.md, DIALOGUE_AVATAR_SCHEMA.md, consent_policy.schema.json, desktop_session_state.schema.json, desktop_performance_sample.schema.json, runtime_health.schema.json]
 ---
 
 # SPEC-050 — Desktop Application and Vertical Slice
 
-Status: draft  
-Owner: humano  
-Fase: design  
-Dependências: SPEC-045 (Integrated Cycle), SPEC-042 (Avatar Shell), SPEC-028 (Native Shell)  
-ADRs aplicáveis: Nenhuma  
-Contratos afetados: Nenhum.
-
-## Problema
-Toda a infraestrutura do ciclo cognitivo (SPECs 045 a 049) ainda forma apenas uma biblioteca ou executável *headless*. O Shell em Qt (SPEC-042) existe em isolamento. O projeto visa construir um produto aplicacional (Vertical Slice) coeso que rode no desktop do usuário e coordene GUI, sensores de O.S., ciclo cognitivo e gerência do modelo de maneira thread-safe, com critérios de UX estritos.
-
 ## Objetivo
-Empacotar o Runtime cognitivo multithread com o Shell Qt existente no binário final `eu_digital_desktop.exe`. Definir de forma explícita os diferentes modos da UI e cobrir fluxos primordiais de produto: onboarding, consentimento explícito pré-observação, pause/resume global, visualização de diagnósticos/quota e degradação suave na ausência de modelo.
+
+Empacotar o runtime cognitivo C++ e o shell Qt em `eu_digital_desktop.exe`,
+oferecendo um produto local mínimo que inicia deny-by-default, mantém GUI e
+trabalho cognitivo separados, permite pausa/revogação e continua operacional
+sem sensores ou modelo opcionais.
 
 ## Resultado observável
-O usuário final inicia a aplicação via menu Iniciar (Windows). Uma tela de Onboarding solicita consentimento de observação local. Ao aprovar, o app vai para a bandeja do sistema (Tray). O *frame time* do Avatar é mantido estável (p95 < 16ms), e o tempo de resposta do ícone da bandeja é menor que 50ms, independentemente da carga do modelo local operando em background.
+
+O usuário inicia a aplicação, revisa consentimento por sensor/finalidade antes
+de qualquer captura e encontra o processo na bandeja. O host publica estado
+operacional versionado, responde dentro dos limites de UI, recupera uma sessão
+anterior interrompida e encerra sem deixar captura ou marker ativo.
 
 ## Requisitos funcionais
-- Ponto de Entrada unificado (`eu_digital_desktop.cpp`).
-- Separação Thread GUI (Qt Event Loop) vs. Thread Cognitiva (Coordenador).
-- Implementar Modos de Interface explícitos para resolver o conflito da SPEC-042:
-  - **Passivo**: Avatar click-through e transparente.
-  - **Interativo**: Janela de diálogo/confirmação bloqueante sobre o evento que chamou a interação.
-  - **Painel**: Menu na bandeja contendo Onboarding, Pause, Status, Diagnóstico.
-- Fluxo de Onboarding obrigatório bloqueando o início dos sensores.
-- Recuperação em Crash: Se fechar inesperadamente, o app sobe em modo Degradado e avisa na bandeja.
+
+- Usar um único entrypoint Qt e uma thread cognitiva com shutdown cooperativo.
+- Persistir consentimento somente por `ConsentLedger` + DPAPI; `QSettings` pode
+  guardar apenas preferências visuais não sensíveis.
+- Construir/iniciar cada sensor somente após `capture_allowed(sensor, purpose)`.
+- Pausa global e revogação devem interromper novas capturas e preservar grants
+  independentes dos demais sensores.
+- Publicar `DesktopSessionState` 1.0 em cada transição relevante.
+- Usar manifesto do pacote e diretório de dados do usuário; nenhum placeholder
+  pode ser criado pelo executável.
+- Detectar marker de shutdown incompleto, entrar em `degraded`, executar o
+  recovery da ADR-0034 e informar localmente sem conteúdo sensorial.
+- Continuar em modo degradado quando renderer/modelo estiver ausente.
+- Apresentação de diálogo deve permanecer pela porta assíncrona da ADR-0035.
 
 ## Requisitos não funcionais
-- **Performance Gráfica**: Frame time p95 < 16.6ms e p99 < 33ms na renderização da interface, atestando desacoplamento real de CPU.
-- **Responsividade**: O menu da bandeja deve aparecer em < 50ms após o clique, garantindo ausência de Hang.
-- **Consumo Idle**: O processo estático sem processar eventos e sem modelo carregado ativamente não deve exceder baseline de recursos do SO (CPU < 1%).
-- **Inicialização e Encerramento Limpos**: O processo deve morrer graciosamente ao fechar a sessão do Windows (graceful shutdown intercept).
 
-## Entradas
-- Eventos de Input do Usuário na GUI e Cliques do Tray.
-- Inicialização do Processo de Usuário (Desktop).
-
-## Saídas
-- Interface QML e Logs unificados.
-
-## Fluxo
-1. Processo inicia. Main thread assume o `QApplication`.
-2. Lê flag de Onboarding/Consentimento. Se `false`, invoca Dialog Modal. Sensoriamento pausado.
-3. Se `true`, invoca a Thread Cognitiva passando a instância do Registry.
-4. UI entra em modo *Passivo* e se aloja no Tray.
-5. Em caso de *PresentationPort* requisitar fala: UI entra temporariamente em modo *Interativo*.
+- Tray activation p99 menor que 50 ms.
+- Frame time p95 menor que 16,6 ms e p99 menor que 33 ms.
+- Idle CPU menor que 1% sem eventos e sem modelo carregado.
+- Shutdown com limite explícito e sem deadlock em stress com watchdog.
+- TSan é gate adicional quando suportado, não substituto dos testes de liveness.
 
 ## Estados e transições
-- `onboarding`: Janela forçada de consentimento, sensores offline.
-- `running`: Background, modo passivo, sensores online.
-- `paused`: Background, sensores offline por ordem do usuário.
-- `interactive`: Focus lock na janela de diálogo ativa.
-- `degraded`: Rodando mas relatando falhas graves no painel de diagnóstico (ex: sem LLM).
 
-## Erros esperados
-- `ThreadHangError`: (Deve ser detectável nos testes de integração, falhando a build se ocorrer deadlock entre GUI e Core).
+- `onboarding`: shell disponível, sensores inexistentes e consentimento pendente.
+- `starting`: configuração, ledger e runtime sendo validados.
+- `running`: runtime ativo e somente sensores consentidos em operação.
+- `paused`: runtime ativo, nenhuma captura nova.
+- `degraded`: capability opcional ausente ou recovery/ledger requer atenção.
+- `stopping`: captura interrompida e componentes drenando.
+- `stopped`: thread encerrada e marker removido após commit limpo.
 
 ## Escopo negativo
-- Não recriar componentes QML.
-- Não exportar telemetria online do produto (Constituição proíbe nuvem).
-- Não embutir o modelo de vários gigabytes no executável (será baixado ou carregado via gateway local separado ou gerência de modelos do usuário).
+
+- Não implementar a experiência de atividade/cards da SPEC-053.
+- Não reativar a SPEC-052 nem conectar UI diretamente ao Ollama.
+- Não baixar, embutir ou selecionar outro modelo.
+- Não adicionar atuador ou ação real.
+- Não usar telemetria externa nem armazenar conteúdo sensorial em logs/markers.
+- Não alegar aprendizado a partir de métricas de UI, CPU ou estabilidade.
 
 ## Critérios de aceite
-- [ ] Tempo de resposta ao clique no Tray é inferior a 50ms (p99).
-- [ ] O aplicativo inicializa sem modelo presente de maneira graciosa (Entra em `degraded` e avisa na bandeja).
-- [ ] Ao clicar em "Pausar Observação" na bandeja, os sensores desativam o pipeline e o consumo de CPU estaciona.
-- [ ] Nenhum *deadlock* multithread detectado via ThreadSanitizer no ciclo completo (Onboarding -> Run -> Exit).
-- [ ] End-to-end Test provando que a primeira execução sem consentimento bloqueia a observação e a captura global.
+
+- [x] Primeira execução sem consentimento publica `onboarding` e produz zero
+  captura/evento de sensor.
+- [x] Grants são independentes por sensor/finalidade; pausa e revogação bloqueiam
+  novas capturas antes do event bus e persistem via DPAPI.
+- [x] Ausência de modelo inicia graciosamente em `degraded` e mantém timeline,
+  privacidade, diagnóstico e cognição disponíveis.
+- [x] Manifesto/timestamps/placeholders não são fabricados pelo desktop.
+- [x] Marker órfão aciona recovery e aviso; shutdown limpo remove o marker.
+- [x] Stress concorrente de start/pause/resume/stop termina sob watchdog sem
+  deadlock, diagnóstico tardio ou thread restante.
+- [x] Tray p99 < 50 ms, frame p95 < 16,6 ms, frame p99 < 33 ms e idle CPU < 1%
+  em amostras `DesktopPerformanceSample` válidas.
+- [ ] IME pt-BR, DPI 100–250%, multi-monitor, keyboard navigation, UI Automation,
+  tray, click-through, transparência e suspend/resume possuem evidência Windows.
+- [ ] Build Qt, testes headless, integração desktop, lint, tipos e suites globais
+  passam; relatório de execução é atualizado.
 
 ## Plano de testes
 
-### Unitários
-- Mockar a UI e a Thread Cognitiva, testar a semântica da máquina de estados (Passivo <-> Interativo).
-
-### Integração
-- Teste End-to-End: Subir aplicação `headless` conectada a `xvfb` ou similar, mandar evento e checar log de Frame Time p95/p99 via QTestLib.
-
-### Contrato
-- Sinais Qt (Signal/Slot) garantem transferência thread-safe imutável (DTO).
-
-### Desempenho
-- Frame times registrados e rejeição automática se ultrapassar baseline no CI.
-
-### Recuperação
-- Testar religamento após crash e verificação do status no Painel.
+- Unitários: máquina de estados, ledger/store, marker e DTOs.
+- Contrato: schemas válidos, campos extras/tipos/versões rejeitados.
+- Integração: primeira execução, grants parciais, pausa, revogação, modelo ausente,
+  marker órfão e shutdown limpo com diretórios isolados.
+- Concorrência: stress cross-thread com watchdog e TSan quando disponível.
+- Performance: probes locais de tray, frame, idle e shutdown, sem inferência.
+- Plataforma: matriz manual/automatizada da ADR-0032 no Windows.
 
 ## Migração
-- Inserir tabela de `app_preferences` para flag de onboarding/consent.
+
+O booleano legado `QSettings/DesktopRuntime/consent_granted` não concede acesso.
+Na primeira execução desta versão ele é ignorado e removido após o ledger
+criptografado ser criado ou o usuário negar. Nenhum grant é inferido do valor
+legado.
 
 ## Rollback
-- Reverter o CMake para compilar os sub-sistemas como lib estática sem gerar o executável desktop integrado.
 
-## Evidências de conclusão
-- Vídeo do Vertical Slice ou dump de métricas de CI com as estatísticas de latência provando desacoplamento GUI-Core.
+Desabilitar o target Qt e executar o runtime headless. Não apagar ledger,
+timeline, snapshots ou marker durante rollback; recovery continua local.

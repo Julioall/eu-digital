@@ -8,7 +8,8 @@ QtAvatarWindow::QtAvatarWindow(std::shared_ptr<ProceduralAvatarRenderer> rendere
     
     // Transparent background, click-through, always on top
     setColor(Qt::transparent);
-    setFlags(Qt::WindowTransparentForInput | Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::Tool);
+    setFlags(Qt::WindowTransparentForInput | Qt::WindowDoesNotAcceptFocus |
+             Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint | Qt::Tool);
     
     frame_timer_ = new QTimer(this);
     connect(frame_timer_, &QTimer::timeout, this, &QtAvatarWindow::updateFrame);

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:desktop-performance-sample:1.0",
+  "title": "DesktopPerformanceSample",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "sample_id", "observed_at", "metric", "statistic",
+    "value", "unit", "sample_count", "environment"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "sample_id": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "metric": {"enum": ["tray_activation", "frame_time", "idle_cpu", "shutdown"]},
+    "statistic": {"enum": ["raw", "mean", "p50", "p95", "p99"]},
+    "value": {"type": "number", "minimum": 0},
+    "unit": {"enum": ["milliseconds", "percent"]},
+    "sample_count": {"type": "integer", "minimum": 1},
+    "environment": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"metric": {"const": "idle_cpu"}}},
+      "then": {"properties": {"unit": {"const": "percent"}}},
+      "else": {"properties": {"unit": {"const": "milliseconds"}}}
+    }
+  ]
+}

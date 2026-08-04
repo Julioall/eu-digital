@@ -330,7 +330,11 @@ public:
 
     bool start() {
 #ifdef _WIN32
+        if (active_ == this && keyboard_hook_ != nullptr && mouse_hook_ != nullptr) {
+            return true;
+        }
         if (active_ != nullptr && active_ != this) return false;
+        stop();
         active_ = this;
         keyboard_hook_ = SetWindowsHookExW(WH_KEYBOARD_LL, &keyboard_proc, nullptr, 0);
         mouse_hook_ = SetWindowsHookExW(WH_MOUSE_LL, &mouse_proc, nullptr, 0);
