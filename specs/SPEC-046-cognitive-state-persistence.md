@@ -1,21 +1,23 @@
 ---
 id: SPEC-046
 title: Consistent Cognitive Snapshot and Replay
-status: draft
+status: in_progress
 phase: design
-dependencies: [SPEC-006, SPEC-030]
-adrs: []
-contracts: []
+dependencies: [SPEC-006, SPEC-030, SPEC-045, SPEC-047]
+adrs: [ADR-0034]
+contracts: [cognitive_snapshot.schema.json]
 ---
 
 # SPEC-046 — Consistent Cognitive Snapshot and Replay
 
-Status: draft  
+Status: in_progress
 Owner: humano  
 Fase: design  
-Dependências: SPEC-006 (Timeline Store), SPEC-030 (Privacy & Storage)  
-ADRs aplicáveis: Nenhuma  
-Contratos afetados: Novo schema `cognitive_snapshot.schema.json`.
+Dependências: SPEC-006 (Timeline Store), SPEC-030 (Privacy & Storage),
+SPEC-045 (Integrated Cognitive Cycle), SPEC-047 (Component Wiring)
+ADRs aplicáveis: ADR-0034
+Contratos afetados: `cognitive_snapshot.schema.json` legado e novos contratos
+2.0 definidos pela ADR-0034.
 
 ## Problema
 Componentes como o `GlobalWorkspace`, a fronteira ativa do `EpisodeSegmenter` e os temporizadores operam em memória volátil. Reiniciar o sistema ou atualizá-lo resulta em "amnésia" de curto prazo. Uma estratégia simples de salvar o estado a cada N eventos é frágil, pois falhas imprevisíveis fariam perder eventos recentes.

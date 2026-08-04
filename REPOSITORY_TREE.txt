@@ -356,6 +356,7 @@ docs/04-adrs/ADR-0030-atomic-episodic-memory-promotion.md
 docs/04-adrs/ADR-0031-atomic-pattern-learning-promotion.md
 docs/04-adrs/ADR-0032-desktop-interface-substitution.md
 docs/04-adrs/ADR-0033-integrated-cognitive-cycle-boundaries.md
+docs/04-adrs/ADR-0034-consistent-cognitive-checkpoint-and-replay.md
 docs/05-governance/CHANGE_CONTROL.md
 docs/05-governance/OPEN_QUESTIONS.md
 docs/05-governance/RISK_REGISTER.md

@@ -33,6 +33,18 @@
     contraditórios, marca itens como concluídos sem contratos versionados para
     `CurrentActivity` e `ContextualAssistanceCard` e termina com um critério
     genérico ainda pendente.
+31. Requisito arquitetural da SPEC-046: quais módulos formam um checkpoint
+    completo, como restaurá-los sem estado parcial e quando usar cold replay?
+
+## Resolução da questão 31 pela ADR-0034
+
+A ADR-0034 foi aceita em 2026-08-04 pela autoridade delegada. O snapshot 2.0
+usa providers removíveis por `ICognitiveStatePort`, só é elegível quando toda
+capacidade cognitiva stateful ativa comprova checkpoint e restaura providers de
+forma transacional. Incompletude, corrupção, versão, fingerprint, expiração,
+cursor ou provider incompatível levam ao snapshot anterior e depois ao replay
+integral. Replay não publica decisão, UI ou ação, e a timeline permanece a
+fonte da verdade.
 ## Resolução das questões 22 e 26–30 pela ADR-0033
 
 A delegação explícita do responsável humano em 2026-08-04 autorizou o agente a
