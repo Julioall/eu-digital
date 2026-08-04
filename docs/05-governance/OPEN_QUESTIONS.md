@@ -18,7 +18,9 @@
 14. Como versionar modalidades novas sem alterar `CanonicalEvent`?
 15. Quais sensores serão considerados obrigatórios? Recomendação atual: nenhum sensor de domínio; somente relógio, event bus e estado interno.
 16. Conflito documental: SPEC-052 foi marcada como `implemented` mas os critérios estavam desmarcados (corrigido na SPEC-053 ao rebaixar para `spike`).
-17. Conflito documental: SPECs 045 a 050 estão como `draft` apesar de existirem commits pesados de implementação. Elas devem ser promovidas para `active`/`implemented`?
+17. Conflito documental: SPECs 046 e 048 a 050 estão como `draft` apesar de
+    existirem commits pesados de implementação. Elas devem ser promovidas para
+    `active`/`implemented` após auditoria individual?
 18. Conflito documental: `docs/03-contracts` possui markdown vazio enquanto `contracts/schemas` possui os schemas reais. Qual é a pasta canônica?
 19. Conflito documental: A estrutura de governança indica que cabeçalhos devem referenciar contratos reais (ex: `contracts: []`), mas há schemas órfãos.
 20. Conflito arquitetural: SPEC-051 seleciona Ollama e sua API HTTP concreta sem
@@ -27,31 +29,19 @@
 21. Conflito contratual e científico: SPEC-049 declara que não afeta contratos,
     mas adiciona `outcome_unknown`, e introduz taxas empíricas de atualização de
     confiança sem hipótese, baseline, métrica, ablação ou falsificação.
-22. Lacuna arquitetural parcialmente resolvida: a SPEC-047 agora fornece
-    `IPatternLearningPort`, mas a SPEC-045 ainda não define a etapa no pipeline
-    nem o mapeamento versionado de `CanonicalEvent` para features observáveis.
-    É necessária aprovação humana da estratégia, baseline e ablação antes de
-    conectar aprendizagem ao coordenador.
 23. Conflito documental: SPEC-053 possui critérios de aceite duplicados e
     contraditórios, marca itens como concluídos sem contratos versionados para
     `CurrentActivity` e `ContextualAssistanceCard` e termina com um critério
     genérico ainda pendente.
-26. Bloqueio contratual da SPEC-045: o `CanonicalEvent` C++ 1.0 não implementa
-    o schema compartilhado `canonical_event.schema.json` 1.0 e não carrega
-    `occurred_at`, `session_id`, contexto, qualidade ou proveniência. O
-    coordenador não consegue construir fielmente os DTOs 1.0 da SPEC-047. Deve
-    ser promovida uma representação C++ compatível ou criado um
-    `CognitiveCycleInput` versionado, sem alterar silenciosamente o contrato.
-27. Bloqueio contratual e de reentrada da SPEC-045: `CognitiveCycleResult` não
-    possui schema/versionamento e hoje fabrica IDs de card/atividade e texto de
-    UI. Além disso, o `RuntimeHost` envia todo evento publicado de volta ao
-    coordenador, incluindo `cognitive.cycle.result`, criando reentrada recursiva
-    com IDs sempre novos. É necessário aprovar o contrato de resultado, sua
-    marcação interna e a política idempotente antes de ativar o ciclo.
-28. Bloqueio arquitetural da SPEC-045: a SPEC exige timeout e cancelamento
-    cooperativo, mas as portas cognitivas não recebem deadline, `stop_token` ou
-    contexto de execução. Deve ser aprovado um contrato versionado de deadline
-    e cancelamento, incluindo semântica para implementações que não cooperam.
+## Resolução das questões 22 e 26–30 pela ADR-0033
+
+A delegação explícita do responsável humano em 2026-08-04 autorizou o agente a
+tomar as decisões necessárias sem nova intervenção. A ADR-0033 foi aceita e a
+SPEC-045 ativada. O ciclo passa a usar entrada, resultado, estágio e contexto
+de invocação versionados; eventos internos não reentram; episódio completo,
+features, saliência e hipóteses só podem vir de capacidades próprias e
+removíveis. `IPatternLearningPort` permanece opcional e recebe apenas features
+numéricas explicitamente publicadas. Ausência omite a etapa e não cria defaults.
 
 ## Resolução da questão 25 pela SPEC-047
 

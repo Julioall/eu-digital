@@ -1,20 +1,20 @@
 ---
 id: SPEC-045
 title: Integrated Headless Cognitive Cycle
-status: draft
+status: in_progress
 phase: design
 dependencies: [SPEC-047, SPEC-023]
-adrs: []
+adrs: [ADR-0033]
 contracts: []
 ---
 
 # SPEC-045 — Integrated Headless Cognitive Cycle
 
-Status: draft  
+Status: in_progress
 Owner: humano  
 Fase: design  
 Dependências: SPEC-047 (Component Wiring), SPEC-023 (Pluggable Capability Runtime)  
-ADRs aplicáveis: Nenhuma  
+ADRs aplicáveis: ADR-0033
 Contratos afetados: Novo DTO `CognitiveCycleResult`.
 
 ## Problema

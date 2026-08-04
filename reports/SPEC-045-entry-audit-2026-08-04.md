@@ -1,5 +1,9 @@
 # Relatório de Execução
 
+> Atualização: após esta auditoria, o responsável humano delegou explicitamente
+> todas as decisões do projeto. A ADR-0033 foi aceita, as questões 22 e 26–30
+> foram resolvidas documentalmente e a SPEC-045 passou a `in_progress`.
+
 SPEC: SPEC-045 — Integrated Headless Cognitive Cycle
 Agente: Codex
 Data: 2026-08-04
@@ -9,14 +13,17 @@ Commit: commit que contém este relatório
 
 - Auditados a SPEC-045, seu plano, dependências, contratos e implementação
   existente antes de modificar o runtime.
-- Registrados os bloqueios contratuais e arquiteturais 26, 27 e 28 em
+- Registrados os bloqueios contratuais e arquiteturais 26 a 30 em
   `OPEN_QUESTIONS.md`.
+- Criada a ADR-0033 como proposta concreta para ativação do ciclo, sem torná-la
+  normativa antes da aprovação humana.
 - Atualizada a questão 22 para refletir que a porta de aprendizagem existe,
   mas sua estratégia de entrada ainda não foi aprovada.
 
 ## Arquivos modificados
 
 - `docs/05-governance/OPEN_QUESTIONS.md`;
+- `docs/04-adrs/ADR-0033-integrated-cognitive-cycle-boundaries.md`;
 - `reports/SPEC-045-entry-audit-2026-08-04.md`;
 - `REPOSITORY_TREE.txt` após regeneração.
 
@@ -61,6 +68,7 @@ semânticas que a autoridade documental reserva à aprovação humana.
 ## Riscos e pendências
 
 - Aprovar ativação da SPEC-045.
+- Aceitar ou revisar a ADR-0033.
 - Escolher entre promover o `CanonicalEvent` C++ ao schema 1.0 compartilhado ou
   criar `CognitiveCycleInput` 1.0.
 - Aprovar `CognitiveCycleResult` 1.0, classificação de evento interno e política
@@ -88,3 +96,5 @@ semânticas que a autoridade documental reserva à aprovação humana.
 - `cpp/core/runtime_host.hpp` assina todos os eventos e reenvia resultados ao
   mesmo coordenador.
 - `cpp/core/ports/` não contém deadline ou cancelamento cooperativo.
+- `EpisodeUpdate` não materializa `EpisodeData`, e não há portas de features,
+  saliência ou formação de hipótese.
