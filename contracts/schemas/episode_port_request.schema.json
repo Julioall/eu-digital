@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:episode-port-request:1.0",
+  "title": "EpisodePortRequest",
+  "oneOf": [
+    {"$ref": "#/$defs/observation"},
+    {"$ref": "#/$defs/write"},
+    {"$ref": "#/$defs/retrieval"}
+  ],
+  "$defs": {
+    "non_empty_strings": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "event_id", "session_id", "occurred_at", "epoch_seconds", "application", "document", "modality"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "event_id": {"type": "string", "minLength": 1},
+        "session_id": {"type": "string", "minLength": 1},
+        "occurred_at": {"type": "string", "minLength": 1},
+        "epoch_seconds": {"type": "number"},
+        "application": {"type": ["string", "null"], "minLength": 1},
+        "document": {"type": ["string", "null"], "minLength": 1},
+        "modality": {"type": "string", "minLength": 1}
+      }
+    },
+    "episode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "episode_id", "session_id", "start_at", "end_at", "event_ids", "applications", "documents", "people", "topics", "modalities", "boundary_reasons", "embedding_ref", "summary", "hypotheses", "coherence", "confidence", "created_by"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "episode_id": {"type": "string", "minLength": 1},
+        "session_id": {"type": "string", "minLength": 1},
+        "start_at": {"type": "string", "minLength": 1},
+        "end_at": {"type": "string", "minLength": 1},
+        "event_ids": {"$ref": "#/$defs/non_empty_strings", "minItems": 1},
+        "applications": {"$ref": "#/$defs/non_empty_strings"},
+        "documents": {"$ref": "#/$defs/non_empty_strings"},
+        "people": {"$ref": "#/$defs/non_empty_strings"},
+        "topics": {"$ref": "#/$defs/non_empty_strings"},
+        "modalities": {"$ref": "#/$defs/non_empty_strings"},
+        "boundary_reasons": {"$ref": "#/$defs/non_empty_strings"},
+        "embedding_ref": {"type": ["string", "null"], "minLength": 1},
+        "summary": {"type": ["string", "null"], "minLength": 1},
+        "hypotheses": {"$ref": "#/$defs/non_empty_strings"},
+        "coherence": {"type": "number", "minimum": 0, "maximum": 1},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "created_by": {"type": "string", "minLength": 1}
+      }
+    },
+    "write": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "episode", "start_epoch", "end_epoch", "embedding"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "episode": {"$ref": "#/$defs/episode"},
+        "start_epoch": {"type": "number"},
+        "end_epoch": {"type": "number"},
+        "embedding": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "array", "items": {"type": "number"}, "minItems": 1}
+          ]
+        }
+      }
+    },
+    "retrieval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "session_id", "applications", "documents", "modalities", "start_epoch", "end_epoch", "embedding", "limit"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "session_id": {"type": ["string", "null"], "minLength": 1},
+        "applications": {"$ref": "#/$defs/non_empty_strings"},
+        "documents": {"$ref": "#/$defs/non_empty_strings"},
+        "modalities": {"$ref": "#/$defs/non_empty_strings"},
+        "start_epoch": {"type": ["number", "null"]},
+        "end_epoch": {"type": ["number", "null"]},
+        "embedding": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "array", "items": {"type": "number"}, "minItems": 1}
+          ]
+        },
+        "limit": {"type": "integer", "minimum": 1}
+      }
+    }
+  }
+}

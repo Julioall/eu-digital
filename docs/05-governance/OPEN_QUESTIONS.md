@@ -34,12 +34,14 @@
     contraditórios, marca itens como concluídos sem contratos versionados para
     `CurrentActivity` e `ContextualAssistanceCard` e termina com um critério
     genérico ainda pendente.
-25. Requisito contratual ausente na SPEC-047: as entradas atuais não permitem
-    delegação fiel em todos os adapters. `IMemoryWritePort` recebe evento onde o
-    store exige episódio; metacognição recebe workspace onde o motor exige
-    hipótese e tempo; decisão não recebe timestamp; workspace não expõe tensão
-    equivalente. Devem ser criados DTOs versionados suficientes ou as portas
-    devem ser redefinidas antes de remover os valores fabricados?
+## Resolução da questão 25 pela SPEC-047
+
+A aprovação humana de 2026-08-04 adotou DTOs 1.0 aditivos para episódio,
+memória, workspace, metacognição e decisão. As novas operações carregam todos
+os campos exigidos pelos componentes promovidos; adapters concretos rejeitam
+as assinaturas legadas insuficientes por `PortResult<T>` em vez de preencher
+episódio, hipótese, tensão, timestamp ou evidência artificialmente. A migração
+do coordenador continua reservada à SPEC-045.
 
 ## Resoluções registradas pela SPEC-023
 

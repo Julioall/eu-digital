@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:metacognition-port-request:1.0",
+  "title": "MetacognitionPortRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "hypothesis", "evaluated_at", "workspace_snapshot_id"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "hypothesis": {"$ref": "#/$defs/hypothesis"},
+    "evaluated_at": {"type": "string", "minLength": 1},
+    "workspace_snapshot_id": {"type": ["string", "null"], "minLength": 1}
+  },
+  "$defs": {
+    "references": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "hypothesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "hypothesis_id", "kind", "statement", "status", "confidence", "supporting_refs", "opposing_refs", "alternatives", "created_at", "updated_at", "verification_question", "expected_information_gain", "provenance_module", "model_version"],
+      "properties": {
+        "schema_version": {"const": "1.0"},
+        "hypothesis_id": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["observed_pattern", "causal", "predictive", "contextual", "capability"]},
+        "statement": {"type": "string", "minLength": 1},
+        "status": {"enum": ["proposed", "confirmed", "rejected", "superseded"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "supporting_refs": {"$ref": "#/$defs/references"},
+        "opposing_refs": {"$ref": "#/$defs/references"},
+        "alternatives": {"$ref": "#/$defs/references"},
+        "created_at": {"type": "string", "minLength": 1},
+        "updated_at": {"type": "string", "minLength": 1},
+        "verification_question": {"type": ["string", "null"], "minLength": 1},
+        "expected_information_gain": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "provenance_module": {"type": "string", "minLength": 1},
+        "model_version": {"type": ["string", "null"], "minLength": 1}
+      }
+    }
+  }
+}

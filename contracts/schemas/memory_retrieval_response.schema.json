@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:memory-retrieval-response:1.0",
+  "title": "MemoryRetrievalResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "items"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "items": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/item"}
+    }
+  },
+  "$defs": {
+    "references": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["memory_id", "relevance", "session_id", "event_ids", "applications", "documents", "modalities", "reason_codes"],
+      "properties": {
+        "memory_id": {"type": "string", "minLength": 1},
+        "relevance": {"type": "number", "minimum": 0},
+        "session_id": {"type": "string", "minLength": 1},
+        "event_ids": {"$ref": "#/$defs/references", "minItems": 1},
+        "applications": {"$ref": "#/$defs/references"},
+        "documents": {"$ref": "#/$defs/references"},
+        "modalities": {"$ref": "#/$defs/references"},
+        "reason_codes": {"$ref": "#/$defs/references"}
+      }
+    }
+  }
+}

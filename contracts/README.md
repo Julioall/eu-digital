@@ -113,6 +113,15 @@ O envelope operacional das portas cognitivas da SPEC-047 está em
 válido do domínio e não transforma ausência de observação em resultado
 negativo.
 
+As requisições 1.0 de episódio/memória, workspace, metacognição e decisão da
+SPEC-047 estão em `episode_port_request.schema.json`,
+`memory_retrieval_response.schema.json`,
+`workspace_port_request.schema.json`, `workspace_port_assessment.schema.json`,
+`metacognition_port_request.schema.json`,
+`metacognitive_port_assessment.schema.json` e
+`cognitive_decision_request.schema.json`. A semântica e a compatibilidade
+aditiva estão em `docs/03-contracts/COGNITIVE_PORT_REQUESTS.md`.
+
 Python e C++ consomem esses contratos; nenhum plugin concreto faz parte do
 núcleo.
 

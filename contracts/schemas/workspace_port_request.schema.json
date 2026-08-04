@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:workspace-port-request:1.0",
+  "title": "WorkspacePortRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "candidate_id", "session_id", "source_kind", "source_refs", "observed_at", "observed_epoch", "content", "salience_signals"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "candidate_id": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "source_kind": {"enum": ["canonical_event", "episode", "pattern", "internal"]},
+    "source_refs": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1},
+    "observed_at": {"type": "string", "minLength": 1},
+    "observed_epoch": {"type": "number"},
+    "content": {"type": "object", "additionalProperties": {"type": "string"}},
+    "salience_signals": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"minLength": 1},
+      "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}
+    }
+  }
+}

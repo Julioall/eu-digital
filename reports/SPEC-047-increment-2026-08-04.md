@@ -1,5 +1,9 @@
 # Relatório de Execução
 
+> Atualização de 2026-08-04: a aprovação e implementação dos DTOs 1.0 resolveu
+> a pendência registrada neste relatório. A evidência final está em
+> `reports/SPEC-047-dto-increment-2026-08-04.md`; a SPEC-047 está concluída.
+
 SPEC: SPEC-047 — Component Wiring, Ports and Contracts
 Agente: Codex
 Data: 2026-08-04

@@ -9,6 +9,13 @@
 - `PortResult<T>` 1.0 será aditivo; as assinaturas legadas permanecem até a
   migração coordenada pela SPEC-045.
 
+## Decisão contratual de 2026-08-04
+
+Foram aprovados DTOs 1.0 aditivos para episódio, memória, workspace,
+metacognição e decisão. Adapters concretos rejeitam entradas legadas
+insuficientes em vez de fabricar campos. As assinaturas anteriores permanecem
+compiláveis até a migração da SPEC-045.
+
 ## Arquivos por Etapa
 
 ### Etapa 1: Portas Virtuais (Abstrações)
@@ -33,6 +40,11 @@
   - `cpp/core/contracts/pattern_learning.hpp`
   - `cpp/core/contracts/port_result.hpp`
   - `contracts/schemas/port_result.schema.json`
+  - `cpp/core/contracts/cognitive_port_requests.hpp`
+  - `contracts/schemas/episode_port_request.schema.json`
+  - `contracts/schemas/workspace_port_request.schema.json`
+  - `contracts/schemas/metacognition_port_request.schema.json`
+  - `contracts/schemas/cognitive_decision_request.schema.json`
   - (etc)
 
 ### Etapa 3: Adaptadores
@@ -44,6 +56,16 @@
   - `cpp/tests/world_model_adapter_test.cpp`
   - `cpp/tests/pattern_learner_adapter_test.cpp`
   - `cpp/tests/port_result_test.cpp`
+
+### Etapa 3.1: Remoção de dados fabricados
+- **Ação:** adicionar operações 1.0 suficientes e mapear cada campo para o
+  componente promovido correspondente.
+- **Compatibilidade:** manter assinaturas legadas; adapters concretos retornam
+  `PortResult<T>` falho quando a entrada não pode ser representada fielmente.
+- **Teste:** `cpp/tests/cognitive_port_requests_test.cpp` e testes focados dos
+  seis adapters afetados.
+- **Limite:** não migrar o `CognitiveCoordinator`; integração pertence à
+  SPEC-045.
 
 ### Etapa 4: Integração no Registry
 - **Ação:** Registrar os adaptadores no startup.

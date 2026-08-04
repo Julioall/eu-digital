@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:metacognitive-port-assessment:1.0",
+  "title": "MetacognitivePortAssessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "assessment_id", "hypothesis_id", "evaluated_at", "curiosity_score", "requires_exploration", "focus_area"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "assessment_id": {"type": "string", "minLength": 1},
+    "hypothesis_id": {"type": "string", "minLength": 1},
+    "evaluated_at": {"type": "string", "minLength": 1},
+    "curiosity_score": {"type": "number", "minimum": 0, "maximum": 1},
+    "requires_exploration": {"type": "boolean"},
+    "focus_area": {"type": "string", "minLength": 1}
+  }
+}

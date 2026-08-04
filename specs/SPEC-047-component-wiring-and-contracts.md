@@ -1,16 +1,16 @@
 ---
 id: SPEC-047
 title: Component Wiring, Ports and Contracts
-status: in_progress
+status: done
 phase: design
 dependencies: [SPEC-023, SPEC-033, SPEC-034, SPEC-035, SPEC-036, SPEC-037, SPEC-038, SPEC-039]
 adrs: [ADR-0009, ADR-0010, ADR-0011, ADR-0031]
-contracts: [PATTERN_SCHEMA.md, PATTERN_PROMOTION_CONTRACT.md, PORT_RESULT.md]
+contracts: [PATTERN_SCHEMA.md, PATTERN_PROMOTION_CONTRACT.md, PORT_RESULT.md, COGNITIVE_PORT_REQUESTS.md]
 ---
 
 # SPEC-047 — Component Wiring, Ports and Contracts
 
-Status: in_progress
+Status: done
 Owner: humano  
 Fase: design  
 Dependências: SPEC-023 (Pluggable Capability Runtime), SPECs 033-039 (Native Promotions)  
@@ -36,6 +36,8 @@ O sistema será capaz de registrar, via `CapabilityRegistry`, instâncias dos ad
   sem importar `PatternLearner` no consumidor.
 - Expor falhas de delegação por `PortResult<T>` 1.0 sem remover as assinaturas
   legadas antes da migração da SPEC-045.
+- Expor requisições 1.0 suficientes para episódio, memória, workspace,
+  metacognição e decisão sem completar campos ausentes artificialmente.
 
 ## Requisitos não funcionais
 - **Estabilidade:** Os componentes promovidos originais (ex: `cpp/core/episodic_memory.hpp`) não devem ser modificados de forma a quebrar seus testes unitários atuais.
@@ -81,7 +83,7 @@ O sistema será capaz de registrar, via `CapabilityRegistry`, instâncias dos ad
   `PortResult<T>` 1.0 sem remover as assinaturas existentes.
 - [x] O microbenchmark em build Release demonstra overhead de despacho virtual
   menor ou igual a 1% em relação à chamada concreta equivalente.
-- [ ] Cada adapter delega ao componente promovido sem fabricar episódio,
+- [x] Cada adapter delega ao componente promovido sem fabricar episódio,
   hipótese, tensão, timestamp ou outro dado ausente na entrada contratual.
 
 ## Plano de testes
@@ -123,8 +125,8 @@ usa ciclos da thread, afinidade de CPU e blocos pareados ABBA/BAAB; sete de sete
 execuções passaram, com mediana global aproximada de -0,27%, sem degradação
 virtual mensurável.
 
-A SPEC permanece `in_progress` porque `EpisodicMemoryAdapter`,
-`GlobalWorkspaceAdapter`, `MetacognitionCuriosityAdapter` e
-`CognitiveDecisionAdapter` ainda fabricam dados que suas entradas não fornecem.
-A decisão sobre contratos versionados de episódio, hipótese e tempo está
-registrada como questão aberta 25 e deve preceder mudanças nessas interfaces.
+A aprovação humana de 2026-08-04 resolveu a questão 25 por DTOs 1.0 aditivos.
+As novas operações carregam episódio, hipótese, workspace, evidência e relógios
+explícitos. As assinaturas legadas permanecem compiláveis para a SPEC-045, mas
+os adapters concretos as rejeitam de forma estruturada quando não permitem
+delegação fiel.

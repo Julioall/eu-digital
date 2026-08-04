@@ -1,5 +1,9 @@
 # Execution Report: SPEC-047 - Component Wiring, Ports and Contracts
 
+> Atualização final (2026-08-04): a nota histórica abaixo foi superada por
+> `reports/SPEC-047-dto-increment-2026-08-04.md`. Os DTOs 1.0 foram aprovados,
+> a pendência contratual foi resolvida e a SPEC-047 está concluída.
+
 > Nota de governança (2026-08-04): este relatório registra a implementação
 > original, mas sua conclusão não satisfaz isoladamente a Definition of Done.
 > A auditoria e o incremento posteriores estão em
