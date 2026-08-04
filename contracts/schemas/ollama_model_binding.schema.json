@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:ollama-model-binding:1.0",
+  "title": "OllamaModelBinding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "ollama_model", "ollama_digest", "ollama_size_bytes", "artifact"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "ollama_model": {"type": "string", "minLength": 1},
+    "ollama_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ollama_size_bytes": {"type": "integer", "minimum": 1, "maximum": 4294967296},
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "format", "quantization", "size_bytes", "sha256", "language", "license_id", "license_compatible", "backend_compatibility", "signature_algorithm", "signature", "signing_key_id", "runtime_artifact_id", "payload_artifact_id", "payload_separate"],
+      "properties": {
+        "model_id": {"type": "string", "minLength": 1},
+        "format": {"const": "GGUF"},
+        "quantization": {"type": "string", "minLength": 1},
+        "size_bytes": {"type": "integer", "minimum": 1, "maximum": 4294967296},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "language": {"type": "string", "pattern": "^pt(?:-.+)?$"},
+        "license_id": {"type": "string", "minLength": 1},
+        "license_compatible": {"const": true},
+        "backend_compatibility": {"const": "ollama.http.loopback.v1"},
+        "signature_algorithm": {"const": "detached_manifest_digest_v1"},
+        "signature": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "signing_key_id": {"type": "string", "minLength": 1},
+        "runtime_artifact_id": {"type": "string", "minLength": 1},
+        "payload_artifact_id": {"type": "string", "minLength": 1},
+        "payload_separate": {"const": true}
+      }
+    }
+  }
+}

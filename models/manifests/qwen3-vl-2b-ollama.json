@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "ollama_model": "qwen3-vl:2b",
+  "ollama_digest": "0635d9d857d497aeadba3d7d27485746c50554446f9f6ec01ef39788221adbe8",
+  "ollama_size_bytes": 1889519687,
+  "artifact": {
+    "model_id": "qwen3-vl:2b",
+    "format": "GGUF",
+    "quantization": "Q4_K_M",
+    "size_bytes": 1889496384,
+    "sha256": "ebabfa59b71a5b96e0281ec2994977e785284e0939807a99fc340dec3c6f10de",
+    "language": "pt-multilingual",
+    "license_id": "Apache-2.0",
+    "license_compatible": true,
+    "backend_compatibility": "ollama.http.loopback.v1",
+    "signature_algorithm": "detached_manifest_digest_v1",
+    "signature": "3f80ffdb57b2301ff5a0626caa1c535014e1bb8a8f37ee1017256b48abbd72c0",
+    "signing_key_id": "local-manifest-digest-v1",
+    "runtime_artifact_id": "ollama-runtime-0.32.5-windows",
+    "payload_artifact_id": "qwen3-vl-2b-ebabfa59",
+    "payload_separate": true
+  }
+}

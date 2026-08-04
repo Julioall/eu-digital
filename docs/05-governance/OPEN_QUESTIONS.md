@@ -25,9 +25,6 @@
     schemas executáveis; `docs/03-contracts` documenta os contratos sem
     duplicá-los, e `schemas/` na raiz permanece legado não normativo.
 19. Conflito documental: A estrutura de governança indica que cabeçalhos devem referenciar contratos reais (ex: `contracts: []`), mas há schemas órfãos.
-20. Conflito arquitetural: SPEC-051 seleciona Ollama e sua API HTTP concreta sem
-    a ADR própria exigida pela ADR-0015; o backend deve permanecer experimental
-    e desabilitado por padrão até decisão humana.
 21. Conflito contratual e científico: SPEC-049 declara que não afeta contratos,
     mas adiciona `outcome_unknown`, e introduz taxas empíricas de atualização de
     confiança sem hipótese, baseline, métrica, ablação ou falsificação.
@@ -54,6 +51,13 @@ Em 2026-08-04, a aprovação humana dos DTOs versionados e a autoridade delegada
 aceitaram a ADR-0035. Schemas executáveis canônicos pertencem a
 `contracts/schemas/`; documentos em `docs/03-contracts/` explicam seu uso e a
 pasta `schemas/` na raiz não recebe novas cópias manuais.
+
+## Resolução da questão 20 pela ADR-0036
+
+Em 2026-08-04, a autoridade delegada aceitou Ollama somente como backend local,
+opcional e removível. A integração 1.0 fixa `127.0.0.1:11434`, desabilita proxy
+e redirects, proíbe endpoints de download e modelos cloud, exige binding local
+versionado e preserva o fallback quando runtime ou modelo estão ausentes.
 ## Resolução das questões 22 e 26–30 pela ADR-0033
 
 A delegação explícita do responsável humano em 2026-08-04 autorizou o agente a

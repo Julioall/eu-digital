@@ -297,6 +297,15 @@ if(WIN32)
 endif()
 add_test(NAME ollama_model_backend COMMAND ollama_model_backend_test)
 
+add_executable(ollama_live_probe
+    cpp/app/ollama_live_probe.cpp
+    cpp/core/adapters/ollama_model_backend.cpp)
+target_include_directories(ollama_live_probe PRIVATE cpp)
+target_compile_features(ollama_live_probe PRIVATE cxx_std_23)
+if(WIN32)
+    target_link_libraries(ollama_live_probe PRIVATE winhttp)
+endif()
+
 add_test(NAME event_bus COMMAND event_bus_test)
 add_test(NAME cognitive_coordinator COMMAND cognitive_coordinator_test)
 add_test(NAME cognitive_snapshot_v2 COMMAND cognitive_snapshot_v2_test)
@@ -375,8 +384,6 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         cpp/shell/toast_notification.cpp
         cpp/shell/log_manager.hpp
         cpp/shell/log_manager.cpp
-        cpp/shell/ollama_dialogue_service.hpp
-        cpp/core/adapters/ollama_model_backend.cpp
     )
     target_include_directories(eu_digital_desktop PRIVATE cpp)
     target_compile_features(eu_digital_desktop PRIVATE cxx_std_23)
@@ -405,8 +412,6 @@ if(EU_DIGITAL_BUILD_QT_SHELL)
         cpp/shell/toast_notification.cpp
         cpp/shell/log_manager.hpp
         cpp/shell/log_manager.cpp
-        cpp/shell/ollama_dialogue_service.hpp
-        cpp/core/adapters/ollama_model_backend.cpp
     )
     target_include_directories(desktop_integration_test PRIVATE cpp)
     target_compile_features(desktop_integration_test PRIVATE cxx_std_23)

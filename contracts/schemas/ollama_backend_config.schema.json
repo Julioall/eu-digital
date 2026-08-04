@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:ollama-backend-config:1.0",
+  "title": "OllamaBackendConfig",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "enabled", "host", "port", "connect_timeout_ms", "send_timeout_ms", "receive_timeout_ms", "max_output_tokens", "max_response_bytes", "max_tags_bytes"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "enabled": {"type": "boolean"},
+    "host": {"const": "127.0.0.1"},
+    "port": {"const": 11434},
+    "connect_timeout_ms": {"type": "integer", "minimum": 100, "maximum": 10000},
+    "send_timeout_ms": {"type": "integer", "minimum": 100, "maximum": 30000},
+    "receive_timeout_ms": {"type": "integer", "minimum": 100, "maximum": 300000},
+    "max_output_tokens": {"type": "integer", "minimum": 8, "maximum": 1024},
+    "max_response_bytes": {"type": "integer", "minimum": 1024, "maximum": 1048576},
+    "max_tags_bytes": {"type": "integer", "minimum": 1024, "maximum": 4194304}
+  }
+}
