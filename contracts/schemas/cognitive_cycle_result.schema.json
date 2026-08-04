@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:cognitive-cycle-result:1.0",
+  "title": "CognitiveCycleResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "cycle_id", "correlation_id", "input_event_id", "state", "policy_id", "stages", "decision", "degradation_reasons", "discard_reason", "replay_mode"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "cycle_id": {"type": "string", "minLength": 1},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "input_event_id": {"type": "string", "minLength": 1},
+    "state": {"type": "string", "enum": ["completed", "degraded", "failed", "discarded"]},
+    "policy_id": {"const": "bounded_ports_v1"},
+    "stages": {"type": "array", "items": {"$ref": "cognitive_cycle_stage.schema.json"}},
+    "decision": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["success", "intent", "reason", "target_action", "error_message"],
+          "properties": {
+            "success": {"type": "boolean"},
+            "intent": {"type": "string", "minLength": 1},
+            "reason": {"type": "string"},
+            "target_action": {"type": "string"},
+            "error_message": {"type": "string"}
+          }
+        }
+      ]
+    },
+    "degradation_reasons": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "discard_reason": {"type": ["string", "null"], "minLength": 1},
+    "replay_mode": {"type": "boolean"}
+  }
+}

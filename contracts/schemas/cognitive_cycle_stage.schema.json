@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:cognitive-cycle-stage:1.0",
+  "title": "CognitiveCycleStage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "stage_id", "operation", "status", "evidence_refs", "error", "duration_microseconds"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "stage_id": {"type": "string", "minLength": 1},
+    "operation": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["succeeded", "failed", "skipped_absent_input", "skipped_unavailable", "cancelled", "timed_out"]},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "error": {"oneOf": [{"type": "null"}, {"$ref": "port_result.schema.json#/$defs/port_error"}]},
+    "duration_microseconds": {"type": "integer", "minimum": 0}
+  }
+}

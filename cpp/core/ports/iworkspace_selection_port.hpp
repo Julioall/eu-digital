@@ -2,6 +2,7 @@
 
 #include "core/event_bus.hpp"
 #include "core/contracts/cognitive_port_requests.hpp"
+#include "core/contracts/cognitive_cycle_v1.hpp"
 #include "core/contracts/port_result.hpp"
 #include "core/contracts/workspace_snapshot.hpp"
 
@@ -30,6 +31,18 @@ public:
         const contracts::WorkspaceSelectionRequest& request) {
         return contracts::capture_port_result<contracts::WorkspaceAssessment>(
             "workspace.select_candidate", [&] { return select_candidate(request); });
+    }
+
+    virtual contracts::PortResult<contracts::WorkspaceAssessment>
+    select_candidate_context(
+        const contracts::WorkspaceSelectionRequest& request,
+        const contracts::PortInvocationContextV1& context) {
+        if (context.stop_requested()) {
+            return contracts::PortResult<contracts::WorkspaceAssessment>::failed(
+                "workspace.select_candidate", "cancelled",
+                "cycle invocation was cancelled");
+        }
+        return select_candidate_result(request);
     }
 };
 

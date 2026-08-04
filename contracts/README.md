@@ -122,6 +122,15 @@ SPEC-047 estão em `episode_port_request.schema.json`,
 `cognitive_decision_request.schema.json`. A semântica e a compatibilidade
 aditiva estão em `docs/03-contracts/COGNITIVE_PORT_REQUESTS.md`.
 
+Os contratos 1.0 do ciclo cognitivo headless da SPEC-045 estão em
+`cognitive_cycle_input.schema.json`, `cognitive_cycle_result.schema.json`,
+`cognitive_cycle_stage.schema.json`, `port_invocation_context.schema.json`,
+`episode_segmentation_response.schema.json`,
+`observation_features.schema.json`, `salience_assessment.schema.json` e
+`hypothesis_formation.schema.json`. A semântica de ausência, timeout, replay,
+idempotência e backpressure está em
+`docs/03-contracts/COGNITIVE_CYCLE_CONTRACTS.md`.
+
 Python e C++ consomem esses contratos; nenhum plugin concreto faz parte do
 núcleo.
 

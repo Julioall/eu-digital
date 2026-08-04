@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:observation-features:1.0",
+  "title": "ObservationFeatures",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "features", "evidence_refs"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "features": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "number"}},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

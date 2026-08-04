@@ -28,7 +28,7 @@ envio de dados à nuvem ou substituição dos módulos cognitivos por um LLM.
 
 | SPEC | Estado documental | Evidência existente | Lacuna que impede conclusão |
 | --- | --- | --- | --- |
-| 045 | `draft` | coordenador e testes existem | não há relatório próprio; o fluxo omite aprendizagem de padrões; faltam evidências completas de timeout, backpressure, reentrada e ablação |
+| 045 | `done` | contratos 1.0, coordenador, integração no host, benchmark, validação operacional e relatório | nenhuma pendência crítica na SPEC; replay persistente permanece exclusivamente na SPEC-046 |
 | 046 | `draft` | schema, DTO, persistência e relatório existem | o próprio relatório informa que o replay ainda não é reaplicado ao coordenador; crash recovery e criptografia não estão comprovados ponta a ponta |
 | 047 | `draft` | portas, adaptadores, factory, testes e relatório existem | falta reconciliar o registro dinâmico, o ciclo completo de remoção/reinstalação/substituição e a ausência de uma porta para aprendizagem de padrões |
 | 048 | `draft` | política, portas, renderer, testes e relatório existem | o relatório admite que validação JSON real permanece pendente; timeout deve provar que não bloqueia na destruição do trabalho assíncrono |

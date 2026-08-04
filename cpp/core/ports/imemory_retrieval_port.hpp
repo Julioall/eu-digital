@@ -2,6 +2,7 @@
 
 #include "core/event_bus.hpp"
 #include "core/contracts/cognitive_port_requests.hpp"
+#include "core/contracts/cognitive_cycle_v1.hpp"
 #include "core/contracts/memory_retrieval_result.hpp"
 #include "core/contracts/port_result.hpp"
 #include <stdexcept>
@@ -30,6 +31,18 @@ public:
         const contracts::MemoryRetrievalRequest& request) {
         return contracts::capture_port_result<contracts::MemoryRetrievalResponse>(
             "memory.retrieve_memory", [&] { return retrieve_memory(request); });
+    }
+
+    virtual contracts::PortResult<contracts::MemoryRetrievalResponse>
+    retrieve_memory_context(
+        const contracts::MemoryRetrievalRequest& request,
+        const contracts::PortInvocationContextV1& context) {
+        if (context.stop_requested()) {
+            return contracts::PortResult<contracts::MemoryRetrievalResponse>::failed(
+                "memory.retrieve_memory", "cancelled",
+                "cycle invocation was cancelled");
+        }
+        return retrieve_memory_result(request);
     }
 };
 

@@ -65,11 +65,16 @@ int main() {
         assert(host.start());
         const auto accepted = host.publish_json(event);
         assert(accepted == eu_digital::PublishResult::accepted);
-        assert(host.replay().size() == 1);
+        host.coordinator()->wait_idle();
+        host.event_bus().wait_idle();
+        assert(host.replay().size() == 2);
+        assert(host.coordinator()->results().size() == 1);
+        assert(host.coordinator()->results().front().state ==
+               eu_digital::contracts::CycleStateV1::degraded);
         const auto ready_health = host.health_json();
         eu_digital::RuntimeHost::validate_health_json(ready_health);
         assert(contains(ready_health, "\"state\":\"ready\""));
-        assert(contains(ready_health, "\"published_events\":1"));
+        assert(contains(ready_health, "\"published_events\":2"));
         const auto storage_health = host.storage_health_json();
         eu_digital::RuntimeHost::validate_storage_health_json(storage_health);
         assert(contains(storage_health, "\"quota_bytes\":10737418240"));
@@ -81,13 +86,13 @@ int main() {
         assert(contains(stopped_health, "\"state\":\"stopped\""));
 
         assert(host.start());
-        assert(host.replay().size() == 1);
-        assert(contains(host.health_json(), "\"recovered_events\":1"));
+        assert(host.replay().size() == 2);
+        assert(contains(host.health_json(), "\"recovered_events\":2"));
         host.stop();
 
         eu_digital::RuntimeHost recovered({manifest.string(), timeline.string(), "recovery-session", "2026-07-29T12:01:00Z"});
         assert(recovered.start());
-        assert(recovered.replay().size() == 1);
+        assert(recovered.replay().size() == 2);
         recovered.stop();
 
         const auto deterministic_timeline = root / "deterministic.sqlite";
@@ -95,6 +100,8 @@ int main() {
             eu_digital::RuntimeHost deterministic({manifest.string(), deterministic_timeline.string(), "fixed-session", "2026-07-29T12:04:00Z"});
             assert(deterministic.start());
             assert(deterministic.publish_json(event) == eu_digital::PublishResult::accepted);
+            deterministic.coordinator()->wait_idle();
+            deterministic.event_bus().wait_idle();
             const auto snapshot = deterministic.health_json();
             deterministic.stop();
             return snapshot;
@@ -118,6 +125,15 @@ int main() {
         assert(contains(degraded_health, "fixture.optional"));
         assert(contains(degraded_health, "temporarily_unavailable"));
         degraded.stop();
+
+        const auto disabled_timeline = root / "coordinator-disabled.sqlite";
+        eu_digital::RuntimeHost disabled({manifest.string(), disabled_timeline.string(),
+            "disabled-session", "2026-07-29T12:03:30Z", false});
+        assert(disabled.start());
+        assert(!disabled.coordinator());
+        assert(disabled.publish_json(event) == eu_digital::PublishResult::accepted);
+        assert(disabled.replay().size() == 1);
+        disabled.stop();
 
         eu_digital::RuntimeHost unavailable_timeline({manifest.string(), root.string(), "failure-session", "2026-07-29T12:05:00Z"});
         assert(!unavailable_timeline.start());

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "cycle_id": "00000000-0000-4000-8000-000000000104",
+  "correlation_id": "00000000-0000-4000-8000-000000000101",
+  "input_event_id": "00000000-0000-4000-8000-000000000102",
+  "state": "degraded",
+  "policy_id": "bounded_ports_v1",
+  "stages": [],
+  "decision": null,
+  "degradation_reasons": ["baseline:no_optional_capabilities"],
+  "discard_reason": null,
+  "replay_mode": false
+}

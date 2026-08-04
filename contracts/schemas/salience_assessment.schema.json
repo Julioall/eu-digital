@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:salience-assessment:1.0",
+  "title": "SalienceAssessment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "signals", "evidence_refs"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "signals": {"type": "object", "minProperties": 1, "additionalProperties": {"type": "number", "minimum": 0, "maximum": 1}},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  }
+}

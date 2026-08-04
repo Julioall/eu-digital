@@ -13,6 +13,8 @@ contracts/fixtures/.gitkeep
 contracts/fixtures/canonical_event.json
 contracts/fixtures/capture_policy.invalid.json
 contracts/fixtures/capture_policy.json
+contracts/fixtures/cognitive_cycle_input.json
+contracts/fixtures/cognitive_cycle_result.json
 contracts/fixtures/component_maturity.invalid.json
 contracts/fixtures/component_maturity.json
 contracts/fixtures/consent_policy.invalid.json
@@ -48,6 +50,9 @@ contracts/schemas/capability_descriptor.schema.json
 contracts/schemas/capability_onboarding.schema.json
 contracts/schemas/capability_state.schema.json
 contracts/schemas/capture_policy.schema.json
+contracts/schemas/cognitive_cycle_input.schema.json
+contracts/schemas/cognitive_cycle_result.schema.json
+contracts/schemas/cognitive_cycle_stage.schema.json
 contracts/schemas/cognitive_decision_request.schema.json
 contracts/schemas/cognitive_snapshot.schema.json
 contracts/schemas/component_maturity.schema.json
@@ -62,8 +67,10 @@ contracts/schemas/digital_body_state.schema.json
 contracts/schemas/efference_copy.schema.json
 contracts/schemas/episode.schema.json
 contracts/schemas/episode_port_request.schema.json
+contracts/schemas/episode_segmentation_response.schema.json
 contracts/schemas/functional_self_model_snapshot.schema.json
 contracts/schemas/hypothesis.schema.json
+contracts/schemas/hypothesis_formation.schema.json
 contracts/schemas/local_model_request.schema.json
 contracts/schemas/local_model_response.schema.json
 contracts/schemas/longitudinal_protocol.schema.json
@@ -76,14 +83,17 @@ contracts/schemas/metacognitive_port_assessment.schema.json
 contracts/schemas/model_prompt_template.schema.json
 contracts/schemas/observability_profile.schema.json
 contracts/schemas/observation_envelope.schema.json
+contracts/schemas/observation_features.schema.json
 contracts/schemas/pattern.schema.json
 contracts/schemas/plugin_manifest.schema.json
+contracts/schemas/port_invocation_context.schema.json
 contracts/schemas/port_result.schema.json
 contracts/schemas/prediction_drift.schema.json
 contracts/schemas/prediction_error.schema.json
 contracts/schemas/retention_decision.schema.json
 contracts/schemas/runtime_health.schema.json
 contracts/schemas/runtime_manifest.schema.json
+contracts/schemas/salience_assessment.schema.json
 contracts/schemas/screen_ocr_capture_policy.schema.json
 contracts/schemas/self_model.schema.json
 contracts/schemas/self_model_decision.schema.json
@@ -106,6 +116,7 @@ cpp/app/main.cpp
 cpp/app/procedural_avatar_probe.cpp
 cpp/app/promotion_fixture_runner.cpp
 cpp/benchmarks/.gitkeep
+cpp/benchmarks/cognitive_coordinator_queue_benchmark.cpp
 cpp/benchmarks/port_dispatch_benchmark.cpp
 cpp/core/.gitkeep
 cpp/core/adapters/action_dispatcher_adapter.hpp
@@ -127,6 +138,7 @@ cpp/core/cognitive_coordinator.hpp
 cpp/core/cognitive_snapshot.hpp
 cpp/core/contracts/cognitive_cycle_context.hpp
 cpp/core/contracts/cognitive_cycle_result.hpp
+cpp/core/contracts/cognitive_cycle_v1.hpp
 cpp/core/contracts/cognitive_decision.hpp
 cpp/core/contracts/cognitive_output.hpp
 cpp/core/contracts/cognitive_port_requests.hpp
@@ -156,13 +168,16 @@ cpp/core/policies/cognitive_decision_policy.hpp
 cpp/core/policies/self_model_feedback_policy.hpp
 cpp/core/ports/icognitive_decision_port.hpp
 cpp/core/ports/iepisode_boundary_port.hpp
+cpp/core/ports/ihypothesis_formation_port.hpp
 cpp/core/ports/ilanguage_renderer.hpp
 cpp/core/ports/imemory_retrieval_port.hpp
 cpp/core/ports/imemory_write_port.hpp
 cpp/core/ports/imetacognition_port.hpp
+cpp/core/ports/iobservation_feature_port.hpp
 cpp/core/ports/ipattern_learning_port.hpp
 cpp/core/ports/iprediction_port.hpp
 cpp/core/ports/ipresentation_port.hpp
+cpp/core/ports/isalience_assessment_port.hpp
 cpp/core/ports/iself_model_query_port.hpp
 cpp/core/ports/iworkspace_selection_port.hpp
 cpp/core/privacy_storage.hpp
@@ -207,6 +222,7 @@ cpp/tests/.gitkeep
 cpp/tests/audio_sensor_test.cpp
 cpp/tests/capability_runtime_test.cpp
 cpp/tests/cognitive_coordinator_test.cpp
+cpp/tests/cognitive_cycle_contracts_test.cpp
 cpp/tests/cognitive_decision_adapter_test.cpp
 cpp/tests/cognitive_decision_policy_test.cpp
 cpp/tests/cognitive_port_factory_test.cpp
@@ -273,6 +289,7 @@ docs/03-contracts/AUDIO_SENSOR_SCHEMA.md
 docs/03-contracts/CAPABILITY_ADAPTATION_SCHEMA.md
 docs/03-contracts/CAPABILITY_DESCRIPTOR.md
 docs/03-contracts/CAPABILITY_STATE_SCHEMA.md
+docs/03-contracts/COGNITIVE_CYCLE_CONTRACTS.md
 docs/03-contracts/COGNITIVE_PORT_REQUESTS.md
 docs/03-contracts/COMPONENT_MATURITY_CONTRACT.md
 docs/03-contracts/CROSS_LANGUAGE_EQUIVALENCE_CONTRACT.md
@@ -361,6 +378,7 @@ docs/07-research/RESEARCH_FOUNDATIONS.md
 docs/07-research/RESEARCH_GAPS_AND_LIMITATIONS.md
 docs/07-research/SCIENTIFIC_DECISION_POLICY.md
 docs/07-research/SCIENTIFIC_VALIDATION_REPORT.md
+docs/07-research/SPEC-045_ORCHESTRATION_VALIDATION.md
 docs/08-roadmap/ROADMAP.md
 docs/09-agent-workflow/AUTONOMOUS_EXECUTION_PROTOCOL.md
 docs/09-agent-workflow/PR_CHECKLIST.md
@@ -433,6 +451,7 @@ python/tests/test_avatar_frame_schema.py
 python/tests/test_avatar_presentation_profile.py
 python/tests/test_capabilities.py
 python/tests/test_capability_adaptation.py
+python/tests/test_cognitive_cycle_contracts.py
 python/tests/test_component_maturity.py
 python/tests/test_desktop_interface_spike.py
 python/tests/test_dialogue_avatar.py
@@ -517,6 +536,7 @@ reports/SPEC-042-headless-preparation-report.md
 reports/SPEC-043-execution-report.md
 reports/SPEC-044-execution-report.md
 reports/SPEC-045-entry-audit-2026-08-04.md
+reports/SPEC-045-execution-report.md
 reports/SPEC-047_REPORT.md
 reports/SPEC-047-dto-increment-2026-08-04.md
 reports/SPEC-047-increment-2026-08-04.md

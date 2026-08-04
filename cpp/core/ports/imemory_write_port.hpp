@@ -2,6 +2,7 @@
 
 #include "core/event_bus.hpp"
 #include "core/contracts/cognitive_port_requests.hpp"
+#include "core/contracts/cognitive_cycle_v1.hpp"
 #include "core/contracts/memory_write_result.hpp"
 #include "core/contracts/port_result.hpp"
 
@@ -30,6 +31,16 @@ public:
         const contracts::EpisodeWriteRequest& request) {
         return contracts::capture_port_result<MemoryWriteResult>(
             "memory.store_episode", [&] { return store_episode(request); });
+    }
+
+    virtual contracts::PortResult<MemoryWriteResult> store_episode_context(
+        const contracts::EpisodeWriteRequest& request,
+        const contracts::PortInvocationContextV1& context) {
+        if (context.stop_requested()) {
+            return contracts::PortResult<MemoryWriteResult>::failed(
+                "memory.store_episode", "cancelled", "cycle invocation was cancelled");
+        }
+        return store_episode_result(request);
     }
 };
 

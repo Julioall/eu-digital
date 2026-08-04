@@ -1,16 +1,16 @@
 ---
 id: SPEC-045
 title: Integrated Headless Cognitive Cycle
-status: in_progress
+status: done
 phase: design
 dependencies: [SPEC-047, SPEC-023]
 adrs: [ADR-0033]
-contracts: []
+contracts: [COGNITIVE_CYCLE_CONTRACTS.md, cognitive_cycle_input.schema.json, cognitive_cycle_result.schema.json, cognitive_cycle_stage.schema.json, port_invocation_context.schema.json, episode_segmentation_response.schema.json, observation_features.schema.json, salience_assessment.schema.json, hypothesis_formation.schema.json]
 ---
 
 # SPEC-045 — Integrated Headless Cognitive Cycle
 
-Status: in_progress
+Status: done
 Owner: humano  
 Fase: design  
 Dependências: SPEC-047 (Component Wiring), SPEC-023 (Pluggable Capability Runtime)  
@@ -70,10 +70,10 @@ A emissão de um `CanonicalEvent` pelo sistema operacional resultará em um regi
 - Não embutir lógica matemática de surpresa (pertence ao WorldModel).
 
 ## Critérios de aceite
-- [ ] O coordenador resolve dependências via CapabilityRegistry e não possui inclusões (`#include`) dos headers concretos de memória/modelo de mundo.
-- [ ] Eventos injetados sequencialmente acima do limite configurado de *backpressure* resultam em estado `discarded` e não derrubam o processo via OOM.
-- [ ] Falha forçada simulada no adaptador de predição gera estado final `degraded`, mantendo o fluxo até a decisão.
-- [ ] O design documentado inclui *baseline*, *ablação* (funcionar sem Módulo X) e *critério de falsificação*.
+- [x] O coordenador resolve dependências via CapabilityRegistry e não possui inclusões (`#include`) dos headers concretos de memória/modelo de mundo.
+- [x] Eventos injetados sequencialmente acima do limite configurado de *backpressure* resultam em estado `discarded` e não derrubam o processo via OOM.
+- [x] Falha forçada simulada no adaptador de predição gera estado final `degraded`, mantendo o fluxo até a decisão.
+- [x] O design documentado inclui *baseline*, *ablação* (funcionar sem Módulo X) e *critério de falsificação*.
 
 ## Plano de testes
 

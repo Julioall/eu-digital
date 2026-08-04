@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/contracts/cognitive_port_requests.hpp"
+#include "core/contracts/cognitive_cycle_v1.hpp"
 #include "core/contracts/port_result.hpp"
 #include "core/contracts/workspace_snapshot.hpp"
 #include "core/contracts/metacognitive_assessment.hpp"
@@ -31,6 +32,18 @@ public:
         return contracts::capture_port_result<contracts::MetacognitivePortAssessment>(
             "metacognition.evaluate_hypothesis",
             [&] { return evaluate_hypothesis(request); });
+    }
+
+    virtual contracts::PortResult<contracts::MetacognitivePortAssessment>
+    evaluate_hypothesis_context(
+        const contracts::MetacognitionRequest& request,
+        const contracts::PortInvocationContextV1& context) {
+        if (context.stop_requested()) {
+            return contracts::PortResult<contracts::MetacognitivePortAssessment>::failed(
+                "metacognition.evaluate_hypothesis", "cancelled",
+                "cycle invocation was cancelled");
+        }
+        return evaluate_hypothesis_result(request);
     }
 };
 

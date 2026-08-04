@@ -9,6 +9,7 @@
 
 #include <cctype>
 #include <cstdint>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <limits>
@@ -51,6 +52,7 @@ struct RuntimeConfig {
     std::string timeline_path;
     std::string session_id;
     std::string observed_at;
+    bool enable_cognitive_coordinator{true};
 };
 
 struct RuntimeManifest {
@@ -307,6 +309,79 @@ inline bool semver(const std::string& value) {
     return parts == 3;
 }
 
+inline std::int64_t days_from_civil(int year, unsigned month, unsigned day) {
+    year -= month <= 2;
+    const int era = (year >= 0 ? year : year - 399) / 400;
+    const unsigned year_of_era = static_cast<unsigned>(year - era * 400);
+    const unsigned day_of_year =
+        (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1;
+    const unsigned day_of_era = year_of_era * 365 + year_of_era / 4 -
+                                 year_of_era / 100 + day_of_year;
+    return static_cast<std::int64_t>(era) * 146097 +
+           static_cast<std::int64_t>(day_of_era) - 719468;
+}
+
+inline double parse_iso8601_epoch(const std::string& value) {
+    if (value.size() < 20 || value[4] != '-' || value[7] != '-' ||
+        value[10] != 'T' || value[13] != ':' || value[16] != ':') {
+        throw RuntimeHostError("timestamp must be a valid ISO-8601 string");
+    }
+    const auto number = [&](std::size_t offset, std::size_t length) {
+        const auto token = value.substr(offset, length);
+        if (token.size() != length || token.find_first_not_of("0123456789") !=
+                                          std::string::npos) {
+            throw RuntimeHostError("timestamp must be a valid ISO-8601 string");
+        }
+        return std::stoi(token);
+    };
+    const int year = number(0, 4);
+    const unsigned month = static_cast<unsigned>(number(5, 2));
+    const unsigned day = static_cast<unsigned>(number(8, 2));
+    const int hour = number(11, 2);
+    const int minute = number(14, 2);
+    const int second = number(17, 2);
+    if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 ||
+        minute > 59 || second > 60) {
+        throw RuntimeHostError("timestamp components are outside valid bounds");
+    }
+    const auto zone_start = value.find_first_of("Z+-", 19);
+    if (zone_start == std::string::npos) {
+        throw RuntimeHostError("timestamp must include timezone");
+    }
+    double fraction = 0.0;
+    if (zone_start > 19) {
+        if (value[19] != '.') {
+            throw RuntimeHostError("timestamp fraction is invalid");
+        }
+        try {
+            fraction = std::stod("0" + value.substr(19, zone_start - 19));
+        } catch (const std::exception&) {
+            throw RuntimeHostError("timestamp fraction is invalid");
+        }
+    }
+    int offset_seconds = 0;
+    if (value[zone_start] == 'Z') {
+        if (zone_start + 1 != value.size()) {
+            throw RuntimeHostError("timestamp timezone is invalid");
+        }
+    } else {
+        if (value.size() != zone_start + 6 || value[zone_start + 3] != ':') {
+            throw RuntimeHostError("timestamp timezone is invalid");
+        }
+        const int offset_hours = number(zone_start + 1, 2);
+        const int offset_minutes = number(zone_start + 4, 2);
+        if (offset_hours > 23 || offset_minutes > 59) {
+            throw RuntimeHostError("timestamp timezone is invalid");
+        }
+        const int sign = value[zone_start] == '-' ? -1 : 1;
+        offset_seconds = sign * (offset_hours * 3600 + offset_minutes * 60);
+    }
+    return static_cast<double>(
+               days_from_civil(year, month, day) * 86400LL + hour * 3600 +
+               minute * 60 + second - offset_seconds) +
+           fraction;
+}
+
 inline std::string escape_json(const std::string& value) {
     std::string output;
     output.reserve(value.size());
@@ -372,17 +447,21 @@ public:
             recover_cognitive_state();
             capability_registry_.define_profile("runtime-host-minimal", {});
             capability_registry_.activate_profile("runtime-host-minimal");
-            coordinator_ = std::make_shared<CognitiveCoordinator>(capability_registry_);
+            if (config_.enable_cognitive_coordinator) {
+                coordinator_ = std::make_shared<CognitiveCoordinator>(capability_registry_);
+            }
             event_bus_ = std::make_shared<EventBus>();
-            coordinator_->set_publisher([this](const CanonicalEvent& ev) {
-                if (event_bus_) {
-                    try { event_bus_->publish(ev); } catch (...) {}
-                }
-            });
+            if (coordinator_) {
+                coordinator_->set_publisher([this](const CanonicalEvent& ev) {
+                    if (event_bus_) {
+                        try { event_bus_->publish(ev); } catch (...) {}
+                    }
+                });
+            }
             event_bus_->subscribe({}, {}, [this](const CanonicalEvent& event) {
                 persist(event);
-                if (coordinator_) {
-                    coordinator_->enqueue(event);
+                if (coordinator_ && event.event_type != "cognitive.cycle.result") {
+                    coordinator_->enqueue_input(make_cycle_input(event));
                 }
             });
 
@@ -606,6 +685,11 @@ public:
         event.source = string(required(root, "source", "CanonicalEvent"), "CanonicalEvent.source");
         event.event_type = string(required(root, "event_type", "CanonicalEvent"), "CanonicalEvent.event_type");
         event.monotonic_ns = static_cast<std::size_t>(unsigned_number(required(root, "monotonic_ns", "CanonicalEvent"), "CanonicalEvent.monotonic_ns"));
+        event.occurred_at = string(required(root, "occurred_at", "CanonicalEvent"), "CanonicalEvent.occurred_at");
+        event.received_at = string(required(root, "received_at", "CanonicalEvent"), "CanonicalEvent.received_at");
+        event.session_id = string(required(root, "session_id", "CanonicalEvent"), "CanonicalEvent.session_id");
+        parse_iso8601_epoch(event.occurred_at);
+        parse_iso8601_epoch(event.received_at);
         event.payload = text;
         return event;
     }
@@ -697,6 +781,27 @@ private:
         std::string message;
         bool fatal{false};
     };
+
+    contracts::CognitiveCycleInputV1 make_cycle_input(
+        const CanonicalEvent& event) const {
+        contracts::CognitiveCycleInputV1 input;
+        input.correlation_id = event.event_id;
+        input.event_id = event.event_id;
+        input.source = event.source;
+        input.event_type = event.event_type;
+        input.session_id = event.session_id.empty() ? config_.session_id : event.session_id;
+        input.occurred_at = event.occurred_at.empty() ? config_.observed_at : event.occurred_at;
+        input.modality = event.source;
+        input.time_basis = event.occurred_at.empty()
+            ? "received_fallback"
+            : "source_occurred";
+        try {
+            input.epoch_seconds = runtime_detail::parse_iso8601_epoch(input.occurred_at);
+        } catch (const RuntimeHostError&) {
+            input.epoch_seconds = std::numeric_limits<double>::quiet_NaN();
+        }
+        return input;
+    }
 
     void persist(const CanonicalEvent& event) {
         std::lock_guard lock(mutex_);

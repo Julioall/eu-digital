@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/contracts/port_result.hpp"
+#include "core/contracts/cognitive_cycle_v1.hpp"
 #include "core/contracts/prediction_assessment.hpp"
 #include <string>
 #include <vector>
@@ -37,6 +38,18 @@ public:
         return contracts::capture_port_result<PredictionAssessment>(
             "prediction.score",
             [&] { return score(prediction, observed_state, observed_at); });
+    }
+
+    virtual contracts::PortResult<PredictionAssessment> predict_context(
+        const std::vector<std::string>& context_values,
+        const std::string& predicted_at,
+        const std::vector<std::string>& candidate_states,
+        const contracts::PortInvocationContextV1& context) {
+        if (context.stop_requested()) {
+            return contracts::PortResult<PredictionAssessment>::failed(
+                "prediction.predict", "cancelled", "cycle invocation was cancelled");
+        }
+        return predict_result(context_values, predicted_at, candidate_states);
     }
 };
 

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:hypothesis-formation:1.0",
+  "title": "HypothesisFormationResult",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "outcome", "hypothesis", "evidence_refs"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "outcome": {"type": "string", "enum": ["formed", "insufficient_evidence"]},
+    "hypothesis": {"oneOf": [{"type": "null"}, {"$ref": "hypothesis.schema.json"}]},
+    "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome": {"const": "formed"}}},
+      "then": {"properties": {"hypothesis": {"$ref": "hypothesis.schema.json"}}},
+      "else": {"properties": {"hypothesis": {"type": "null"}}}
+    }
+  ]
+}

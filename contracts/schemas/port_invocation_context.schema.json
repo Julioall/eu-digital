@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:port-invocation-context:1.0",
+  "title": "PortInvocationContext",
+  "$comment": "stop_token is runtime-only and is intentionally not serialized.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "correlation_id", "deadline_monotonic_ns", "replay_mode"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "correlation_id": {"type": "string", "minLength": 1},
+    "deadline_monotonic_ns": {"type": "integer", "minimum": 1},
+    "replay_mode": {"type": "boolean"}
+  }
+}

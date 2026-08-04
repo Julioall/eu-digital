@@ -183,9 +183,18 @@ add_executable(cognitive_port_requests_test cpp/tests/cognitive_port_requests_te
 target_include_directories(cognitive_port_requests_test PRIVATE cpp)
 target_compile_features(cognitive_port_requests_test PRIVATE cxx_std_23)
 
+add_executable(cognitive_cycle_contracts_test cpp/tests/cognitive_cycle_contracts_test.cpp)
+target_include_directories(cognitive_cycle_contracts_test PRIVATE cpp)
+target_compile_features(cognitive_cycle_contracts_test PRIVATE cxx_std_23)
+
 add_executable(port_dispatch_benchmark cpp/benchmarks/port_dispatch_benchmark.cpp)
 target_include_directories(port_dispatch_benchmark PRIVATE cpp)
 target_compile_features(port_dispatch_benchmark PRIVATE cxx_std_23)
+
+add_executable(cognitive_coordinator_queue_benchmark
+    cpp/benchmarks/cognitive_coordinator_queue_benchmark.cpp)
+target_include_directories(cognitive_coordinator_queue_benchmark PRIVATE cpp)
+target_compile_features(cognitive_coordinator_queue_benchmark PRIVATE cxx_std_23)
 
 add_executable(world_model_adapter_test cpp/tests/world_model_adapter_test.cpp)
 target_include_directories(world_model_adapter_test PRIVATE cpp)
@@ -247,6 +256,7 @@ add_test(NAME ollama_model_backend COMMAND ollama_model_backend_test)
 
 add_test(NAME event_bus COMMAND event_bus_test)
 add_test(NAME cognitive_coordinator COMMAND cognitive_coordinator_test)
+add_test(NAME runtime_host COMMAND runtime_host_test)
 add_test(NAME capability_runtime COMMAND capability_runtime_test)
 add_test(NAME promotion_registry COMMAND promotion_registry_test)
 add_test(NAME episode_segmentation COMMAND episode_segmentation_test)
@@ -347,6 +357,9 @@ add_test(NAME supervised_actions_feedback COMMAND supervised_actions_feedback_te
 add_test(NAME ports_mock COMMAND ports_mock_test)
 add_test(NAME port_result COMMAND port_result_test)
 add_test(NAME cognitive_port_requests COMMAND cognitive_port_requests_test)
+add_test(NAME cognitive_cycle_contracts COMMAND cognitive_cycle_contracts_test)
+add_test(NAME cognitive_coordinator_queue_benchmark
+    COMMAND cognitive_coordinator_queue_benchmark)
 add_test(NAME world_model_adapter COMMAND world_model_adapter_test)
 add_test(NAME episodic_memory_adapter COMMAND episodic_memory_adapter_test)
 add_test(NAME episode_segmenter_adapter COMMAND episode_segmenter_adapter_test)

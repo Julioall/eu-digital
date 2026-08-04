@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "correlation_id": "00000000-0000-4000-8000-000000000101",
+  "event_id": "00000000-0000-4000-8000-000000000102",
+  "source": "system",
+  "event_type": "fixture.cognitive_observation",
+  "session_id": "00000000-0000-4000-8000-000000000103",
+  "occurred_at": "2026-08-04T12:00:00Z",
+  "epoch_seconds": 1785844800,
+  "modality": "system",
+  "application": null,
+  "document": null,
+  "content": {},
+  "numeric_features": {},
+  "salience_signals": {},
+  "causation_chain": [],
+  "time_basis": "source_occurred",
+  "replay_mode": false
+}

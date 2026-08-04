@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:eu-digital:contracts:episode-segmentation-response:1.0",
+  "title": "EpisodeSegmentationResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "update", "materialized_episode", "start_epoch", "end_epoch"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "update": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["episode_id", "is_new_episode", "current_state"],
+      "properties": {
+        "episode_id": {"type": "string", "minLength": 1},
+        "is_new_episode": {"type": "boolean"},
+        "current_state": {"type": "string", "minLength": 1}
+      }
+    },
+    "materialized_episode": {"oneOf": [{"type": "null"}, {"$ref": "episode.schema.json"}]},
+    "start_epoch": {"type": ["number", "null"]},
+    "end_epoch": {"type": ["number", "null"]}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "materialized_episode": {"type": "null"},
+        "start_epoch": {"type": "null"},
+        "end_epoch": {"type": "null"}
+      }
+    },
+    {
+      "properties": {
+        "materialized_episode": {"$ref": "episode.schema.json"},
+        "start_epoch": {"type": "number"},
+        "end_epoch": {"type": "number"}
+      }
+    }
+  ]
+}

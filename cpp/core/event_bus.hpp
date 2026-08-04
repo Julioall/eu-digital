@@ -23,6 +23,9 @@ struct CanonicalEvent {
     std::string event_type;
     std::string payload;
     std::size_t monotonic_ns{};
+    std::string occurred_at;
+    std::string received_at;
+    std::string session_id;
 
     bool valid() const {
         return schema_version == "1.0" && !event_id.empty() && !source.empty() && !event_type.empty();
